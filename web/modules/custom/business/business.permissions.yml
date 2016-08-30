@@ -1,0 +1,16 @@
+add business entities:
+  title: 'Create new Business entities'
+
+administer business entities:
+  title: 'Administer Business entities'
+  description: 'Allow to access the administration form to configure Business entities.'
+  restrict access: true
+
+delete business entities:
+  title: 'Delete Business entities'
+
+edit business entities:
+  title: 'Edit Business entities'
+
+access business overview:
+  title: 'Access the Business overview page'

@@ -1,0 +1,5 @@
+entity.business.add_form:
+  route_name: entity.business.add_form
+  title: 'Add Business'
+  appears_on:
+    - entity.business.collection

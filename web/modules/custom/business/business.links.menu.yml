@@ -1,0 +1,13 @@
+# Business menu items definition
+entity.business.collection:
+  title: 'Business list'
+  route_name: entity.business.collection
+  description: 'List Businesses'
+  parent: system.admin_structure
+  weight: 0
+
+business.admin.structure.settings:
+  title: Business settings
+  description: 'Configure Business entities'
+  route_name: business.settings
+  parent: system.admin_structure
