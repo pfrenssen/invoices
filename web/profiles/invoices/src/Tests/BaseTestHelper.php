@@ -453,25 +453,6 @@ trait BaseTestHelper {
   }
 
   /**
-   * {@inheritdoc}
-   *
-   * Like DrupalTestCase::randomString(), but includes additional special
-   * characters, and starts with a space. This helps in discovering security
-   * problems and improper trimming and encoding of strings.
-   *
-   * By default it returns 16 characters rather than the usual 8 to make up for
-   * lost entropy.
-   */
-  static function randomString($length = 16) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $str = ' &\/;<>\'"ä☢';
-    for ($i = 0; $i < $length; $i++) {
-      $str .= chr(mt_rand(32, 126));
-    }
-    return $str;
-  }
-
-  /**
    * Prepares the input for the entity reference autocomplete field.
    *
    * @param string $name
