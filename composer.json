@@ -23,6 +23,7 @@
         "behat/mink": "~1.7",
         "behat/mink-goutte-driver": "~1.2",
         "drupal/coder": "~8.2.7",
+        "drupal/config_devel": "~8.1@rc",
         "drupal/config_update": "8.1.*@dev",
         "drupal/devel": "8.1.*@dev",
         "drupal/drupal-extension": "~3.0",
@@ -84,6 +85,11 @@
         }
     ],
     "extra": {
+        "patches": {
+            "drupal/config_devel": {
+                "Create config/install folders in execution time": "https://www.drupal.org/files/issues/2558299-7.patch"
+            }
+        },
         "installer-paths": {
             "web/core": ["type:drupal-core"],
             "web/libraries/{$name}": ["type:drupal-library"],

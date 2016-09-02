@@ -5,4 +5,9 @@ core: 8.x
 package: Invoicing
 
 dependencies:
+  - address
   - views
+
+config_devel:
+  - field.field.business.business.field_business_address
+  - field.storage.business.field_business_address
