@@ -6,6 +6,17 @@ core: 8.x
 distribution:
   name: Invoices
 
+dependencies:
+  - block
+  - business
+  - datetime
+  - dynamic_page_cache
+  - file
+  - image
+  - options
+  - page_cache
+  - toolbar
+
 themes:
   - bartik
   - seven
