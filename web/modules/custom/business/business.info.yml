@@ -10,4 +10,6 @@ dependencies:
 
 config_devel:
   - field.field.business.business.field_business_address
+  - field.field.business.business.field_business_bic
   - field.storage.business.field_business_address
+  - field.storage.business.field_business_bic
