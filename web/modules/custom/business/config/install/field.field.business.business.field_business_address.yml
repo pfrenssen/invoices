@@ -10,7 +10,7 @@ id: business.business.field_business_address
 field_name: field_business_address
 entity_type: business
 bundle: business
-label: business_address
+label: 'Invoice address'
 description: ''
 required: false
 translatable: false
