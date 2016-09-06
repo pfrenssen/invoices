@@ -6,10 +6,21 @@ package: Invoicing
 
 dependencies:
   - address
+  - telephone
   - views
 
 config_devel:
   - field.field.business.business.field_business_address
   - field.field.business.business.field_business_bic
+  - field.field.business.business.field_business_email
+  - field.field.business.business.field_business_iban
+  - field.field.business.business.field_business_mobile
+  - field.field.business.business.field_business_phone
+  - field.field.business.business.field_business_vat
   - field.storage.business.field_business_address
   - field.storage.business.field_business_bic
+  - field.storage.business.field_business_email
+  - field.storage.business.field_business_iban
+  - field.storage.business.field_business_mobile
+  - field.storage.business.field_business_phone
+  - field.storage.business.field_business_vat

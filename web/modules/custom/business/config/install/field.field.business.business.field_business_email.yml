@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.business.field_business_email
+  module:
+    - business
+id: business.business.field_business_email
+field_name: field_business_email
+entity_type: business
+bundle: business
+label: 'Email address'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: email

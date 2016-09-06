@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.business.field_business_phone
+  module:
+    - business
+    - telephone
+id: business.business.field_business_phone
+field_name: field_business_phone
+entity_type: business
+bundle: business
+label: 'Phone number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: telephone

@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.business.field_business_vat
+  module:
+    - business
+id: business.business.field_business_vat
+field_name: field_business_vat
+entity_type: business
+bundle: business
+label: 'VAT number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
