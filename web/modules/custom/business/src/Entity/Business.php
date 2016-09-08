@@ -37,7 +37,7 @@ use Drupal\user\UserInterface;
  *   base_table = "business",
  *   data_table = "business_field_data",
  *   translatable = TRUE,
-  *   admin_permission = "administer business entities",
+ *   admin_permission = "administer business entities",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "name",
