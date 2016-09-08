@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\business\Tests;
+
 use Drupal\business\Entity\Business;
 use Drupal\business\Entity\BusinessInterface;
 

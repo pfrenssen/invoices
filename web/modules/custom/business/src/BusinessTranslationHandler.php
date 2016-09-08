@@ -5,10 +5,7 @@ namespace Drupal\business;
 use Drupal\content_translation\ContentTranslationHandler;
 
 /**
- * Defines the translation handler for business.
+ * Defines the translation handler for the Business entity.
  */
 class BusinessTranslationHandler extends ContentTranslationHandler {
-
-  // Override here the needed methods from ContentTranslationHandler.
-
 }
