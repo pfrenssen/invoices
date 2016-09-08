@@ -2,6 +2,13 @@
 
 namespace Drupal\invoices\Tests;
 
+use Drupal\Component\Utility\Random;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Tests\RandomGeneratorTrait;
+
 /**
  * Reusable test methods.
  */
@@ -59,38 +66,57 @@ trait BaseTestHelper {
   /**
    * Check if the properties of the given entity match the given values.
    *
-   * This uses the entity metadata wrapper, so the values passed should match
-   * the format used by the wrapper.
-   *
    * @param string $entity_type
    *   The type of the entity.
-   * @param \Entity $entity
+   * @param \Drupal\core\Entity\EntityInterface $entity
    *   The entity to check.
    * @param array $values
    *   An associative array of values to check, keyed by property name.
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
+   * @throws \Exception
+   *   Thrown when an unsupported property is compared.
+   *
+   * @todo Remove unused properties $entity_type and $message.
    */
-  function assertEntityProperties($entity_type, \Entity $entity, array $values, $message = '', $group = 'Other') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $wrapper = entity_metadata_wrapper($entity_type, $entity);
+  function assertEntityProperties($entity_type, EntityInterface $entity, array $values, $message = '') {
+    foreach ($values as $property_name => $expected_value) {
+      $property = $entity->get($property_name);
+      if (!$property instanceof FieldItemListInterface) {
+        // I'm assuming all properties and fields are instances of FieldItemList
+        // but let's throw an exception if this is not the case.
+        throw new \Exception("The property '$property_name' is no FieldItemList. Cannot retrieve the value.");
+      }
+      // An indexed array of values is always returned, even if there only is a
+      // single value. Make sure the expected value is also put in an array if
+      // it consists of a single value.
+      if (!is_array($expected_value) || (!empty($expected_value) && !is_numeric(current(array_keys($expected_value))))) {
+        $count = $property->count();
+        $this->assertEquals(1, $count, "Expected only a single value for property '$property_name'. Found $count values.");
 
-    $result = TRUE;
-    foreach ($values as $property => $value) {
-      if (is_array($value)) {
-        $result &= $this->assertFalse(drupal_array_diff_assoc_recursive($value, $wrapper->$property->value()), format_string('The %property property has the correct value.', ['%property' => $property]));
+        /** @var FieldItemInterface $item */
+        $item = $property->first();
+        if (!is_array($expected_value)) {
+          if ($property instanceof FieldItemListInterface) {
+            $main_property = $item->getFieldDefinition()->getFieldStorageDefinition()->getMainPropertyName();
+            $actual = $property->$main_property;
+          }
+          else {
+            throw new \Exception('Comparing non-standard properties is not yet implemented.');
+          }
+        }
+        else {
+          $actual = $property->first()->getValue();
+          // Filter out empty (default) values.
+          $actual = array_filter($actual);
+        }
       }
       else {
-        $result &= $this->assertEqual($wrapper->$property->value(), $value, format_string('The %property property has the correct value.', ['%property' => $property]));
+        throw new \Exception('Support for multivalue fields is not yet implemented.');
       }
+      $this->assertEquals($expected_value, $actual);
     }
-
-    return $this->assertTrue($result, $message ?: format_string('The @entity contains the given values.', ['@entity' => $entity_type]), $group);
   }
 
   /**
@@ -102,13 +128,11 @@ trait BaseTestHelper {
    *   An indexed array of field names that should be checked.
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertFieldValidationFailed(array $fields, $message = '', $group = 'Other') {
+  function assertFieldValidationFailed(array $fields, $message = '') {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $result = TRUE;
     foreach ($fields as $field) {
@@ -116,7 +140,7 @@ trait BaseTestHelper {
       $elements = $this->xpath($this->buildXPathQuery($xpath, [':value' => $field]));
       $result &= $this->assertTrue($elements, format_string('The field %field has the "error" class.', ['%field' => $field]));
     }
-    return $this->assertTrue($result, $message ?: 'All fields are indicating that validation failed.', $group);
+    return $this->assertTrue($result, $message ?: 'All fields are indicating that validation failed.');
   }
 
   /**
@@ -124,17 +148,15 @@ trait BaseTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertNoPager($message = '', $group = 'Other') {
+  function assertNoPager($message = '') {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $message = $message ?: 'No pager is present on the page.';
     $xpath = '//div[@class = "item-list"]/ul[@class = "pager"]';
-    return $this->assertXpathElements($xpath, 0, [], $message, $group);
+    return $this->assertXpathElements($xpath, 0, [], $message);
   }
 
   /**
@@ -142,17 +164,15 @@ trait BaseTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertPager($message = '', $group = 'Other') {
+  function assertPager($message = '') {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $message = $message ?: 'A pager is present on the page.';
     $xpath = '//div[@class = "item-list"]/ul[@class = "pager"]';
-    return $this->assertXpathElements($xpath, 1, [], $message, $group);
+    return $this->assertXpathElements($xpath, 1, [], $message);
   }
 
   /**
@@ -168,13 +188,11 @@ trait BaseTestHelper {
    *   contains an indexed array of status messages.
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertStatusMessages(array $messages, $message = '', $group = 'Other') {
+  function assertStatusMessages(array $messages, $message = '') {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Messages can contain a mix of HTML and sanitized HTML, for example:
     // '<em class="placeholder">&lt;script&gt;alert();&lt;&#039;script&gt;</em>'
@@ -221,7 +239,7 @@ trait BaseTestHelper {
       }
     }
 
-    return $this->assertTrue($result, $message ?: 'The correct messages are shown.', $group);
+    return $this->assertTrue($result, $message ?: 'The correct messages are shown.');
   }
 
   /**
@@ -248,13 +266,11 @@ trait BaseTestHelper {
    *   messages of the Field module will be used.
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertRequiredFieldMessages(array $required_fields, $messages = [], $message = '', $group = 'Other') {
+  function assertRequiredFieldMessages(array $required_fields, $messages = [], $message = '') {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $success = TRUE;
 
@@ -265,7 +281,7 @@ trait BaseTestHelper {
       }
     }
     $success &= $this->assertFieldValidationFailed(array_keys($required_fields));
-    return $success &= $this->assertStatusMessages($messages, $message ?: 'The error messages about required fields are present.', $group);
+    return $success &= $this->assertStatusMessages($messages, $message ?: 'The error messages about required fields are present.');
   }
 
   /**
@@ -279,19 +295,17 @@ trait BaseTestHelper {
    *   Optional array of arguments to pass to DrupalWebTestCase::xpath().
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertXpathElements($xpath, $count, array $arguments = [], $message = '', $group = 'Other') {
+  function assertXpathElements($xpath, $count, array $arguments = [], $message = '') {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Provide a default message.
     $message = $message ?: format_plural($count, 'The element matching the XPath expression is present in the page.', 'The @count elements matching the XPath expression are present in the page.');
 
     $elements = $this->xpath($xpath, $arguments);
-    return $this->assertEqual(count($elements), $count, $message, $group);
+    return $this->assertEqual(count($elements), $count, $message);
   }
 
   /**
@@ -384,16 +398,16 @@ trait BaseTestHelper {
    *   A random address field.
    */
   function randomAddressField() {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // The Address Field module trims all input and converts double spaces to
     // single spaces before saving the values to the database. We make sure our
     // random data does the same so we do not get random failures.
     // @see addressfield_field_presave()
+    // @todo Is this still necessary in D8 with the Address module?
     return [
-      'country' => chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)),
+      'country_code' => chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)),
       'locality' => trim(str_replace('  ', ' ', $this->randomString())),
       'postal_code' => (string) rand(1000, 9999),
-      'thoroughfare' => trim(str_replace('  ', ' ', $this->randomString())),
+      'address_line1' => trim(str_replace('  ', ' ', $this->randomString())),
     ];
   }
 
@@ -404,7 +418,6 @@ trait BaseTestHelper {
    *   A random email address.
    */
   function randomEmail() {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     return strtolower($this->randomName()) . '@example.com';
   }
 
@@ -420,7 +433,6 @@ trait BaseTestHelper {
    *   A random phone number.
    */
   public static function randomPhoneNumber($countrycode = 'BE') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $matches = NULL;
     do {
       $number = rand(10000000, 89000000);
@@ -445,10 +457,10 @@ trait BaseTestHelper {
    *   - countrycode: the country code for the phone number.
    */
   public function randomPhoneNumberField($countrycode = 'BE') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     return [
-      'number' => $this->randomPhoneNumber($countrycode),
-      'countrycode' => $countrycode,
+      'value' => $this->randomPhoneNumber($countrycode),
+      // @todo Add this back when we have a better phone field.
+      // 'countrycode' => $countrycode,
     ];
   }
 
@@ -500,17 +512,13 @@ trait BaseTestHelper {
    * @return string
    *   Randomly generated string.
    *
+   * @deprecated
+   *   Use \Drupal\Tests\RandomGeneratorTrait::randomMachineName() instead.
+   *
    * @see DrupalWebTestCase::randomString()
    */
   public static function randomName($length = 8) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $values = array_merge(range(65, 90), range(97, 122), range(48, 57));
-    $max = count($values) - 1;
-    $str = chr(mt_rand(97, 122));
-    for ($i = 1; $i < $length; $i++) {
-      $str .= chr($values[mt_rand(0, $max)]);
-    }
-    return $str;
+    return (new Random())->name($length, TRUE);
   }
 
 }

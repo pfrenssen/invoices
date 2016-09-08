@@ -1,6 +1,8 @@
 <?php
 
 namespace Drupal\business\Tests;
+use Drupal\business\Entity\Business;
+use Drupal\business\Entity\BusinessInterface;
 
 /**
  * Reusable test methods for testing businesses.
@@ -10,21 +12,18 @@ trait BusinessTestHelper {
   /**
    * Check if the properties of the given business match the given values.
    *
-   * @param \Business $business
+   * @param \Drupal\business\Entity\Business $business
    *   The Business entity to check.
    * @param array $values
    *   An associative array of values to check, keyed by property name.
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertBusinessProperties(\Business $business, array $values, $message = '', $group = 'Other') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    return $this->assertEntityProperties('business', $business, $values, $message, $group);
+  function assertBusinessProperties(Business $business, array $values, $message = '') {
+    return $this->assertEntityProperties('business', $business, $values, $message);
   }
 
   /**
@@ -32,16 +31,18 @@ trait BusinessTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertBusinessTableEmpty($message = '', $group = 'Other') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $result = (bool) db_select('business', 'b')->fields('b')->execute()->fetchAll();
-    return $this->assertFalse($result, $message ?: 'The business database table is empty.', $group);
+  function assertBusinessTableEmpty($message = '') {
+    $result = (bool) $this->connection
+      ->select('business', 'b')
+      ->fields('b')
+      ->range(0, 1)
+      ->execute()
+      ->fetchAll();
+    return $this->assertFalse($result, $message ?: 'The business database table is empty.');
   }
 
   /**
@@ -56,9 +57,13 @@ trait BusinessTestHelper {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   function assertBusinessTableNotEmpty($message = '', $group = 'Other') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $result = (bool) db_select('business', 'b')->fields('b')->execute()->fetchAll();
-    return $this->assertTrue($result, $message ?: 'The business database table is not empty.', $group);
+    $result = (bool) $this->connection
+      ->select('business', 'b')
+      ->fields('b')
+      ->range(0, 1)
+      ->execute()
+      ->fetchAll();
+    return $this->assertTrue($result, $message ?: 'The business database table is not empty.');
   }
 
   /**
@@ -70,14 +75,13 @@ trait BusinessTestHelper {
    *   An optional associative array of values, keyed by property name. Random
    *   values will be applied to all omitted properties.
    *
-   * @return \Business
+   * @return \Drupal\business\Entity\BusinessInterface
    *   A new business entity.
    */
   function createBusiness(array $values = array()) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Provide some default values.
     $values += $this->randomBusinessValues();
-    $business = business_create();
+    $business = Business::create();
     $this->updateBusiness($business, $values);
 
     return $business;
@@ -129,9 +133,8 @@ trait BusinessTestHelper {
    *   An associative array of random values, keyed by property name.
    */
   function randomBusinessValues() {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     return array(
-      'field_business_name' => $this->randomString(),
+      'name' => $this->randomString(),
       'field_business_address' => $this->randomAddressField(),
       'field_business_bic' => $this->randomString(),
       'field_business_email' => $this->randomEmail(),
@@ -218,17 +221,15 @@ trait BusinessTestHelper {
   /**
    * Updates the given business with the given properties.
    *
-   * @param \Business $business
+   * @param \Drupal\business\Entity\BusinessInterface $business
    *   The business entity to update.
    * @param array $values
    *   An associative array of values to apply to the entity, keyed by property
    *   name.
    */
-  function updateBusiness(\Business $business, array $values) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $wrapper = entity_metadata_wrapper('business', $business);
+  function updateBusiness(BusinessInterface $business, array $values) {
     foreach ($values as $property => $value) {
-      $wrapper->$property->set($value);
+      $business->set($property, $value);
     }
   }
 

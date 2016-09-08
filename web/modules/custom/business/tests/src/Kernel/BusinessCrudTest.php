@@ -2,16 +2,17 @@
 
 namespace Drupal\Tests\business\Kernel;
 
+use Drupal\business\Entity\Business;
 use Drupal\business\Tests\BusinessTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
  * CRUD tests for the Business module.
  *
  * @group business
  */
-class BusinessCrudTest extends KernelTestBase {
+class BusinessCrudTest extends EntityKernelTestBase {
 
   use BaseTestHelper;
   use BusinessTestHelper;
@@ -19,15 +20,41 @@ class BusinessCrudTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [];
+  public static $modules = ['address', 'business', 'telephone'];
+
+  /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+
+    $this->connection = $this->container->get('database');
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
+
+    $this->installEntitySchema('business');
+    $this->installConfig(['business']);
+  }
 
   /**
    * Tests creating, reading, updating and deleting of businesses.
    */
   public function testBusinessCrud() {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Check that the database table exists and is empty.
-    $this->assertTrue(db_table_exists('business'), 'The business database table exists.');
+    $this->assertTrue($this->connection->schema()->tableExists('business'), 'The business database table exists.');
     $this->assertBusinessTableEmpty('The business database is initially empty.');
 
     // @todo Throw a failure when there are more fields available on the entity
@@ -39,8 +66,8 @@ class BusinessCrudTest extends KernelTestBase {
     $this->assertBusinessTableNotEmpty('The business database table is no longer empty after creating a business.');
 
     // Check that the business data can be read from the database.
-    $retrieved_business = business_load($business->bid);
-    $this->assertBusinessProperties($retrieved_business, $values, 'The business that was saved to the database can be read correctly.');
+    $reloaded_business = $this->reloadEntity($business);
+    $this->assertBusinessProperties($reloaded_business, $values, 'The business that was saved to the database can be read correctly.');
 
     // Update the business and check that the new values were written to the
     // database.
@@ -48,6 +75,8 @@ class BusinessCrudTest extends KernelTestBase {
     $this->updateBusiness($business, $new_values);
     $business->save();
     $this->assertBusinessProperties($business, $new_values, 'The business has been updated correctly.');
+    $reloaded_business = $this->reloadEntity($business);
+    $this->assertBusinessProperties($reloaded_business, $new_values, 'The business has been updated correctly in the database.');
 
     // Delete the business. The database should be empty again.
     $business->delete();
