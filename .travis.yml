@@ -55,6 +55,7 @@ install:
   - test ${TEST} == "PHP_CodeSniffer" || ./vendor/bin/phing install-dev
 
 script:
-  - test ${TEST} == "PHP_CodeSniffer" && ./vendor/bin/phpcs
-  - test ${TEST} == "PHPUnit" && cd $TRAVIS_BUILD_DIR/web && ../vendor/bin/phpunit
-  - test ${TEST} == "Behat" && cd $TRAVIS_BUILD_DIR/tests && ./behat
+  - test ${TEST} == "PHP_CodeSniffer" && ./vendor/bin/phpcs ; RESULT=$?
+  - test ${TEST} == "PHPUnit" && cd $TRAVIS_BUILD_DIR/web && ../vendor/bin/phpunit ; RESULT=$?
+  - test ${TEST} == "Behat" && cd $TRAVIS_BUILD_DIR/tests && ./behat ; RESULT=$?
+  - test ${RESULT} == 0 || exit 1
