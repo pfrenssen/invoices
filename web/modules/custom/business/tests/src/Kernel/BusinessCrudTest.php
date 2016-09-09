@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\business\Kernel;
 
-use Drupal\business\Entity\Business;
 use Drupal\business\Tests\BusinessTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
