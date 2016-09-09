@@ -54,4 +54,4 @@ install:
   # Install Drupal. This is not needed when doing a coding standards check.
   - test ${TEST} == "PHP_CodeSniffer" || ./vendor/bin/phing install-dev
 
-script: ./scripts/travis-ci/run-tests.sh ${TEST}
+script: ./scripts/travis-ci/run-test.sh ${TEST}
