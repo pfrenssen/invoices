@@ -54,8 +54,4 @@ install:
   # Install Drupal. This is not needed when doing a coding standards check.
   - test ${TEST} == "PHP_CodeSniffer" || ./vendor/bin/phing install-dev
 
-script:
-  - test ${TEST} == "PHP_CodeSniffer" && ./vendor/bin/phpcs ; RESULT=$?
-  - test ${TEST} == "PHPUnit" && cd $TRAVIS_BUILD_DIR/web && ../vendor/bin/phpunit ; RESULT=$?
-  - test ${TEST} == "Behat" && cd $TRAVIS_BUILD_DIR/tests && cat behat.yml && ./behat ; RESULT=$?
-  - test ${RESULT} == 0 || exit 1
+script: ./scripts/travis-ci/run-tests.sh ${TEST}
