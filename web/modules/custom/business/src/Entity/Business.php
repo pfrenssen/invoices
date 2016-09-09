@@ -42,7 +42,7 @@ use Drupal\user\UserInterface;
  *     "id" = "id",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "uid" = "user_id",
+ *     "uid" = "uid",
  *     "langcode" = "langcode",
  *     "status" = "status",
  *   },
@@ -66,7 +66,7 @@ class Business extends ContentEntityBase implements BusinessInterface {
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
     $values += array(
-      'user_id' => \Drupal::currentUser()->id(),
+      'uid' => \Drupal::currentUser()->id(),
     );
   }
 
@@ -104,21 +104,21 @@ class Business extends ContentEntityBase implements BusinessInterface {
    * {@inheritdoc}
    */
   public function getOwner() {
-    return $this->get('user_id')->entity;
+    return $this->get('uid')->entity;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    return $this->get('user_id')->target_id;
+    return $this->get('uid')->target_id;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setOwnerId($uid) {
-    $this->set('user_id', $uid);
+    $this->set('uid', $uid);
     return $this;
   }
 
@@ -126,7 +126,7 @@ class Business extends ContentEntityBase implements BusinessInterface {
    * {@inheritdoc}
    */
   public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
+    $this->set('uid', $account->id());
     return $this;
   }
 
@@ -136,7 +136,7 @@ class Business extends ContentEntityBase implements BusinessInterface {
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Authored by'))
       ->setDescription(t('The user ID of author of the Business entity.'))
       ->setRevisionable(TRUE)
