@@ -46,7 +46,7 @@ install:
   - composer --verbose install
 
   # Define build properties for the local test environment.
-  - echo -e "drupal.base_url = http://127.0.0.1:8888\n" > build.properties.local
+  - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
 
   # Build the project.
   - ./vendor/bin/phing build-dev
