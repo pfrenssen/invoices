@@ -25,5 +25,3 @@ Scenario Outline: Anonymous user cannot access site administration
   | admin/content   |
   | admin/people    |
   | admin/structure |
-  | node/add        |
-  | node/add/page   |
