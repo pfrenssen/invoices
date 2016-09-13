@@ -24,7 +24,7 @@ trait BusinessTestHelper {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   function assertBusinessProperties(Business $business, array $values, $message = '') {
-    return $this->assertEntityProperties('business', $business, $values, $message);
+    return $this->assertEntityFieldValues($business, $values);
   }
 
   /**
@@ -83,7 +83,7 @@ trait BusinessTestHelper {
     // Provide some default values.
     $values += $this->randomBusinessValues();
     $business = Business::create();
-    $this->updateBusiness($business, $values);
+    $this->updateEntity($business, $values);
 
     return $business;
   }
@@ -136,6 +136,8 @@ trait BusinessTestHelper {
   function randomBusinessValues() {
     return array(
       'name' => $this->randomString(),
+      'created' => rand(0, 2000000000),
+      'changed' => rand(0, 2000000000),
       'field_business_address' => $this->randomAddressField(),
       'field_business_bic' => $this->randomString(),
       'field_business_email' => $this->randomEmail(),
@@ -151,9 +153,12 @@ trait BusinessTestHelper {
    *
    * @returns array
    *   An associative array of field data, keyed by field name.
+   *
+   * @deprecated
+   *   Use \Drupal\business\Tests\BusinessTestHelper::randomBusinessValues()
    */
   public function randomBusinessFieldValues() {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+    throw new \Exception(__METHOD__ . ' is deprecated.');
     $values = array();
 
     $values['field_business_name'][LANGUAGE_NONE][0]['value'] = $this->randomString();
@@ -176,11 +181,14 @@ trait BusinessTestHelper {
    *
    * This excludes the Business ID ('bid') property which is immutable.
    *
+   * @deprecated
+   *   Use \Drupal\business\Tests\BusinessTestHelper::randomBusinessValues()
+   *
    * @return array
    *   An associative array of property values, keyed by property name.
    */
   protected function randomBusinessPropertyValues() {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+    throw new \Exception(__METHOD__ . ' is deprecated.');
     return array(
       'type' => $this->randomName(),
       'created' => rand(0, 2000000000),
@@ -227,11 +235,13 @@ trait BusinessTestHelper {
    * @param array $values
    *   An associative array of values to apply to the entity, keyed by property
    *   name.
+   *
+   * @deprecated
+   *   Use BaseTestHelper::updateEntity() instead.
    */
   function updateBusiness(BusinessInterface $business, array $values) {
-    foreach ($values as $property => $value) {
-      $business->set($property, $value);
-    }
+    throw new \Exception(__METHOD__ . ' is deprecated.');
+    $this->updateEntity($business, $values);
   }
 
   /**

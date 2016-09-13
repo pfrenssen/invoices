@@ -3,11 +3,8 @@
 namespace Drupal\invoices\Tests;
 
 use Drupal\Component\Utility\Random;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
-use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Tests\RandomGeneratorTrait;
 
 /**
  * Reusable test methods.
@@ -64,50 +61,49 @@ trait BaseTestHelper {
   }
 
   /**
-   * Check if the properties of the given entity match the given values.
+   * Updates the given entity with the given values.
    *
-   * @param string $entity_type
-   *   The type of the entity.
-   * @param \Drupal\core\Entity\EntityInterface $entity
+   * The entity is only updated, it is not saved.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   The entity to update.
+   * @param array $values
+   *   An associative array of values to apply to the entity, keyed by field
+   *   name.
+   */
+  function updateEntity(ContentEntityInterface $entity, array $values) {
+    foreach ($values as $property => $value) {
+      $entity->set($property, $value);
+    }
+  }
+
+  /**
+   * Check if the field values of the given entity match the given values.
+   *
+   * @param \Drupal\core\Entity\ContentEntityInterface $entity
    *   The entity to check.
    * @param array $values
-   *   An associative array of values to check, keyed by property name.
-   * @param string $message
-   *   The message to display along with the assertion.
+   *   An associative array of values to check, keyed by field name.
    *
    * @throws \Exception
-   *   Thrown when an unsupported property is compared.
-   *
-   * @todo Remove unused properties $entity_type and $message.
+   *   Thrown when an unknown field is compared.
    */
-  function assertEntityProperties($entity_type, EntityInterface $entity, array $values, $message = '') {
-    foreach ($values as $property_name => $expected_value) {
-      $property = $entity->get($property_name);
-      if (!$property instanceof FieldItemListInterface) {
-        // I'm assuming all properties and fields are instances of FieldItemList
-        // but let's throw an exception if this is not the case.
-        throw new \Exception("The property '$property_name' is no FieldItemList. Cannot retrieve the value.");
-      }
-      // An indexed array of values is always returned, even if there only is a
-      // single value. Make sure the expected value is also put in an array if
-      // it consists of a single value.
+  function assertEntityFieldValues(ContentEntityInterface $entity, array $values) {
+    foreach ($values as $field_name => $expected_value) {
+      $field_item_list = $entity->get($field_name);
+      // Check if a single value or multiple values are expected.
       if (!is_array($expected_value) || (!empty($expected_value) && !is_numeric(current(array_keys($expected_value))))) {
-        $count = $property->count();
-        $this->assertEquals(1, $count, "Expected only a single value for property '$property_name'. Found $count values.");
+        $count = $field_item_list->count();
+        $this->assertEquals(1, $count, "Expected only a single value for field '$field_name'. Found $count values.");
 
         /** @var FieldItemInterface $item */
-        $item = $property->first();
+        $item = $field_item_list->first();
         if (!is_array($expected_value)) {
-          if ($property instanceof FieldItemListInterface) {
-            $main_property = $item->getFieldDefinition()->getFieldStorageDefinition()->getMainPropertyName();
-            $actual = $property->$main_property;
-          }
-          else {
-            throw new \Exception('Comparing non-standard properties is not yet implemented.');
-          }
+          $main_property = $item->getFieldDefinition()->getFieldStorageDefinition()->getMainPropertyName();
+          $actual = $field_item_list->$main_property;
         }
         else {
-          $actual = $property->first()->getValue();
+          $actual = $field_item_list->first()->getValue();
           // Filter out empty (default) values.
           $actual = array_filter($actual);
         }

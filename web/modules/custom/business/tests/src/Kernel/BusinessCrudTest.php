@@ -71,7 +71,7 @@ class BusinessCrudTest extends EntityKernelTestBase {
     // Update the business and check that the new values were written to the
     // database.
     $new_values = $this->randomBusinessValues();
-    $this->updateBusiness($business, $new_values);
+    $this->updateEntity($business, $new_values);
     $business->save();
     $this->assertBusinessProperties($business, $new_values, 'The business has been updated correctly.');
     $reloaded_business = $this->reloadEntity($business);
