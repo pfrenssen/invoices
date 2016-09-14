@@ -39,7 +39,7 @@ use Drupal\user\UserInterface;
  *   translatable = TRUE,
  *   admin_permission = "administer business entities",
  *   entity_keys = {
- *     "id" = "id",
+ *     "id" = "bid",
  *     "label" = "name",
  *     "uuid" = "uuid",
  *     "uid" = "uid",
@@ -47,7 +47,7 @@ use Drupal\user\UserInterface;
  *     "status" = "status",
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/business/{business}",
+ *     "canonical" = "/business/{business}",
  *     "add-form" = "/admin/structure/business/add",
  *     "edit-form" = "/admin/structure/business/{business}/edit",
  *     "delete-form" = "/admin/structure/business/{business}/delete",

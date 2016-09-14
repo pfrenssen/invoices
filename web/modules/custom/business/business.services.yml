@@ -1,0 +1,4 @@
+services:
+  business.manager:
+    class: Drupal\business\BusinessManager
+    arguments: ['@current_user', '@entity_type.manager']

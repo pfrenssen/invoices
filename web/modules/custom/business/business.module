@@ -2,5 +2,688 @@
 
 /**
  * @file
- * Main functions and hook implementations of the Business module.
+ * Main functions and hook implementations for the Business module.
  */
+
+/**
+ * Implements hook_entity_info().
+ */
+function business_entity_info() {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $entity_info = array();
+
+  $entity_info['business'] = array(
+    'label' => t('Business'),
+    'plural label' => t('Businesses'),
+    'entity class' => 'Business',
+    'controller class' => 'EntityAPIController',
+    'base table' => 'business',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'bid',
+      'bundle' => 'type',
+    ),
+    'bundle keys' => array(
+      'bundle' => 'type',
+    ),
+    'bundles' => array(),
+    'label callback' => 'business_label',
+    'uri callback' => 'entity_class_uri',
+    'access callback' => 'business_access',
+    'module' => 'business',
+    'translation' => array(
+      'entity_translation' => array(
+        'class' => 'EntityTranslationBusinessHandler',
+        'default settings' => array(
+          'default_language' => LANGUAGE_NONE,
+          'hide_language_selector' => TRUE,
+        ),
+      ),
+    ),
+  );
+
+  // Add bundle info but bypass entity_load() as we cannot use it here.
+  $types = db_select('business_type', 'ibt')
+    ->fields('ibt', array('type', 'name'))
+    ->execute()
+    ->fetchAllKeyed();
+
+  foreach ($types as $type => $name) {
+    $entity_info['business']['bundles'][$type] = array(
+      'label' => $name,
+      'admin' => array(
+        'path' => 'admin/structure/businesses/manage/%business_type',
+        'real path' => 'admin/structure/businesses/manage/' . $type,
+        'bundle argument' => 4,
+        'access arguments' => array('administer businesses'),
+      ),
+    );
+  }
+
+  $entity_info['business_type'] = array(
+    'label' => t('Business type'),
+    'plural label' => t('Business types'),
+    'entity class' => 'Entity',
+    'controller class' => 'EntityAPIControllerExportable',
+    'base table' => 'business_type',
+    'fieldable' => FALSE,
+    'bundle of' => 'business',
+    'exportable' => TRUE,
+    'entity keys' => array(
+      'id' => 'type',
+      'name' => 'type',
+      'label' => 'name',
+    ),
+    'access callback' => 'business_type_access',
+    'label callback' => 'business_type_label',
+    'module' => 'business',
+    'admin ui' => array(
+      'path' => 'admin/structure/businesses',
+      'file' => 'business.admin.inc',
+      'controller class' => 'EntityDefaultUIController',
+    ),
+  );
+
+  return $entity_info;
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function business_entity_property_info_alter(&$info) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  // Augment the default information that is provided by entityPropertyInfo().
+  // @see EntityDefaultMetadataController::entityPropertyInfo()
+  $properties = &$info['business']['properties'];
+
+  $properties['type']['description'] = t('The business type');
+  $properties['type']['options list'] = 'business_type_get_names';
+  $properties['type']['required'] = TRUE;
+  $properties['type']['setter callback'] = 'entity_property_verbatim_set';
+  $properties['type']['setter permission'] = 'administer businesses';
+
+  $properties['created']['label'] = t('Date created');
+  $properties['created']['description'] = t('The date the business was created.');
+  $properties['created']['type'] = 'date';
+  $properties['created']['setter callback'] = 'entity_property_verbatim_set';
+  $properties['created']['setter permission'] = 'administer businesses';
+
+  $properties['changed']['label'] = t('Date changed');
+  $properties['changed']['description'] = t('The date the business was most recently updated.');
+  $properties['changed']['type'] = 'date';
+  $properties['changed']['setter callback'] = 'entity_property_verbatim_set';
+  $properties['changed']['setter permission'] = 'administer businesses';
+
+  $properties['is_new']['label'] = t('Is new');
+  $properties['is_new']['description'] = t('Whether the business is new and not saved to the database yet.');
+  $properties['is_new']['type'] = 'boolean';
+  $properties['is_new']['getter callback'] = 'business_entity_metadata_get_properties';
+}
+
+/**
+ * Implements hook_menu().
+ */
+function business_menu() {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $items = array();
+
+  // We only support one basic business type for the moment. This may be
+  // extended in the future.
+  $business_type = business_type_load('business');
+  $items['business/add'] = array(
+    'title' => 'Add business',
+    'page callback' => 'business_add_page',
+    'page arguments' => array($business_type),
+    'access callback' => 'business_access',
+    'access arguments' => array('create', $business_type),
+    'file' => 'business.pages.inc',
+  );
+
+  $items['business/%business/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'business_edit_page',
+    'page arguments' => array(1),
+    'access callback' => 'business_access',
+    'access arguments' => array('update', 1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'business.pages.inc',
+    'weight' => 5,
+  );
+
+  $items['business/%business/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('business_delete_confirm_form', 1),
+    'access callback' => 'business_access',
+    'access arguments' => array('delete', 1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'business.pages.inc',
+    'weight' => 10,
+  );
+
+  $items['business/%business/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
+  );
+
+  $items['business/%business'] = array(
+    'title' => '',
+    'page callback' => 'business_detail_page',
+    'page arguments' => array(1),
+    'access callback' => 'business_access',
+    'access arguments' => array('view', 1),
+    'type' => MENU_CALLBACK,
+    'file' => 'business.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function business_permission() {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $permissions = array(
+    'administer business types' => array(
+      'title' => t('Administer business types'),
+      'description' => t('Create and delete fields for business types, and set their permissions.'),
+    ),
+    'administer businesses' => array(
+      'title' => t('Administer businesses'),
+      'description' => t('Edit and delete all businesses'),
+    ),
+    'delete own businesses' => array(
+      'title' => t('Delete own businesses'),
+    ),
+    'edit own businesses' => array(
+      'title' => t('Edit own businesses'),
+    ),
+    'view own businesses' => array(
+      'title' => t('View own businesses'),
+    ),
+  );
+
+  // Generate permissions per business type.
+  foreach (business_get_types() as $type) {
+    $permissions += array(
+      "edit any $type->type business" => array(
+        'title' => t('%type_name: Edit any business', array('%type_name' => $type->name)),
+      ),
+      "view any $type->type business" => array(
+        'title' => t('%type_name: View any business', array('%type_name' => $type->name)),
+      ),
+    );
+  }
+
+  return $permissions;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function business_ctools_plugin_directory($module, $plugin) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  if ($module == 'entityreference' && $plugin == 'selection') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Determines whether the given user has access to a business.
+ *
+ * @param string $op
+ *   The operation being performed. One of 'view', 'update', 'create', 'delete'
+ *   or just 'edit' (being the same as 'create' or 'update').
+ * @param Business|\stdClass $business
+ *   Optionally a business or a business type to check access for. If nothing is
+ *   given, access for all businesses is determined.
+ * @param \stdClass $account
+ *   Optional, a user object representing the user for whom the operation is to
+ *   be performed. Determines access for a user other than the current user.
+ *
+ * @return bool
+ *   TRUE if the operation may be performed, FALSE otherwise.
+ */
+function business_access($op, $business = NULL, \stdClass $account = NULL) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  global $user;
+
+  // Users with the 'administer businesses' permission always have access.
+  if (user_access('administer businesses', $account)) {
+    return TRUE;
+  }
+
+  // Allow access for users that can perform operations on any business.
+  if (!empty($business)) {
+    $operation = $op == 'view' ? 'view' : 'edit';
+    if (user_access("$operation any $business->type business", $account)) {
+      return TRUE;
+    }
+
+    // Allow access if the user wants to edit or delete their own business.
+    $account = $account ?: $user;
+    switch ($op) {
+      case 'delete':
+        return user_access('delete own businesses', $account) && business_is_owned_by_user($business, $account);
+
+      case 'edit':
+      case 'update':
+        return user_access('edit own businesses', $account) && business_is_owned_by_user($business, $account);
+
+      case 'view':
+        return user_access('view own businesses', $account) && business_is_owned_by_user($business, $account);
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Access callback for Entity API exportables for business types.
+ */
+function business_type_access($op, $type = NULL, $account = NULL) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  return user_access('administer business types', $account);
+}
+
+/**
+ * Returns an array of business types, keyed by the type name.
+ *
+ * @return array
+ *   An associative array of business types, keyed by business type.
+ */
+function business_get_types() {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $types = &drupal_static(__FUNCTION__);
+
+  if (!$types) {
+    $types = db_select('business_type', 'ibt')
+      ->fields('ibt')
+      ->execute()
+      ->fetchAllAssoc('type');
+  }
+
+  return $types;
+}
+
+/**
+ * Returns a business type by type name.
+ *
+ * @param string $type
+ *   The machine readable name of the business type.
+ *
+ * @return Entity
+ *   A business type entity, or FALSE if the business type does not exist.
+ */
+function business_type_load($type) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $types = business_get_types();
+
+  return !empty($types[$type]) ? $types[$type] : FALSE;
+}
+
+/**
+ * Returns a list of business type names.
+ *
+ * @return array
+ *   An associative array of business type labels, keyed by business type.
+ */
+function business_type_get_names() {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $types = array();
+
+  foreach (business_get_types() as $machine_name => $type) {
+    $types[$machine_name] = $type->name;
+  }
+
+  return $types;
+}
+
+/**
+ * Composes the label of a business type.
+ *
+ * @param \Entity $entity
+ *   The entity for which to generate the label.
+ * @param string $entity_type
+ *   The entity type; e.g., 'node' or 'user'.
+ *
+ * @return string|bool
+ *   The entity label or FALSE if not found.
+ *
+ * @see entity_label()
+ */
+function business_type_label(\Entity $entity, $entity_type) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  // If the entity type is being created it does not have a name yet.
+  if (empty($entity->is_new)) {
+    return $entity->name;
+  }
+  return FALSE;
+}
+
+/**
+ * Loads businesses from the database.
+ *
+ * This function should be used whenever you need to load more than one business
+ * from the database. businesses are loaded into memory and will not require
+ * database access if loaded again during the same page request.
+ *
+ * @param array $bids
+ *   An array of business IDs.
+ * @param bool $reset
+ *   Whether to reset the internal cache.
+ *
+ * @return array
+ *   An array of business objects indexed by bid.
+ *
+ * @see entity_load()
+ * @see EntityFieldQuery
+ */
+function business_load_multiple(array $bids = array(), $reset = FALSE) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  return entity_load('business', $bids, array(), $reset);
+}
+
+/**
+ * Loads a business object from the database.
+ *
+ * @param int $bid
+ *   The business ID.
+ * @param bool $reset
+ *   Whether to reset the cache.
+ *
+ * @return Business|FALSE
+ *   A fully-populated business object, or FALSE if the business is not found.
+ *
+ * @throws InvalidArgumentException
+ *   Thrown when the passed ID is not valid.
+ */
+function business_load($bid, $reset = FALSE) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $bid = (int) $bid;
+  if (empty($bid)) {
+    throw new InvalidArgumentException('Invalid business id.');
+  }
+  $businesses = business_load_multiple((array) $bid, $reset);
+
+  return $businesses ? reset($businesses) : FALSE;
+}
+
+/**
+ * Deletes a business.
+ *
+ * @param Business $business
+ *   The business to delete.
+ */
+function business_delete(Business $business) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $business->delete();
+}
+
+/**
+ * Deletes multiple businesses.
+ *
+ * @param array $bids
+ *   An array of business IDs.
+ */
+function business_delete_multiple(array $bids) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  entity_get_controller('business')->delete($bids);
+}
+
+/**
+ * Creates a new business entity.
+ *
+ * @param array $values
+ *   An associative array of values to apply to the entity, keyed by property
+ *   name.
+ *
+ * @return Business
+ *   The new business entity.
+ */
+function business_create($values = array()) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  // Default to the 'business' bundle.
+  $values += array('type' => 'business');
+  return entity_get_controller('business')->create($values);
+}
+
+/**
+ * Saves a business to the database.
+ *
+ * @param Business $business
+ *   The business entity.
+ *
+ * @return mixed
+ *   Returns FALSE if the transaction failed. If it succeeded, returns SAVED_NEW
+ *   or SAVED_UPDATED, depending on the operation performed.
+ */
+function business_save(Business $business) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  return $business->save();
+}
+
+/**
+ * Implements callback_entity_info_uri().
+ */
+function business_uri(Business $business) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  return array(
+    'path' => 'business/' . $business->bid,
+  );
+}
+
+/**
+ * Title callback: Returns the title of the business.
+ *
+ * @param Business $business
+ *   The business object.
+ *
+ * @return string
+ *   An unsanitized string that is the title of the business.
+ *
+ * @see business_menu()
+ */
+function business_page_title(Business $business) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  return $business->getName();
+}
+
+/**
+ * Checks if the given business name is still available.
+ *
+ * @param string $name
+ *   The business name to check.
+ *
+ * @return bool
+ *   TRUE is the name is still available.
+ */
+function business_name_available($name) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $query = new EntityFieldQuery();
+  $query
+    ->entityCondition('entity_type', 'business')
+    ->fieldCondition('field_business_name', 'value', $name);
+  $result = $query->execute();
+
+  return empty($result['business']);
+}
+
+/**
+ * Creates a business type.
+ *
+ * @param string $type
+ *   The machine readable name of the business type.
+ * @param string $name
+ *   The human readable name of the business type.
+ */
+function business_type_create($type, $name) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  db_insert('business_type')
+    ->fields(array(
+      'type' => $type,
+      'name' => $name,
+    ))
+    ->execute();
+}
+
+/**
+ * Callback for getting business properties.
+ *
+ * @see business_entity_property_info()
+ */
+function business_entity_metadata_get_properties(Business $business, array $options, $name, $entity_type, $info) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  switch ($name) {
+    case 'is_new':
+      return empty($business->bid) || !empty($business->is_new);
+  }
+}
+
+/**
+ * Implements hook_field_access().
+ */
+function business_field_access($op, $field, $entity_type, $entity, $account) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  if ($op == 'edit' && $field['field_name'] == 'field_user_businesses') {
+    return user_access('administer businesses', $account);
+  }
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function business_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  // Add action link to 'business/add' on the Businesses overview.
+  if ($root_path == 'businesses') {
+    $item = menu_get_item('business/add');
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
+}
+
+/**
+ * Get the business IDs from a specific user, defaults to the logged in user.
+ *
+ * @param \stdClass $account
+ *   The account of the user to get the business IDs for. If omitted, the logged
+ *   in user will be used.
+ * @param bool $reset
+ *   Whether or not to reset the static cache. Defaults to FALSE.
+ *
+ * @return array
+ *   An array with IDs of the businesses linked to this user. If no businesses
+ *   are found an empty array will be returned.
+ *
+ * @deprecated
+ *   Use BusinessManager::getBusinessIdsFromUser()
+ */
+function business_get_business_ids_from_user(\stdClass $account = NULL, $reset = FALSE) {
+  if ($reset) {
+    throw new \Exception('The $reset parameter is deprecated. Use ::resetCache().');
+  }
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
+}
+
+/**
+ * Get the businesses from a specific user, defaults to the logged in user.
+ *
+ * @param \stdClass $account
+ *   The account of the user to get the businesses for. If omitted, the logged
+ *   in user will be used.
+ * @param bool $reset
+ *   Whether or not to reset the static cache. Defaults to FALSE.
+ *
+ * @return Business[]
+ *   An array with all the businesses linked to this user. If no businesses were
+ *   found an empty array will be returned.
+ *
+ * @deprecated Use BusinessManager::getBusinessesFromUser()
+ */
+function business_get_businesses_from_user(\stdClass $account = NULL, $reset = FALSE) {
+  if ($reset) {
+    throw new \Exception('The $reset parameter is deprecated. Use ::resetCache().');
+  }
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
+}
+
+/**
+ * Gets the active business for the current user.
+ *
+ * @todo This currently simply returns the first business owned by the logged in
+ *   user. Once we are able to get the active business from the context (e.g.
+ *   by using Spaces, PURL or Context) this should return that instead.
+ *
+ * @return Business
+ *   The active business for the current user.
+ */
+function business_get_active_business() {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $businesses = business_get_businesses_from_user();
+  return $businesses ? reset($businesses) : NULL;
+}
+
+/**
+ * Returns whether a given business is owned by a given user.
+ *
+ * @param Business $business
+ *   The business to check.
+ * @param \stdClass $account
+ *   Optional user account to check. Defaults to the currently logged in user.
+ *
+ * @return bool
+ *   TRUE if the business is owned by the user, FALSE otherwise.
+ *
+ * @deprecated
+ *   Use BusinessManager::businessIsOwnedByUser()
+ */
+function business_is_owned_by_user(Business $business, \stdClass $account = NULL) {
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
+}
+
+/**
+ * Adds a business to a user, making the user the business owner.
+ *
+ * @param Business $business
+ *   The business to add to the user.
+ * @param \stdClass $account
+ *   The user account the business should be added to.
+ */
+function business_add_to_user(Business $business, \stdClass $account) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  $account->field_user_businesses[LANGUAGE_NONE][]['target_id'] = $business->identifier();
+  user_save($account);
+}
+
+/**
+ * Composes the label of a business.
+ *
+ * @param Business $entity
+ *   The entity for which to generate the label.
+ * @param string $entity_type
+ *   The entity type; e.g., 'node' or 'user'.
+ *
+ * @return string|bool
+ *   The entity label or FALSE if not found.
+ *
+ * @see entity_label()
+ */
+function business_label(Business $entity, $entity_type) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
+  return $entity->getName();
+}
+
+/**
+ * Exception thrown if an active business is required but not present.
+ *
+ * @deprecated Port to D8.
+ */
+class NoActiveBusinessException extends \LogicException {
+}
