@@ -638,11 +638,12 @@ function business_is_owned_by_user(Business $business, \stdClass $account = NULL
  *   The business to add to the user.
  * @param \stdClass $account
  *   The user account the business should be added to.
+ *
+ * @deprecated
+ *   Use BusinessInterface::setOwner()
  */
 function business_add_to_user(Business $business, \stdClass $account) {
-  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
-  $account->field_user_businesses[LANGUAGE_NONE][]['target_id'] = $business->identifier();
-  user_save($account);
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
 }
 
 /**

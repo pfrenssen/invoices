@@ -245,20 +245,21 @@ trait BusinessTestHelper {
    */
   function updateBusiness(BusinessInterface $business, array $values) {
     throw new \Exception(__METHOD__ . ' is deprecated.');
-    $this->updateEntity($business, $values);
   }
 
   /**
    * Adds a business to a user, making the user the business owner.
    *
-   * @param \Business $business
+   * @param \Drupal\business\Entity\BusinessInterface $business
    *   The business to add to the user.
-   * @param \stdClass $user
+   * @param \Drupal\Core\Session\AccountInterface $user
    *   The user the business should be added to.
+   *
+   * @deprecated
+   *   Use BusinessInterface::setOwner()
    */
-  function addBusinessToUser(\Business $business, \stdClass $user) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    business_add_to_user($business, $user);
+  function addBusinessToUser(BusinessInterface $business, AccountInterface $user) {
+    throw new \Exception(__METHOD__ . ' is deprecated.');
   }
 
   /**
