@@ -138,11 +138,13 @@ trait BusinessTestHelper {
       'name' => $this->randomString(),
       'created' => rand(0, 2000000000),
       'changed' => rand(0, 2000000000),
+      'field_business_accountable' => $this->randomString(),
       'field_business_address' => $this->randomAddressField(),
       'field_business_bic' => $this->randomString(),
       'field_business_email' => $this->randomEmail(),
       'field_business_iban' => $this->randomString(),
       'field_business_mobile' => $this->randomPhoneNumberField(),
+      'field_business_number' => $this->randomString(),
       'field_business_phone' => $this->randomPhoneNumberField(),
       'field_business_vat' => $this->randomString(),
     );
@@ -161,6 +163,7 @@ trait BusinessTestHelper {
     throw new \Exception(__METHOD__ . ' is deprecated.');
     $values = array();
 
+    // @todo Add accountable and trade registry number.
     $values['field_business_name'][LANGUAGE_NONE][0]['value'] = $this->randomString();
     $values['field_business_address'][LANGUAGE_NONE][0] = $this->randomAddressField();
     $values['field_business_bic'][LANGUAGE_NONE][0]['value'] = $this->randomString();
@@ -211,6 +214,7 @@ trait BusinessTestHelper {
    */
   public function convertBusinessValuesToFormPostValues(array $values) {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+    // @todo Add accountable and trade registry number.
     return array(
       'field_business_name[und][0][value]' => $values['field_business_name'],
       'field_business_email[und][0][email]' => $values['field_business_email'],
