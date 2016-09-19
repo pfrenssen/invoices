@@ -48,10 +48,10 @@ use Drupal\user\UserInterface;
  *   },
  *   links = {
  *     "canonical" = "/business/{business}",
- *     "add-form" = "/admin/structure/business/add",
- *     "edit-form" = "/admin/structure/business/{business}/edit",
- *     "delete-form" = "/admin/structure/business/{business}/delete",
- *     "collection" = "/admin/structure/business",
+ *     "add-form" = "/business/add",
+ *     "edit-form" = "/business/{business}/edit",
+ *     "delete-form" = "/business/{business}/delete",
+ *     "collection" = "/businesses",
  *   },
  *   field_ui_base_route = "business.settings"
  * )
