@@ -162,8 +162,7 @@ class Business extends ContentEntityBase implements BusinessInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the Business entity.'))
+      ->setLabel(t('Business name'))
       ->setSettings(array(
         'max_length' => 50,
         'text_processing' => 0,
