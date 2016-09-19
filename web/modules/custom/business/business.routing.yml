@@ -1,0 +1,7 @@
+entity.business.collection:
+  path: '/businesses'
+  defaults:
+    _entity_list: 'business'
+    _title: 'Businesses'
+  requirements:
+    _permission: 'administer businesses'
