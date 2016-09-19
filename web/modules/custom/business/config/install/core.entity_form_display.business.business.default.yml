@@ -1,0 +1,91 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.business.business.field_business_accountable
+    - field.field.business.business.field_business_address
+    - field.field.business.business.field_business_bic
+    - field.field.business.business.field_business_email
+    - field.field.business.business.field_business_iban
+    - field.field.business.business.field_business_mobile
+    - field.field.business.business.field_business_number
+    - field.field.business.business.field_business_phone
+    - field.field.business.business.field_business_vat
+  module:
+    - address
+    - business
+    - telephone
+id: business.business.default
+targetEntityType: business
+bundle: business
+mode: default
+content:
+  field_business_accountable:
+    weight: 8
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+  field_business_address:
+    type: address_default
+    weight: 2
+    settings:
+      default_country: null
+    third_party_settings: {  }
+  field_business_bic:
+    type: string_textfield
+    weight: 7
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_business_email:
+    type: email_default
+    weight: 1
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_business_iban:
+    type: string_textfield
+    weight: 6
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_business_mobile:
+    type: telephone_default
+    weight: 4
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_business_number:
+    weight: 9
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+  field_business_phone:
+    type: telephone_default
+    weight: 3
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_business_vat:
+    type: string_textfield
+    weight: 5
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  name:
+    type: string_textfield
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  uid: true
