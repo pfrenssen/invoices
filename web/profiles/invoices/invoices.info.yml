@@ -31,7 +31,6 @@ config_devel:
   - block.block.bartik_main_menu
   - block.block.bartik_messages
   - block.block.bartik_page_title
-  - block.block.bartik_tools
   - block.block.seven_breadcrumbs
   - block.block.seven_content
   - block.block.seven_local_actions
