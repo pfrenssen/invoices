@@ -3,13 +3,13 @@ status: true
 dependencies:
   module:
     - business
-    - telephone
+    - libphonenumber
 id: business.field_business_mobile
 field_name: field_business_mobile
 entity_type: business
-type: telephone
+type: libphonenumber
 settings: {  }
-module: telephone
+module: libphonenumber
 locked: false
 cardinality: 1
 translatable: true

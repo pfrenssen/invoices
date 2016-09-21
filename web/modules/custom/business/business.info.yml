@@ -6,7 +6,7 @@ package: Invoicing
 
 dependencies:
   - address
-  - telephone
+  - libphonenumber
   - views
 
 config_devel:

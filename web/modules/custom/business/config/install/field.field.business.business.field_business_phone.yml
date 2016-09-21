@@ -5,7 +5,7 @@ dependencies:
     - field.storage.business.field_business_phone
   module:
     - business
-    - telephone
+    - libphonenumber
 id: business.business.field_business_phone
 field_name: field_business_phone
 entity_type: business
@@ -17,4 +17,4 @@ translatable: false
 default_value: {  }
 default_value_callback: ''
 settings: {  }
-field_type: telephone
+field_type: libphonenumber
