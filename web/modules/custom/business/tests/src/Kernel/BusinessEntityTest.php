@@ -19,7 +19,7 @@ class BusinessEntityTest extends ContentEntityTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['address', 'business', 'telephone'];
+  public static $modules = ['address', 'business', 'libphonenumber', 'views'];
 
   /**
    * {@inheritdoc}

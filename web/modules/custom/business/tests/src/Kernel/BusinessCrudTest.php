@@ -19,7 +19,7 @@ class BusinessCrudTest extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['address', 'business', 'telephone'];
+  public static $modules = ['address', 'business', 'libphonenumber', 'views'];
 
   /**
    * The database connection.

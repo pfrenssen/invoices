@@ -454,7 +454,7 @@ trait BaseTestHelper {
    */
   public function randomPhoneNumberField($countrycode = 'BE') {
     return [
-      'value' => $this->randomPhoneNumber($countrycode),
+      'raw_input' => $this->randomPhoneNumber($countrycode),
       // @todo Add this back when we have a better phone field.
       // 'countrycode' => $countrycode,
     ];

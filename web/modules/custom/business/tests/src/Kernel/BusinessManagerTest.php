@@ -22,7 +22,7 @@ class BusinessManagerTest extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['address', 'business', 'telephone'];
+  public static $modules = ['address', 'business', 'libphonenumber', 'views'];
 
   /**
    * Test user accounts.
