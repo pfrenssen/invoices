@@ -7,6 +7,7 @@ dependencies:
     - field.storage.business.field_business_phone
   module:
     - business
+    - libphonenumber
 id: businesses
 label: Businesses
 module: views
@@ -310,10 +311,9 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: value
-          type: string
-          settings:
-            link_to_entity: false
+          click_sort_column: raw_input
+          type: libphonenumber_link
+          settings: {  }
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -373,10 +373,9 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: value
-          type: string
-          settings:
-            link_to_entity: false
+          click_sort_column: raw_input
+          type: libphonenumber_link
+          settings: {  }
           group_column: value
           group_columns: {  }
           group_rows: true
