@@ -12,6 +12,7 @@ use Drupal\invoices\Tests\BaseTestHelper;
  * Tests the BusinessManager service.
  *
  * @group business
+ *
  * @coversDefaultClass \Drupal\business\BusinessManager
  */
 class BusinessManagerTest extends EntityKernelTestBase {

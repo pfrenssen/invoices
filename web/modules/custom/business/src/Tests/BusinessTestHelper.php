@@ -4,6 +4,7 @@ namespace Drupal\business\Tests;
 
 use Drupal\business\Entity\Business;
 use Drupal\business\Entity\BusinessInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Reusable test methods for testing businesses.
@@ -115,7 +116,7 @@ trait BusinessTestHelper {
     $query
       ->entityCondition('entity_type', 'business')
       ->entityCondition('bundle', 'business')
-      ->fieldCondition('field_business_name', 'value', $values['field_business_name'])
+      ->fieldCondition('name', 'value', $values['name'])
       ->fieldCondition('field_business_email', 'email', $values['field_business_email'])
       ->range(0, 1);
     $result = $query->execute();
@@ -164,7 +165,7 @@ trait BusinessTestHelper {
     $values = array();
 
     // @todo Add accountable and trade registry number.
-    $values['field_business_name'][LANGUAGE_NONE][0]['value'] = $this->randomString();
+    $values['name'][LANGUAGE_NONE][0]['value'] = $this->randomString();
     $values['field_business_address'][LANGUAGE_NONE][0] = $this->randomAddressField();
     $values['field_business_bic'][LANGUAGE_NONE][0]['value'] = $this->randomString();
     $values['field_business_email'][LANGUAGE_NONE][0]['email'] = $this->randomEmail();
@@ -216,7 +217,7 @@ trait BusinessTestHelper {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // @todo Add accountable and trade registry number.
     return array(
-      'field_business_name[und][0][value]' => $values['field_business_name'],
+      'name[und][0][value]' => $values['name'],
       'field_business_email[und][0][email]' => $values['field_business_email'],
       // @todo Support other countries in addition to Belgium.
       'field_business_address[und][0][country]' => 'BE',
@@ -265,7 +266,7 @@ trait BusinessTestHelper {
   /**
    * Returns a random business from the database.
    *
-   * @return \Business
+   * @return \Drupal\business\Entity\BusinessInterface
    *   A random business.
    */
   function randomBusiness() {

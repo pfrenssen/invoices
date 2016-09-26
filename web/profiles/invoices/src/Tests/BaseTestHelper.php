@@ -5,6 +5,11 @@ namespace Drupal\invoices\Tests;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use Drupal\user\Entity\Role;
+use Drupal\user\Entity\User;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 
 /**
  * Reusable test methods.
@@ -14,49 +19,45 @@ trait BaseTestHelper {
   /**
    * Create a user with the given user role.
    *
-   * This is based on drupalCreateUser() but accepts a user role rather than a
-   * set of permissions.
+   * This is based on UserCreationTrait::createUser() with the following
+   * changes:
+   * - It accepts a user role rather than a set of permissions.
+   * - It populates the fields for the first and last name.
    *
    * @param string $role
    *   The user role to assign to the user.
    *
-   * @return object|false
+   * @return \Drupal\user\Entity\User|false
    *   A fully loaded user object with pass_raw property, or FALSE if account
    *   creation fails.
    */
   protected function drupalCreateUserWithRole($role) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $role = user_role_load_by_name($role);
+    $role = Role::load($role);
 
     // Create a user assigned to that role.
-    $name = $this->randomName();
+    $name = $this->randomMachineName();
     $edit = [
       'name' => $name,
       'mail' => $name . '@example.com',
       'pass' => user_password(),
       'status' => 1,
-      'roles' => [$role->rid => $role->rid],
-      'field_user_first_name' => [
-        LANGUAGE_NONE => [
-          ['value' => $this->randomString()],
-        ],
-      ],
-      'field_user_last_name' => [
-        LANGUAGE_NONE => [
-          ['value' => $this->randomString()],
-        ],
-      ],
+      'roles' => [$role->id()],
+      'field_user_first_name' => $this->randomString(),
+      'field_user_last_name' => $this->randomString(),
     ];
 
-    $account = user_save(drupal_anonymous_user(), $edit);
+    $account = User::create($edit);
+    $account->save();
 
-    $this->assertTrue(!empty($account->uid), t('User created with name %name and pass %pass', ['%name' => $edit['name'], '%pass' => $edit['pass']]), t('User login'));
-    if (empty($account->uid)) {
+    $this->assertTrue($account->id());
+    if (!$account->id()) {
       return FALSE;
     }
 
     // Add the raw password so that we can log in as this user.
     $account->pass_raw = $edit['pass'];
+    // Support BrowserTestBase as well.
+    $account->passRaw = $account->pass_raw;
     return $account;
   }
 
@@ -149,10 +150,9 @@ trait BaseTestHelper {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   function assertNoPager($message = '') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $message = $message ?: 'No pager is present on the page.';
-    $xpath = '//div[@class = "item-list"]/ul[@class = "pager"]';
-    return $this->assertXpathElements($xpath, 0, [], $message);
+    $xpath = '//nav[@class = "pager"]';
+    return $this->assertXPathElements($xpath, 0, [], $message);
   }
 
   /**
@@ -165,10 +165,9 @@ trait BaseTestHelper {
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   function assertPager($message = '') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $message = $message ?: 'A pager is present on the page.';
-    $xpath = '//div[@class = "item-list"]/ul[@class = "pager"]';
-    return $this->assertXpathElements($xpath, 1, [], $message);
+    $xpath = '//nav[@class = "pager"]';
+    return $this->assertXPathElements($xpath, 1, [], $message);
   }
 
   /**
@@ -295,13 +294,12 @@ trait BaseTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertXpathElements($xpath, $count, array $arguments = [], $message = '') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+  function assertXPathElements($xpath, $count, array $arguments = [], $message = '') {
     // Provide a default message.
-    $message = $message ?: format_plural($count, 'The element matching the XPath expression is present in the page.', 'The @count elements matching the XPath expression are present in the page.');
+    $message = $message ?: (string) new PluralTranslatableMarkup($count, 'The element matching the XPath expression is present in the page.', 'The @count elements matching the XPath expression are present in the page.');
 
     $elements = $this->xpath($xpath, $arguments);
-    return $this->assertEqual(count($elements), $count, $message);
+    return $this->assertEquals($count, count($elements), $message);
   }
 
   /**
@@ -458,6 +456,26 @@ trait BaseTestHelper {
       // @todo Add this back when we have a better phone field.
       // 'countrycode' => $countrycode,
     ];
+  }
+
+  /**
+   * Formats the given phone number in the given format using libphonenumber.
+   *
+   * @param string $number
+   *   The phone number to format.
+   * @param int $format
+   *   The format to use. See PhoneNumberFormat for possible options.
+   * @param string $countrycode
+   *   The default country code to use if the country code is missing from the
+   *   number.
+   *
+   * @return string
+   *   The formatted number.
+   */
+  public function formatPhoneNumber($number, $format = PhoneNumberFormat::E164, $countrycode = 'BE') {
+    $util = PhoneNumberUtil::getInstance();
+    $number = $util->parseAndKeepRawInput($number, $countrycode);
+    return $util->format($number, $format);
   }
 
   /**
