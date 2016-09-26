@@ -10,6 +10,9 @@ web/profiles/contrib
 # Ignore Drupal's file directory
 web/sites/*/files
 
+# Ignore test data.
+web/sites/simpletest
+
 # Ignore environment specific settings
 build.properties.local
 phpcs.xml
