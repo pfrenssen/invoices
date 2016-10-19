@@ -42,7 +42,7 @@
         "drupal/core": "~8.0",
         "drupal/libphonenumber": "dev-1.x",
         "drush/drush": "~8.0",
-        "php": ">=5.5.9"
+        "php": ">=7.1"
     },
     "require-dev": {
         "behat/mink": "~1.7",
