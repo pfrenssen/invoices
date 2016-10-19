@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Drupal\Tests\simpletest\Functional;
 
 use Drupal\business\Entity\Business;
@@ -17,11 +19,6 @@ class BusinessOverviewTest extends InvoicesFunctionalTestBase {
 
   use BaseTestHelper;
   use BusinessTestHelper;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $profile = 'invoices';
 
   /**
    * An array of test businesses.
@@ -118,7 +115,7 @@ class BusinessOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The fourth column contains the "edit" action link.',
-          'expected' => t('edit'),
+          'expected' => (string) t('edit'),
           'actual' => $tablerow->find('css', 'td:nth-child(4)>a')->getText(),
         ],
         [

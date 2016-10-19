@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Drupal\business\Form;
 
 use Drupal\Core\Entity\ContentEntityDeleteForm;
@@ -10,6 +12,5 @@ use Drupal\Core\Entity\ContentEntityDeleteForm;
  * @ingroup business
  */
 class BusinessDeleteForm extends ContentEntityDeleteForm {
-
 
 }

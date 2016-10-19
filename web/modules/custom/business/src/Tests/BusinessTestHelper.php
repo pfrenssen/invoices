@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Drupal\business\Tests;
 
 use Drupal\business\Entity\Business;
@@ -18,54 +20,48 @@ trait BusinessTestHelper {
    *   The Business entity to check.
    * @param array $values
    *   An associative array of values to check, keyed by property name.
-   * @param string $message
-   *   The message to display along with the assertion.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertBusinessProperties(Business $business, array $values, $message = '') {
-    return $this->assertEntityFieldValues($business, $values);
+  public function assertBusinessProperties(Business $business, array $values) {
+    $this->assertEntityFieldValues($business, $values);
   }
 
   /**
-   * Check if the business database table is empty.
+   * Checks if the business table exists.
+   */
+  public function assertBusinessTableExists() {
+    $this->assertTrue($this->connection->schema()->tableExists('business'), 'The business database table exists.');
+  }
+
+  /**
+   * Checks if the business database table is empty.
    *
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertBusinessTableEmpty($message = '') {
+  public function assertBusinessTableEmpty(string $message = '') {
     $result = (bool) $this->connection
       ->select('business', 'b')
       ->fields('b')
       ->range(0, 1)
       ->execute()
       ->fetchAll();
-    return $this->assertFalse($result, $message ?: 'The business database table is empty.');
+    $this->assertFalse($result, $message ?: 'The business database table is empty.');
   }
 
   /**
-   * Check if the business database table is not empty.
+   * Checks if the business database table is not empty.
    *
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertBusinessTableNotEmpty($message = '', $group = 'Other') {
+  public function assertBusinessTableNotEmpty(string $message = '') {
     $result = (bool) $this->connection
       ->select('business', 'b')
       ->fields('b')
       ->range(0, 1)
       ->execute()
       ->fetchAll();
-    return $this->assertTrue($result, $message ?: 'The business database table is not empty.');
+    $this->assertTrue($result, $message ?: 'The business database table is not empty.');
   }
 
   /**
@@ -80,7 +76,7 @@ trait BusinessTestHelper {
    * @return \Drupal\business\Entity\BusinessInterface
    *   A new business entity.
    */
-  function createBusiness(array $values = array()) {
+  public function createBusiness(array $values = array()) {
     // Provide some default values.
     $values += $this->randomBusinessValues();
     $business = Business::create();
@@ -95,35 +91,36 @@ trait BusinessTestHelper {
    * The saved business is retrieved by business name and email address. In
    * order to retrieve the correct business entity, these should be unique.
    *
+   * This only works in functional tests.
+   *
    * @param array $values
    *   An optional associative array of values, keyed by property name. Random
    *   values will be applied to all omitted properties.
    *
-   * @return \Business
+   * @return \Drupal\business\Entity\BusinessInterface
    *   A new business entity.
    */
-  function createUiBusiness(array $values = array()) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+  public function createUiBusiness(array $values = array()) {
     // Provide some default values.
     $values += $this->randomBusinessValues();
 
     // Convert the entity property values to form values and submit the form.
     $edit = $this->convertBusinessValuesToFormPostValues($values);
-    $this->drupalPost('business/add', $edit, t('Save'));
+    $this->drupalPostForm('business/add', $edit, t('Save'));
 
     // Retrieve the saved business by name and email address and return it.
-    $query = new \EntityFieldQuery();
+    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+    $query = $this->container->get('entity.query')->get('business');
     $query
-      ->entityCondition('entity_type', 'business')
-      ->entityCondition('bundle', 'business')
-      ->fieldCondition('name', 'value', $values['name'])
-      ->fieldCondition('field_business_email', 'email', $values['field_business_email'])
+      ->condition('bundle', 'business')
+      ->condition('name', 'value', $values['name'])
+      ->condition('field_business_email', 'email', $values['field_business_email'])
       ->range(0, 1);
     $result = $query->execute();
     $bids = array_keys($result['business']);
     $this->assertTrue($bids, 'Business was successfully created through the UI.');
 
-    return business_load($bids[0]);
+    return Business::load($bids[0]);
   }
 
   /**
@@ -134,7 +131,7 @@ trait BusinessTestHelper {
    * @returns array
    *   An associative array of random values, keyed by property name.
    */
-  function randomBusinessValues() {
+  public function randomBusinessValues() {
     return array(
       'name' => $this->randomString(),
       'created' => rand(0, 2000000000),
@@ -214,14 +211,13 @@ trait BusinessTestHelper {
    * @see self::randomBusinessValues()
    */
   public function convertBusinessValuesToFormPostValues(array $values) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // @todo Add accountable and trade registry number.
     return array(
       'name[und][0][value]' => $values['name'],
       'field_business_email[und][0][email]' => $values['field_business_email'],
       // @todo Support other countries in addition to Belgium.
-      'field_business_address[und][0][country]' => 'BE',
-      'field_business_address[und][0][thoroughfare]' => $values['field_business_address']['thoroughfare'],
+      'field_business_address[und][0][country_code]' => 'BE',
+      'field_business_address[und][0][address_line1]' => $values['field_business_address']['address_line1'],
       'field_business_address[und][0][postal_code]' => $values['field_business_address']['postal_code'],
       'field_business_address[und][0][locality]' => $values['field_business_address']['locality'],
       'field_business_vat[und][0][value]' => $values['field_business_vat'],
@@ -244,7 +240,7 @@ trait BusinessTestHelper {
    * @deprecated
    *   Use BaseTestHelper::updateEntity() instead.
    */
-  function updateBusiness(BusinessInterface $business, array $values) {
+  public function updateBusiness(BusinessInterface $business, array $values) {
     throw new \Exception(__METHOD__ . ' is deprecated.');
   }
 
@@ -259,7 +255,7 @@ trait BusinessTestHelper {
    * @deprecated
    *   Use BusinessInterface::setOwner()
    */
-  function addBusinessToUser(BusinessInterface $business, AccountInterface $user) {
+  public function addBusinessToUser(BusinessInterface $business, AccountInterface $user) {
     throw new \Exception(__METHOD__ . ' is deprecated.');
   }
 
@@ -269,7 +265,7 @@ trait BusinessTestHelper {
    * @return \Drupal\business\Entity\BusinessInterface
    *   A random business.
    */
-  function randomBusiness() {
+  public function randomBusiness() {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $bid = db_select('business', 'b')
       ->fields('b', array('bid'))

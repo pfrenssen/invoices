@@ -397,6 +397,9 @@ function business_load_multiple(array $bids = array(), $reset = FALSE) {
  * @return Business|FALSE
  *   A fully-populated business object, or FALSE if the business is not found.
  *
+ * @deprecated
+ *   Use Business::load() instead.
+ *
  * @throws InvalidArgumentException
  *   Thrown when the passed ID is not valid.
  */
@@ -416,6 +419,9 @@ function business_load($bid, $reset = FALSE) {
  *
  * @param Business $business
  *   The business to delete.
+ *
+ * @deprecated
+ *   Use Business::delete() instead.
  */
 function business_delete(Business $business) {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
@@ -427,6 +433,9 @@ function business_delete(Business $business) {
  *
  * @param array $bids
  *   An array of business IDs.
+ *
+ * @deprecated
+ *   Use Business::delete() instead.
  */
 function business_delete_multiple(array $bids) {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
@@ -442,6 +451,8 @@ function business_delete_multiple(array $bids) {
  *
  * @return Business
  *   The new business entity.
+ *
+ * @deprecated
  */
 function business_create($values = array()) {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
@@ -459,6 +470,8 @@ function business_create($values = array()) {
  * @return mixed
  *   Returns FALSE if the transaction failed. If it succeeded, returns SAVED_NEW
  *   or SAVED_UPDATED, depending on the operation performed.
+ *
+ * @deprecated
  */
 function business_save(Business $business) {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');

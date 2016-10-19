@@ -2,6 +2,7 @@
 
 namespace Drupal\invoices\Tests;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
@@ -125,19 +126,15 @@ trait BaseTestHelper {
    *   An indexed array of field names that should be checked.
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   function assertFieldValidationFailed(array $fields, $message = '') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $result = TRUE;
     foreach ($fields as $field) {
       $xpath = '//textarea[@name=:value and contains(@class, "error")]|//input[@name=:value and contains(@class, "error")]|//select[@name=:value and contains(@class, "error")]';
       $elements = $this->xpath($this->buildXPathQuery($xpath, [':value' => $field]));
-      $result &= $this->assertTrue($elements, format_string('The field %field has the "error" class.', ['%field' => $field]));
+      $result &= $this->assertTrue($elements, new FormattableMarkup('The field %field has the "error" class.', ['%field' => $field]));
     }
-    return $this->assertTrue($result, $message ?: 'All fields are indicating that validation failed.');
+    $this->assertTrue($result, $message ?: 'All fields are indicating that validation failed.');
   }
 
   /**
@@ -261,22 +258,16 @@ trait BaseTestHelper {
    *   messages of the Field module will be used.
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   function assertRequiredFieldMessages(array $required_fields, $messages = [], $message = '') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $success = TRUE;
-
     // Use the standard message of the Field module by default.
     if (!$messages) {
       foreach ($required_fields as $required_field) {
         $messages['error'][] = t('!name field is required.', ['!name' => $required_field]);
       }
     }
-    $success &= $this->assertFieldValidationFailed(array_keys($required_fields));
-    return $success &= $this->assertStatusMessages($messages, $message ?: 'The error messages about required fields are present.');
+    $this->assertFieldValidationFailed(array_keys($required_fields));
+    $this->assertStatusMessages($messages, $message ?: 'The error messages about required fields are present.');
   }
 
   /**

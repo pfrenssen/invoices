@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Drupal\business\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -19,7 +21,7 @@ interface BusinessInterface extends ContentEntityInterface, EntityChangedInterfa
    * @return string
    *   Name of the Business.
    */
-  public function getName();
+  public function getName() : string;
 
   /**
    * Sets the Business name.
@@ -30,7 +32,7 @@ interface BusinessInterface extends ContentEntityInterface, EntityChangedInterfa
    * @return \Drupal\business\Entity\BusinessInterface
    *   The called Business entity.
    */
-  public function setName($name);
+  public function setName(string $name) : BusinessInterface;
 
   /**
    * Gets the Business creation timestamp.
@@ -38,7 +40,7 @@ interface BusinessInterface extends ContentEntityInterface, EntityChangedInterfa
    * @return int
    *   Creation timestamp of the Business.
    */
-  public function getCreatedTime();
+  public function getCreatedTime() : int;
 
   /**
    * Sets the Business creation timestamp.
@@ -49,6 +51,6 @@ interface BusinessInterface extends ContentEntityInterface, EntityChangedInterfa
    * @return \Drupal\business\Entity\BusinessInterface
    *   The called Business entity.
    */
-  public function setCreatedTime($timestamp);
+  public function setCreatedTime(int $timestamp) : BusinessInterface;
 
 }
