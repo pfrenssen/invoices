@@ -16,6 +16,7 @@
         "drupal/address": "^8.1@beta",
         "drupal/console": "~1.0",
         "drupal/core": "~8.0",
+        "drupal/libphonenumber": "dev-8.x-1.x",
         "drush/drush": "~8.0",
         "php": ">=5.5.9"
     },
