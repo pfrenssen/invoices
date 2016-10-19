@@ -8,15 +8,39 @@
             "name": "Pieter Frenssen <pieter@frenssen.be>"
         }
     ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "pfrenssen/phpcs-pre-push",
+                "version": "1.0",
+                "type": "git-hook",
+                "source": {
+                    "url": "https://gist.github.com/498fc52fea3f965f6640.git",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
+        },
+        {
+            "_comment": "The PhingDrushTask module does not currently have a D8 release and is not available on https://packages.drupal.org/8. See https://www.drupal.org/node/2817131.",
+            "type": "vcs",
+            "url": "git@github.com:pfrenssen/phingdrushtask.git"
+        }
+    ],
     "require": {
         "composer/composer": "~1.0",
         "composer/installers": "^1.0.20",
         "cweagans/composer-patches": "~1.0",
         "drupal-composer/drupal-scaffold": "^2.0.1",
-        "drupal/address": "^8.1@beta",
+        "drupal/address": "^1.0@beta",
         "drupal/console": "~1.0",
         "drupal/core": "~8.0",
-        "drupal/libphonenumber": "dev-8.x-1.x",
+        "drupal/libphonenumber": "dev-1.x",
         "drush/drush": "~8.0",
         "php": ">=5.5.9"
     },
@@ -24,9 +48,9 @@
         "behat/mink": "~1.7",
         "behat/mink-goutte-driver": "~1.2",
         "drupal/coder": "~8.2.7",
-        "drupal/config_devel": "~8.1@rc",
-        "drupal/config_update": "8.1.*@dev",
-        "drupal/devel": "8.1.*@dev",
+        "drupal/config_devel": "dev-1.x#92f735cae8e9fb328edca285340a5bfbf72028cc",
+        "drupal/config_update": "1.*@dev",
+        "drupal/devel": "1.*@dev",
         "drupal/drupal-extension": "~3.0",
         "drupal/phingdrushtask": "dev-7.x-2.x",
         "jcalderonzumba/gastonjs": "^1.1@dev",
@@ -66,25 +90,6 @@
             "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
         ]
     },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://packagist.drupal-composer.org"
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "pfrenssen/phpcs-pre-push",
-                "version": "1.0",
-                "type": "git-hook",
-                "source": {
-                    "url": "https://gist.github.com/498fc52fea3f965f6640.git",
-                    "type": "git",
-                    "reference": "master"
-                }
-            }
-        }
-    ],
     "extra": {
         "patches": {
             "drupal/config_devel": {

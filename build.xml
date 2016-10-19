@@ -2,6 +2,9 @@
 
 <project name="My Drupal Project" default="help">
 
+    <!-- Import project specific Phing targets. -->
+    <import file="${project.basedir}/build.project.xml" optional="true" />
+
     <property file="build.properties.local" />
     <property file="build.properties" />
     <property file="build.properties.dist" />
@@ -74,6 +77,7 @@
                 <delete file="${phpcs.global.config}" failonerror="false" />
             </then>
         </if>
+        <echo message="Generating PHP Codesniffer configuration files." />
         <phpcodesnifferconfiguration
             configFile="${phpcs.config}"
             extensions="${phpcs.extensions}"
