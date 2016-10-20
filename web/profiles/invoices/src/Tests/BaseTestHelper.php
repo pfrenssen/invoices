@@ -73,7 +73,7 @@ trait BaseTestHelper {
    *   An associative array of values to apply to the entity, keyed by field
    *   name.
    */
-  function updateEntity(ContentEntityInterface $entity, array $values) {
+  protected function updateEntity(ContentEntityInterface $entity, array $values) {
     foreach ($values as $property => $value) {
       $entity->set($property, $value);
     }
@@ -90,7 +90,7 @@ trait BaseTestHelper {
    * @throws \Exception
    *   Thrown when an unknown field is compared.
    */
-  function assertEntityFieldValues(ContentEntityInterface $entity, array $values) {
+  protected function assertEntityFieldValues(ContentEntityInterface $entity, array $values) {
     foreach ($values as $field_name => $expected_value) {
       $field_item_list = $entity->get($field_name);
       // Check if a single value or multiple values are expected.
@@ -127,7 +127,7 @@ trait BaseTestHelper {
    * @param string $message
    *   The message to display along with the assertion.
    */
-  function assertFieldValidationFailed(array $fields, $message = '') {
+  protected function assertFieldValidationFailed(array $fields, $message = '') {
     $result = TRUE;
     foreach ($fields as $field) {
       $xpath = '//textarea[@name=:value and contains(@class, "error")]|//input[@name=:value and contains(@class, "error")]|//select[@name=:value and contains(@class, "error")]';
@@ -146,7 +146,7 @@ trait BaseTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertNoPager($message = '') {
+  protected function assertNoPager($message = '') {
     $message = $message ?: 'No pager is present on the page.';
     $xpath = '//nav[@class = "pager"]';
     return $this->assertXPathElements($xpath, 0, [], $message);
@@ -161,7 +161,7 @@ trait BaseTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertPager($message = '') {
+  protected function assertPager($message = '') {
     $message = $message ?: 'A pager is present on the page.';
     $xpath = '//nav[@class = "pager"]';
     return $this->assertXPathElements($xpath, 1, [], $message);
@@ -184,7 +184,7 @@ trait BaseTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertStatusMessages(array $messages, $message = '') {
+  protected function assertStatusMessages(array $messages, $message = '') {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Messages can contain a mix of HTML and sanitized HTML, for example:
     // '<em class="placeholder">&lt;script&gt;alert();&lt;&#039;script&gt;</em>'
@@ -259,7 +259,7 @@ trait BaseTestHelper {
    * @param string $message
    *   The message to display along with the assertion.
    */
-  function assertRequiredFieldMessages(array $required_fields, $messages = [], $message = '') {
+  protected function assertRequiredFieldMessages(array $required_fields, $messages = [], $message = '') {
     // Use the standard message of the Field module by default.
     if (!$messages) {
       foreach ($required_fields as $required_field) {
@@ -285,7 +285,7 @@ trait BaseTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertXPathElements($xpath, $count, array $arguments = [], $message = '') {
+  protected function assertXPathElements($xpath, $count, array $arguments = [], $message = '') {
     // Provide a default message.
     $message = $message ?: (string) new PluralTranslatableMarkup($count, 'The element matching the XPath expression is present in the page.', 'The @count elements matching the XPath expression are present in the page.');
 
@@ -304,7 +304,7 @@ trait BaseTestHelper {
    * @return array
    *   The decoded array of status messages.
    */
-  function decodeStatusMessages(array $messages) {
+  protected function decodeStatusMessages(array $messages) {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     foreach (array_keys($messages) as $type) {
       foreach ($messages[$type] as $key => $encoded_message) {
@@ -322,7 +322,7 @@ trait BaseTestHelper {
    *   'status', 'warning' or 'error'). Every type contains an indexed array of
    *   status messages.
    */
-  function getStatusMessages() {
+  protected function getStatusMessages() {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $return = [
       'error' => [],
@@ -382,7 +382,7 @@ trait BaseTestHelper {
    * @return array
    *   A random address field.
    */
-  function randomAddressField() {
+  protected function randomAddressField() {
     // The Address Field module trims all input and converts double spaces to
     // single spaces before saving the values to the database. We make sure our
     // random data does the same so we do not get random failures.
@@ -402,7 +402,7 @@ trait BaseTestHelper {
    * @return string
    *   A random email address.
    */
-  function randomEmail() {
+  protected function randomEmail() {
     return strtolower($this->randomName()) . '@example.com';
   }
 
@@ -441,7 +441,7 @@ trait BaseTestHelper {
    *   - number: the phone number, without country code or leading zeroes.
    *   - countrycode: the country code for the phone number.
    */
-  public function randomPhoneNumberField($countrycode = 'BE') {
+  protected function randomPhoneNumberField($countrycode = 'BE') {
     return [
       'raw_input' => $this->randomPhoneNumber($countrycode),
       // @todo Add this back when we have a better phone field.
@@ -463,7 +463,7 @@ trait BaseTestHelper {
    * @return string
    *   The formatted number.
    */
-  public function formatPhoneNumber($number, $format = PhoneNumberFormat::E164, $countrycode = 'BE') {
+  protected function formatPhoneNumber($number, $format = PhoneNumberFormat::E164, $countrycode = 'BE') {
     $util = PhoneNumberUtil::getInstance();
     $number = $util->parseAndKeepRawInput($number, $countrycode);
     return $util->format($number, $format);
@@ -480,7 +480,7 @@ trait BaseTestHelper {
    * @return string
    *   The input for the entity reference autocomplete field.
    */
-  public function entityReferenceFieldValue($name, $id) {
+  protected function entityReferenceFieldValue($name, $id) {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Prepare the field input the way entityreference expects it.
     // @see entityreference_autocomplete_callback_get_matches()

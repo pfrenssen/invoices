@@ -50,7 +50,7 @@ class BusinessManager implements BusinessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getBusinessesFromUser(AccountInterface $account = NULL, $reset = FALSE) {
+  public function getBusinessesFromUser(AccountInterface $account = NULL, bool $reset = FALSE) : array {
     if ($reset) {
       throw new \Exception('The $reset parameter is deprecated. Use ::resetCache().');
     }
@@ -61,7 +61,7 @@ class BusinessManager implements BusinessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getBusinessIdsFromUser(AccountInterface $account = NULL, $reset = FALSE) {
+  public function getBusinessIdsFromUser(AccountInterface $account = NULL, bool $reset = FALSE) : array {
     if ($reset) {
       throw new \Exception('The $reset parameter is deprecated. Use ::resetCache().');
     }
@@ -83,25 +83,16 @@ class BusinessManager implements BusinessManagerInterface {
     return $this->bids[$uid];
   }
 
-
   /**
-   * Returns whether a given business is owned by a given user.
-   *
-   * @param \Drupal\business\Entity\Business $business
-   *   The business to check.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   Optional user account to check. Defaults to the currently logged in user.
-   *
-   * @return bool
-   *   TRUE if the business is owned by the user, FALSE otherwise.
+   * {@inheritdoc}
    */
-  function businessIsOwnedByUser(Business $business, AccountInterface $account = NULL) {
+  public function businessIsOwnedByUser(Business $business, AccountInterface $account = NULL) : bool {
     $account = $account ?: $this->currentUser;
     return in_array($business->id(), $this->getBusinessIdsFromUser($account));
   }
 
   /**
-   * Resets the static cache.
+   * {@inheritdoc}
    */
   public function resetCache() {
     $this->bids = [];
