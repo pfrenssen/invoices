@@ -31,7 +31,7 @@ content:
     type: address_default
     weight: 2
     settings:
-      default_country: null
+      default_country: BE
     third_party_settings: {  }
   field_business_bic:
     type: string_textfield

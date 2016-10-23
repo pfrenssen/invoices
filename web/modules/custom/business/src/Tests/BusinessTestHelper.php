@@ -106,21 +106,21 @@ trait BusinessTestHelper {
 
     // Convert the entity property values to form values and submit the form.
     $edit = $this->convertBusinessValuesToFormPostValues($values);
+
     $this->drupalPostForm('business/add', $edit, t('Save'));
 
     // Retrieve the saved business by name and email address and return it.
     /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
     $query = $this->container->get('entity.query')->get('business');
     $query
-      ->condition('bundle', 'business')
-      ->condition('name', 'value', $values['name'])
-      ->condition('field_business_email', 'email', $values['field_business_email'])
+      ->condition('name', $values['name'])
+      ->condition('field_business_email', $values['field_business_email'])
       ->range(0, 1);
     $result = $query->execute();
-    $bids = array_keys($result['business']);
-    $this->assertTrue($bids, 'Business was successfully created through the UI.');
+    $bid = reset($result);
+    $this->assertTrue($bid, 'Business was successfully created through the UI.');
 
-    return Business::load($bids[0]);
+    return Business::load($bid);
   }
 
   /**
@@ -213,18 +213,20 @@ trait BusinessTestHelper {
   public function convertBusinessValuesToFormPostValues(array $values) {
     // @todo Add accountable and trade registry number.
     return array(
-      'name[und][0][value]' => $values['name'],
-      'field_business_email[und][0][email]' => $values['field_business_email'],
+      'name[0][value]' => $values['name'],
+      'field_business_email[0][value]' => $values['field_business_email'],
       // @todo Support other countries in addition to Belgium.
-      'field_business_address[und][0][country_code]' => 'BE',
-      'field_business_address[und][0][address_line1]' => $values['field_business_address']['address_line1'],
-      'field_business_address[und][0][postal_code]' => $values['field_business_address']['postal_code'],
-      'field_business_address[und][0][locality]' => $values['field_business_address']['locality'],
-      'field_business_vat[und][0][value]' => $values['field_business_vat'],
-      'field_business_phone[und][0][number]' => $values['field_business_phone']['number'],
-      'field_business_mobile[und][0][number]' => $values['field_business_mobile']['number'],
-      'field_business_bic[und][0][value]' => $values['field_business_bic'],
-      'field_business_iban[und][0][value]' => $values['field_business_iban'],
+      'field_business_address[0][country_code]' => 'BE',
+      'field_business_address[0][address_line1]' => $values['field_business_address']['address_line1'],
+      'field_business_address[0][postal_code]' => $values['field_business_address']['postal_code'],
+      'field_business_address[0][locality]' => $values['field_business_address']['locality'],
+      'field_business_vat[0][value]' => $values['field_business_vat'],
+      'field_business_iban[0][value]' => $values['field_business_iban'],
+      'field_business_bic[0][value]' => $values['field_business_bic'],
+      'field_business_accountable[0][value]' => $values['field_business_accountable'],
+      'field_business_number[0][value]' => $values['field_business_number'],
+      'field_business_phone[0][raw_input]' => $values['field_business_phone']['raw_input'],
+      'field_business_mobile[0][raw_input]' => $values['field_business_mobile']['raw_input'],
     );
   }
 

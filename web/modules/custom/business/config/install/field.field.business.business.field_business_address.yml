@@ -26,7 +26,9 @@ settings:
     sortingCode: sortingCode
     addressLine1: addressLine1
     addressLine2: addressLine2
-    organization: organization
-    recipient: recipient
+    organization: '0'
+    givenName: '0'
+    additionalName: '0'
+    familyName: '0'
   langcode_override: ''
 field_type: address

@@ -24,7 +24,6 @@ use Drupal\user\UserInterface;
  *     "list_builder" = "Drupal\business\BusinessListBuilder",
  *     "views_data" = "Drupal\business\Entity\BusinessViewsData",
  *     "translation" = "Drupal\business\BusinessTranslationHandler",
- *
  *     "form" = {
  *       "default" = "Drupal\business\Form\BusinessForm",
  *       "add" = "Drupal\business\Form\BusinessForm",
@@ -46,7 +45,6 @@ use Drupal\user\UserInterface;
  *     "uuid" = "uuid",
  *     "uid" = "uid",
  *     "langcode" = "langcode",
- *     "status" = "status",
  *   },
  *   links = {
  *     "canonical" = "/business/{business}",
@@ -164,6 +162,7 @@ class Business extends ContentEntityBase implements BusinessInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['name'] = BaseFieldDefinition::create('string')
+      ->setRequired(TRUE)
       ->setLabel(t('Business name'))
       ->setSettings([
         'max_length' => 50,

@@ -1,7 +1,10 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Drupal\invoices\Tests;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -28,11 +31,13 @@ trait BaseTestHelper {
    * @param string $role
    *   The user role to assign to the user.
    *
-   * @return \Drupal\user\Entity\User|false
-   *   A fully loaded user object with pass_raw property, or FALSE if account
-   *   creation fails.
+   * @return \Drupal\user\Entity\User
+   *   A fully loaded user object with pass_raw property.
+   *
+   * @throws \Exception
+   *   Thrown when user creation fails.
    */
-  protected function drupalCreateUserWithRole($role) {
+  protected function drupalCreateUserWithRole(string $role) : User {
     $role = Role::load($role);
 
     // Create a user assigned to that role.
@@ -52,13 +57,14 @@ trait BaseTestHelper {
 
     $this->assertTrue($account->id());
     if (!$account->id()) {
-      return FALSE;
+      throw new \Exception('User creation failed.');
     }
 
     // Add the raw password so that we can log in as this user.
     $account->pass_raw = $edit['pass'];
     // Support BrowserTestBase as well.
     $account->passRaw = $account->pass_raw;
+
     return $account;
   }
 
@@ -124,17 +130,13 @@ trait BaseTestHelper {
    *
    * @param array $fields
    *   An indexed array of field names that should be checked.
-   * @param string $message
-   *   The message to display along with the assertion.
    */
-  protected function assertFieldValidationFailed(array $fields, $message = '') {
-    $result = TRUE;
+  protected function assertFieldValidationFailed(array $fields) {
     foreach ($fields as $field) {
       $xpath = '//textarea[@name=:value and contains(@class, "error")]|//input[@name=:value and contains(@class, "error")]|//select[@name=:value and contains(@class, "error")]';
       $elements = $this->xpath($this->buildXPathQuery($xpath, [':value' => $field]));
-      $result &= $this->assertTrue($elements, new FormattableMarkup('The field %field has the "error" class.', ['%field' => $field]));
+      $this->assertTrue($elements, new FormattableMarkup('The field %field has the "error" class.', ['%field' => $field]));
     }
-    $this->assertTrue($result, $message ?: 'All fields are indicating that validation failed.');
   }
 
   /**
@@ -142,14 +144,11 @@ trait BaseTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  protected function assertNoPager($message = '') {
+  protected function assertNoPager(string $message = '') {
     $message = $message ?: 'No pager is present on the page.';
     $xpath = '//nav[@class = "pager"]';
-    return $this->assertXPathElements($xpath, 0, [], $message);
+    $this->assertXPathElements($xpath, 0, [], $message);
   }
 
   /**
@@ -157,14 +156,11 @@ trait BaseTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  protected function assertPager($message = '') {
+  protected function assertPager(string $message = '') {
     $message = $message ?: 'A pager is present on the page.';
     $xpath = '//nav[@class = "pager"]';
-    return $this->assertXPathElements($xpath, 1, [], $message);
+    $this->assertXPathElements($xpath, 1, [], $message);
   }
 
   /**
@@ -180,12 +176,8 @@ trait BaseTestHelper {
    *   contains an indexed array of status messages.
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  protected function assertStatusMessages(array $messages, $message = '') {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+  protected function assertStatusMessages(array $messages, string $message = '') {
     // Messages can contain a mix of HTML and sanitized HTML, for example:
     // '<em class="placeholder">&lt;script&gt;alert();&lt;&#039;script&gt;</em>'
     // Unfortunately, check_plain() and SimpleXML::asXml() encode quotes and
@@ -206,18 +198,18 @@ trait BaseTestHelper {
 
         // If the message is not one of the expected messages, fail.
         if ($key === FALSE) {
-          $result &= $this->fail(format_string('Unexpected @type message: @message', ['@type' => $type, '@message' => $shown_message]));
+          $result &= $this->fail(new FormattableMarkup('Unexpected @type message: @message', ['@type' => $type, '@message' => $shown_message]));
         }
 
         // Mark found messages as passed and remove them from the list.
         else {
-          $this->pass(format_string('Found @type message: @message', ['@type' => $type, '@message' => $shown_message]));
+          $this->assertTrue(TRUE, new FormattableMarkup('Found @type message: @message', ['@type' => $type, '@message' => $shown_message]));
           unset($expected_messages[$key]);
         }
       }
       // Throw fails for all expected messages that are not shown.
       foreach ($expected_messages as $expected_message) {
-        $result &= $this->fail(format_string('Did not find @type message: @message', ['@type' => $type, '@message' => $expected_message]));
+        $result &= $this->fail(new FormattableMarkup('Did not find @type message: @message', ['@type' => $type, '@message' => $expected_message]));
       }
     }
 
@@ -227,11 +219,11 @@ trait BaseTestHelper {
     // negatives.
     foreach ($messages as $type => $expected_messages) {
       foreach ($expected_messages as $expected_message) {
-        $result &= $this->assertRaw($expected_message, format_string('Found correctly encoded message in raw HTML: @message', ['@message' => $expected_message]));
+        $result &= $this->assertRaw($expected_message, new FormattableMarkup('Found correctly encoded message in raw HTML: @message', ['@message' => $expected_message]));
       }
     }
 
-    return $this->assertTrue($result, $message ?: 'The correct messages are shown.');
+    $this->assertTrue($result, $message ?: 'The correct messages are shown.');
   }
 
   /**
@@ -259,11 +251,11 @@ trait BaseTestHelper {
    * @param string $message
    *   The message to display along with the assertion.
    */
-  protected function assertRequiredFieldMessages(array $required_fields, $messages = [], $message = '') {
+  protected function assertRequiredFieldMessages(array $required_fields, array $messages = [], string $message = '') {
     // Use the standard message of the Field module by default.
     if (!$messages) {
       foreach ($required_fields as $required_field) {
-        $messages['error'][] = t('!name field is required.', ['!name' => $required_field]);
+        $messages['error'][] = (string) t('!name field is required.', ['!name' => $required_field]);
       }
     }
     $this->assertFieldValidationFailed(array_keys($required_fields));
@@ -281,16 +273,13 @@ trait BaseTestHelper {
    *   Optional array of arguments to pass to DrupalWebTestCase::xpath().
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  protected function assertXPathElements($xpath, $count, array $arguments = [], $message = '') {
+  protected function assertXPathElements(string $xpath, int $count, array $arguments = [], string $message = '') {
     // Provide a default message.
     $message = $message ?: (string) new PluralTranslatableMarkup($count, 'The element matching the XPath expression is present in the page.', 'The @count elements matching the XPath expression are present in the page.');
 
     $elements = $this->xpath($xpath, $arguments);
-    return $this->assertEquals($count, count($elements), $message);
+    $this->assertEquals($count, count($elements), $message);
   }
 
   /**
@@ -304,8 +293,7 @@ trait BaseTestHelper {
    * @return array
    *   The decoded array of status messages.
    */
-  protected function decodeStatusMessages(array $messages) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+  protected function decodeStatusMessages(array $messages) : array {
     foreach (array_keys($messages) as $type) {
       foreach ($messages[$type] as $key => $encoded_message) {
         $messages[$type][$key] = html_entity_decode($encoded_message, ENT_QUOTES, 'UTF-8');
@@ -322,8 +310,7 @@ trait BaseTestHelper {
    *   'status', 'warning' or 'error'). Every type contains an indexed array of
    *   status messages.
    */
-  protected function getStatusMessages() {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+  protected function getStatusMessages() : array {
     $return = [
       'error' => [],
       'warning' => [],
@@ -332,6 +319,7 @@ trait BaseTestHelper {
 
     foreach (array_keys($return) as $type) {
       // Retrieve the entire messages container.
+      /** @var NodeElement[] $messages */
       if ($messages = $this->xpath('//div[contains(@class, "messages") and contains(@class, :type)]', [':type' => $type])) {
         // If only a single message is being rendered by theme_status_messages()
         // it outputs it as text preceded by an <h2> element that is provided
@@ -349,8 +337,8 @@ trait BaseTestHelper {
         // accessibility element using DOMDocument.
         $dom = new \DOMDocument();
 
-        // Load the messges HTML using UTF-8 encoding.
-        @$dom->loadHTML('<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $messages[0]->asXml() . '</body></html>');
+        // Load the messages HTML using UTF-8 encoding.
+        @$dom->loadHTML('<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $messages[0]->getHtml() . '</body></html>');
         // Strip the accessibility element.
         $accessibility_message = $dom->getElementsByTagName('h2')->item(0);
         $accessibility_message->parentNode->removeChild($accessibility_message);
@@ -382,7 +370,7 @@ trait BaseTestHelper {
    * @return array
    *   A random address field.
    */
-  protected function randomAddressField() {
+  protected function randomAddressField() : array {
     // The Address Field module trims all input and converts double spaces to
     // single spaces before saving the values to the database. We make sure our
     // random data does the same so we do not get random failures.
@@ -402,7 +390,7 @@ trait BaseTestHelper {
    * @return string
    *   A random email address.
    */
-  protected function randomEmail() {
+  protected function randomEmail() : string {
     return strtolower($this->randomName()) . '@example.com';
   }
 
@@ -417,10 +405,10 @@ trait BaseTestHelper {
    * @return string
    *   A random phone number.
    */
-  public static function randomPhoneNumber($countrycode = 'BE') {
+  public static function randomPhoneNumber(string $countrycode = 'BE') : string {
     $matches = NULL;
     do {
-      $number = rand(10000000, 89000000);
+      $number = (string) rand(10000000, 89000000);
       // This regex is taken from libphonenumber. See PhoneNumberMetadata_BE.
       preg_match('/(?:1[0-69]|[49][23]|5\\d|6[013-57-9]|71|8[0-79])[1-9]\\d{5}|[23][2-8]\\d{6}/', $number, $matches);
     } while (empty($matches[0]));
@@ -441,7 +429,7 @@ trait BaseTestHelper {
    *   - number: the phone number, without country code or leading zeroes.
    *   - countrycode: the country code for the phone number.
    */
-  protected function randomPhoneNumberField($countrycode = 'BE') {
+  protected function randomPhoneNumberField(string $countrycode = 'BE') : array {
     return [
       'raw_input' => $this->randomPhoneNumber($countrycode),
       // @todo Add this back when we have a better phone field.
@@ -463,7 +451,7 @@ trait BaseTestHelper {
    * @return string
    *   The formatted number.
    */
-  protected function formatPhoneNumber($number, $format = PhoneNumberFormat::E164, $countrycode = 'BE') {
+  protected function formatPhoneNumber(string $number, int $format = PhoneNumberFormat::E164, string $countrycode = 'BE') : string {
     $util = PhoneNumberUtil::getInstance();
     $number = $util->parseAndKeepRawInput($number, $countrycode);
     return $util->format($number, $format);
@@ -480,7 +468,7 @@ trait BaseTestHelper {
    * @return string
    *   The input for the entity reference autocomplete field.
    */
-  protected function entityReferenceFieldValue($name, $id) {
+  protected function entityReferenceFieldValue(string $name, string $id) : string {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Prepare the field input the way entityreference expects it.
     // @see entityreference_autocomplete_callback_get_matches()
@@ -522,7 +510,7 @@ trait BaseTestHelper {
    *
    * @see DrupalWebTestCase::randomString()
    */
-  public static function randomName($length = 8) {
+  public static function randomName(int $length = 8) : string {
     return (new Random())->name($length, TRUE);
   }
 
