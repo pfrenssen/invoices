@@ -1,0 +1,90 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.business.business.field_business_accountable
+    - field.field.business.business.field_business_address
+    - field.field.business.business.field_business_bic
+    - field.field.business.business.field_business_email
+    - field.field.business.business.field_business_iban
+    - field.field.business.business.field_business_mobile
+    - field.field.business.business.field_business_number
+    - field.field.business.business.field_business_phone
+    - field.field.business.business.field_business_vat
+  module:
+    - address
+    - business
+    - libphonenumber
+id: business.business.default
+targetEntityType: business
+bundle: business
+mode: default
+content:
+  field_business_accountable:
+    type: string
+    weight: 8
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_business_address:
+    type: address_default
+    weight: 1
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_business_bic:
+    type: string
+    weight: 5
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_business_email:
+    type: email_mailto
+    weight: 2
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_business_iban:
+    type: string
+    weight: 4
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_business_mobile:
+    type: libphonenumber_link
+    weight: 7
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_business_number:
+    type: string
+    weight: 9
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_business_phone:
+    type: libphonenumber_link
+    weight: 6
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_business_vat:
+    type: string
+    weight: 3
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  name:
+    label: hidden
+    type: string
+    weight: 0
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+hidden:
+  uid: true

@@ -11,6 +11,7 @@ dependencies:
 
 config_devel:
   - core.entity_form_display.business.business.default
+  - core.entity_view_display.business.business.default
   - field.field.business.business.field_business_accountable
   - field.field.business.business.field_business_address
   - field.field.business.business.field_business_bic
