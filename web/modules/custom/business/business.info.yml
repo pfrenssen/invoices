@@ -20,6 +20,7 @@ config_devel:
   - field.field.business.business.field_business_number
   - field.field.business.business.field_business_phone
   - field.field.business.business.field_business_vat
+  - field.field.user.user.field_user_businesses
   - field.storage.business.field_business_accountable
   - field.storage.business.field_business_address
   - field.storage.business.field_business_bic
@@ -29,4 +30,5 @@ config_devel:
   - field.storage.business.field_business_number
   - field.storage.business.field_business_phone
   - field.storage.business.field_business_vat
+  - field.storage.user.field_user_businesses
   - views.view.businesses
