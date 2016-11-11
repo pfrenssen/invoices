@@ -1,9 +1,14 @@
 <?php
 
+declare (strict_types = 1);
+
 /**
  * @file
  * Main functions and hook implementations for the Business module.
  */
+
+use Drupal\Core\Render\Element;
+use Drupal\business\Entity\BusinessInterface;
 
 /**
  * Implements hook_entity_info().
@@ -675,6 +680,65 @@ function business_add_to_user(Business $business, \stdClass $account) {
 function business_label(Business $entity, $entity_type) {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
   return $entity->getName();
+}
+
+/**
+ * Implements hook_theme().
+ */
+function business_theme() {
+  return [
+    'business' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Prepares variables for business templates.
+ *
+ * Default template: business.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An array of render elements to display.
+ */
+function template_preprocess_business(&$variables) {
+  // @todo Mark this function as return void.
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $variables['business'] = $variables['elements']['#business'];
+  /** @var \Drupal\business\Entity\BusinessInterface $business */
+  $business = $variables['business'];
+
+  // Remove the title, this is rendered as a field.
+  unset($variables['elements']['title']);
+
+  // The 'page' variable is set to TRUE when the view mode is 'full' and we are
+  // on the 'business.view' route.
+  $variables['page'] = $variables['view_mode'] == 'full' && business_is_page($business);
+
+  // Helpful $content variable for templates.
+  $variables += array('content' => array());
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Checks whether the current page is the canonical page of the given business.
+ *
+ * @param \Drupal\business\Entity\BusinessInterface $business
+ *   The business to check.
+ *
+ * @return bool
+ *   TRUE if we are on the canonical page of the given business, FALSE
+ *   otherwise.
+ */
+function business_is_page(BusinessInterface $business) : bool {
+  $route_match = \Drupal::routeMatch();
+  if ($route_match->getRouteName() == 'entity.business.canonical') {
+    $page_business = $route_match->getParameter('business');
+  }
+  return !empty($page_business) ? $page_business->id() == $business->id() : FALSE;
 }
 
 /**
