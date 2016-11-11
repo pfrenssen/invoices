@@ -76,7 +76,7 @@ trait BusinessTestHelper {
    * @return \Drupal\business\Entity\BusinessInterface
    *   A new business entity.
    */
-  public function createBusiness(array $values = array()) {
+  public function createBusiness(array $values = []) {
     // Provide some default values.
     $values += $this->randomBusinessValues();
     $business = Business::create();
@@ -100,7 +100,7 @@ trait BusinessTestHelper {
    * @return \Drupal\business\Entity\BusinessInterface
    *   A new business entity.
    */
-  public function createUiBusiness(array $values = array()) {
+  public function createUiBusiness(array $values = []) {
     // Provide some default values.
     $values += $this->randomBusinessValues();
 
@@ -132,7 +132,7 @@ trait BusinessTestHelper {
    *   An associative array of random values, keyed by property name.
    */
   public function randomBusinessValues() {
-    return array(
+    return [
       'name' => $this->randomString(),
       'created' => rand(0, 2000000000),
       'changed' => rand(0, 2000000000),
@@ -145,7 +145,7 @@ trait BusinessTestHelper {
       'field_business_number' => $this->randomString(),
       'field_business_phone' => $this->randomPhoneNumberField(),
       'field_business_vat' => $this->randomString(),
-    );
+    ];
   }
 
   /**
@@ -159,7 +159,7 @@ trait BusinessTestHelper {
    */
   public function randomBusinessFieldValues() {
     throw new \Exception(__METHOD__ . ' is deprecated.');
-    $values = array();
+    $values = [];
 
     // @todo Add accountable and trade registry number.
     $values['name'][LANGUAGE_NONE][0]['value'] = $this->randomString();
@@ -190,11 +190,11 @@ trait BusinessTestHelper {
    */
   protected function randomBusinessPropertyValues() {
     throw new \Exception(__METHOD__ . ' is deprecated.');
-    return array(
+    return [
       'type' => $this->randomName(),
       'created' => rand(0, 2000000000),
       'changed' => rand(0, 2000000000),
-    );
+    ];
   }
 
   /**
@@ -212,7 +212,7 @@ trait BusinessTestHelper {
    */
   public function convertBusinessValuesToFormPostValues(array $values) {
     // @todo Add accountable and trade registry number.
-    return array(
+    return [
       'name[0][value]' => $values['name'],
       'field_business_email[0][value]' => $values['field_business_email'],
       // @todo Support other countries in addition to Belgium.
@@ -227,7 +227,7 @@ trait BusinessTestHelper {
       'field_business_number[0][value]' => $values['field_business_number'],
       'field_business_phone[0][raw_input]' => $values['field_business_phone']['raw_input'],
       'field_business_mobile[0][raw_input]' => $values['field_business_mobile']['raw_input'],
-    );
+    ];
   }
 
   /**
@@ -270,7 +270,7 @@ trait BusinessTestHelper {
   public function randomBusiness() {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $bid = db_select('business', 'b')
-      ->fields('b', array('bid'))
+      ->fields('b', ['bid'])
       ->orderRandom()
       ->range(0, 1)
       ->execute()

@@ -36,9 +36,9 @@ class BusinessListBuilder extends EntityListBuilder {
     $row['name'] = $this->l(
       $entity->label(),
       new Url(
-        'entity.business.edit_form', array(
+        'entity.business.edit_form', [
           'business' => $entity->id(),
-        )
+        ]
       )
     );
     return $row + parent::buildRow($entity);
