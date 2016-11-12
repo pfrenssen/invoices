@@ -235,7 +235,7 @@ trait BaseTestHelper {
    * @code
    *   $required_fields = [
    *     'name' => t('Client name'),
-   *     'field_client_email[und][0][email]' => t('Email address'),
+   *     'field_client_email[0][email]' => t('Email address'),
    *   ];
    *   $this->assertRequiredFieldMessages($required_fields);
    * @endcode
