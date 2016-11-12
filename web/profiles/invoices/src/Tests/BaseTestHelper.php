@@ -255,7 +255,9 @@ trait BaseTestHelper {
     // Use the standard message of the Field module by default.
     if (!$messages) {
       foreach ($required_fields as $required_field) {
-        $messages['error'][] = (string) t('!name field is required.', ['!name' => $required_field]);
+        $messages['error'][] = (string) t('@name field is required.', [
+          '@name' => $required_field,
+        ]);
       }
     }
     $this->assertFieldValidationFailed(array_keys($required_fields));
