@@ -37,7 +37,7 @@
         "composer/installers": "^1.0.20",
         "cweagans/composer-patches": "~1.0",
         "drupal-composer/drupal-scaffold": "^2.0.1",
-        "drupal/address": "^1.0@beta",
+        "drupal/address": "dev-1.x",
         "drupal/console": "~1.0",
         "drupal/core": "~8.0",
         "drupal/libphonenumber": "dev-1.x",
@@ -92,6 +92,9 @@
     },
     "extra": {
         "patches": {
+            "drupal/address": {
+                "Add an option for allowing incomplete data to be saved": "https://www.drupal.org/files/issues/2514126-20.patch"
+            },
             "drupal/config_devel": {
                 "Create config/install folders in execution time": "https://www.drupal.org/files/issues/2558299-7.patch"
             }

@@ -47,7 +47,7 @@ class BusinessUiTest extends InvoicesFunctionalTestBase {
   /**
    * Tests the business form.
    */
-  public function _testBusinessForm() {
+  public function testBusinessForm() {
     // Check that the database table exists and is empty.
     $this->assertTrue($this->connection->schema()->tableExists('business'), 'The business database table exists.');
     $this->assertBusinessTableEmpty('The business database is initially empty.');
@@ -57,9 +57,6 @@ class BusinessUiTest extends InvoicesFunctionalTestBase {
     $this->drupalPostForm('business/add', [], t('Save'));
     $required_fields = ['name[0][value]' => t('Business name')];
     $this->assertRequiredFieldMessages($required_fields);
-
-    // @todo test fails here because the address field is required. Fix this in
-    //   the Address module.
 
     // Check form validation errors.
     $invalid_values = [
@@ -126,9 +123,9 @@ class BusinessUiTest extends InvoicesFunctionalTestBase {
 
     // Add the businesses to the user.
     $this->drupalPostForm(NULL, ['field_user_businesses[0][target_id]' => $business1->getName() . ' (' . $business1->id() . ')'], t('Add another item'));
-    $this->assertFieldById('edit-field-user-businesses-und-1-target-id', '', 'The field_user_businesses for a second business is shown on the page.');
+    $this->assertSession()->fieldExists('edit-field-user-businesses-1-target-id');
     $this->drupalPostForm(NULL, ['field_user_businesses[1][target_id]' => $business2->getName() . ' (' . $business2->id() . ')'], t('Add another item'));
-    $this->assertFieldById('edit-field-user-businesses-und-1-target-id', '', 'The field_user_businesses for a third business is shown on the page.');
+    $this->assertSession()->fieldExists('edit-field-user-businesses-2-target-id');
     $this->drupalPostForm(NULL, [], t('Save'));
     $this->assertRaw('The changes have been saved.', 'The user was saved successfully.');
 
