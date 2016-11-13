@@ -8,6 +8,7 @@ use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\user\Entity\Role;
@@ -119,7 +120,7 @@ trait BaseTestHelper {
       else {
         throw new \Exception('Support for multivalue fields is not yet implemented.');
       }
-      $this->assertEquals($expected_value, $actual);
+      $this->assertEquals($expected_value, $actual, $field_name);
     }
   }
 
@@ -174,10 +175,8 @@ trait BaseTestHelper {
    *   An associative array of status messages that should be displayed, keyed
    *   by message type (either 'status', 'warning' or 'error'). Every type
    *   contains an indexed array of status messages.
-   * @param string $message
-   *   The message to display along with the assertion.
    */
-  protected function assertStatusMessages(array $messages, string $message = '') {
+  protected function assertStatusMessages(array $messages) {
     // Messages can contain a mix of HTML and sanitized HTML, for example:
     // '<em class="placeholder">&lt;script&gt;alert();&lt;&#039;script&gt;</em>'
     // Unfortunately, check_plain() and SimpleXML::asXml() encode quotes and
@@ -187,7 +186,6 @@ trait BaseTestHelper {
     $shown_messages = $this->decodeStatusMessages($this->getStatusMessages());
     $decoded_messages = $this->decodeStatusMessages($messages);
 
-    $result = TRUE;
     foreach (['status', 'warning', 'error'] as $type) {
       $expected_messages = !empty($decoded_messages[$type]) ? $decoded_messages[$type] : [];
 
@@ -197,20 +195,13 @@ trait BaseTestHelper {
         $key = array_search($shown_message, $expected_messages);
 
         // If the message is not one of the expected messages, fail.
-        if ($key === FALSE) {
-          $result &= $this->fail(new FormattableMarkup('Unexpected @type message: @message', ['@type' => $type, '@message' => $shown_message]));
-        }
+        $this->assertNotFalse($key, new FormattableMarkup('Unexpected @type message: @message', ['@type' => $type, '@message' => $shown_message]));
 
-        // Mark found messages as passed and remove them from the list.
-        else {
-          $this->assertTrue(TRUE, new FormattableMarkup('Found @type message: @message', ['@type' => $type, '@message' => $shown_message]));
-          unset($expected_messages[$key]);
-        }
+        // Remove found messages from the list.
+        unset($expected_messages[$key]);
       }
-      // Throw fails for all expected messages that are not shown.
-      foreach ($expected_messages as $expected_message) {
-        $result &= $this->fail(new FormattableMarkup('Did not find @type message: @message', ['@type' => $type, '@message' => $expected_message]));
-      }
+      // Fail if any of the expected messages is not shown.
+      $this->assertEmpty($expected_messages, new FormattableMarkup('Did not find @type messages: @messages', ['@type' => $type, '@messages' => '"' . implode('", "', $expected_messages) . '"']));
     }
 
     // Also check if the correctly encoded messages are present in the raw HTML.
@@ -219,11 +210,9 @@ trait BaseTestHelper {
     // negatives.
     foreach ($messages as $type => $expected_messages) {
       foreach ($expected_messages as $expected_message) {
-        $result &= $this->assertRaw($expected_message, new FormattableMarkup('Found correctly encoded message in raw HTML: @message', ['@message' => $expected_message]));
+        $this->assertSession()->responseContains($expected_message, new FormattableMarkup('Found correctly encoded message in raw HTML: @message', ['@message' => $expected_message]));
       }
     }
-
-    $this->assertTrue($result, $message ?: 'The correct messages are shown.');
   }
 
   /**
@@ -261,7 +250,7 @@ trait BaseTestHelper {
       }
     }
     $this->assertFieldValidationFailed(array_keys($required_fields));
-    $this->assertStatusMessages($messages, $message ?: 'The error messages about required fields are present.');
+    $this->assertStatusMessages($messages);
   }
 
   /**
@@ -322,7 +311,7 @@ trait BaseTestHelper {
     foreach (array_keys($return) as $type) {
       // Retrieve the entire messages container.
       /** @var NodeElement[] $messages */
-      if ($messages = $this->xpath('//div[contains(@class, "messages") and contains(@class, :type)]', [':type' => $type])) {
+      if ($messages = $this->xpath('//div[contains(concat(" ", @class, " "), " messages ") and contains(concat(" ", @class, " "), " messages--' . $type . ' ")]')) {
         // If only a single message is being rendered by theme_status_messages()
         // it outputs it as text preceded by an <h2> element that is provided
         // for accessibility reasons. An example:
@@ -340,18 +329,31 @@ trait BaseTestHelper {
         $dom = new \DOMDocument();
 
         // Load the messages HTML using UTF-8 encoding.
-        @$dom->loadHTML('<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $messages[0]->getHtml() . '</body></html>');
+        @$dom->loadHTML('<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $messages[0]->getOuterHtml() . '</body></html>');
         // Strip the accessibility element.
         $accessibility_message = $dom->getElementsByTagName('h2')->item(0);
         $accessibility_message->parentNode->removeChild($accessibility_message);
 
         // We have valid XML now, so we can use XPath to find the messages. If
         // there are multiple messages, they are output in an unordered list. A
-        // single message is output directly in the <div> container.
+        // single message is output directly in the <div> container. In case of
+        // an 'error' message, the output is wrapped in a second div.
         $xpath = new \DOMXPath($dom);
-        $elements = $xpath->query('//body/div/ul/li');
-        if (!$elements->length) {
-          $elements = $xpath->query('//body/div');
+        $paths = [
+          // Multiple messages of type 'error'.
+          '//body/div/div/ul/li',
+          // A single message of type 'error'.
+          '//body/div/div',
+          // Multiple messages of type 'warning' or 'status'.
+          '//body/div/ul/li',
+          // A single message of type 'warning' or 'status'.
+          '//body/div',
+        ];
+        foreach ($paths as $path) {
+          $elements = $xpath->query($path);
+          if ($elements->length) {
+            break;
+          }
         }
 
         // Loop over the messages. Strip the containing element, which is either
@@ -514,6 +516,21 @@ trait BaseTestHelper {
    */
   public static function randomName(int $length = 8) : string {
     return (new Random())->name($length, TRUE);
+  }
+
+  /**
+   * Returns the unchanged, i.e. not modified, entity from the database.
+   *
+   * @param string $entity_type_id
+   *   The entity type.
+   * @param mixed $id
+   *   The ID of the entity to return.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The entity.
+   */
+  public function loadUnchangedEntity(string $entity_type_id, $id) : EntityInterface {
+    return $this->entityTypeManager->getStorage($entity_type_id)->loadUnchanged($id);
   }
 
 }

@@ -73,6 +73,13 @@ class Business extends ContentEntityBase implements BusinessInterface {
   /**
    * {@inheritdoc}
    */
+  public function id() : int {
+    return (int) parent::id();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getName() : string {
     return $this->get('name')->value;
   }

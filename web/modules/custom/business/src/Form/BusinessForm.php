@@ -23,15 +23,13 @@ class BusinessForm extends ContentEntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label Business.', [
+        drupal_set_message($this->t('Created new business %label.', [
           '%label' => $entity->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label Business.', [
-          '%label' => $entity->label(),
-        ]));
+        drupal_set_message($this->t('The changes have been saved.'));
     }
     $form_state->setRedirect('entity.business.canonical', ['business' => $entity->id()]);
   }

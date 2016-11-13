@@ -279,4 +279,17 @@ trait BusinessTestHelper {
     return business_load($bid);
   }
 
+  /**
+   * Returns the unchanged, i.e. not modified, business from the database.
+   *
+   * @param int $id
+   *   The ID of the business to return.
+   *
+   * @return \Drupal\business\Entity\Business
+   *   The business.
+   */
+  public function loadUnchangedBusiness(int $id) : Business {
+    return $this->loadUnchangedEntity('business', $id);
+  }
+
 }

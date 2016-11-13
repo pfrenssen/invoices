@@ -2,6 +2,7 @@
 
 namespace Drupal\invoices\Tests;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\business\Tests\BusinessTestHelper;
 
@@ -47,10 +48,19 @@ class InvoicesFunctionalTestBase extends BrowserTestBase {
   );
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
 
     // Create the requested user accounts.
     foreach ($this->usersToCreate as $role) {
