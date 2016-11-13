@@ -30,6 +30,7 @@ config_devel:
   - block.block.bartik_main_menu
   - block.block.bartik_messages
   - block.block.bartik_page_title
+  - core.entity_form_display.user.user.default
   - system.menu.main
   - system.theme
   - user.role.administrator
