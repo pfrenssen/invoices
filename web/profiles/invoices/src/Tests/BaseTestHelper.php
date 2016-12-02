@@ -395,7 +395,7 @@ trait BaseTestHelper {
    *   A random email address.
    */
   protected function randomEmail() : string {
-    return strtolower($this->randomName()) . '@example.com';
+    return strtolower($this->randomMachineName()) . '@example.com';
   }
 
   /**
