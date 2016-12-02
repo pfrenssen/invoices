@@ -1,0 +1,55 @@
+lib/tests/
+├── access
+│   ├── access_web_test_case.php
+│   ├── administrator.test
+│   ├── anonymous_user.test
+│   ├── authenticated_user.test
+│   ├── business_owner.test
+│   └── client.test
+├── create_client.test
+├── entity_test_case.test
+├── invoicing_integration_test_case.test
+├── invoicing_web_test_case.test
+└── registration_form.test
+
+tests/features/
+├── create_client.feature
+├── create_invoice.feature
+├── export_pdf.feature
+├── invoice_number.feature
+├── invoices.feature
+├── price_calculation.feature
+├── tax_rates.feature
+└── user_login.feature
+
+business/tests/
+├── crud.test     - BusinessCrudTest
+├── entity.test   - BusinessEntityTest
+├── overview.test - BusinessOverviewTest
+├── ui.test       - BusinessUiTest
+└── unit.test     - BusinessManagerTest
+
+client/tests/
+├── crud.test
+├── entity.test
+├── overview.test
+├── ui.test
+└── unit.test
+
+invoice/tests/
+├── client_reference.test
+├── crud.test
+├── entity.test
+├── export.test
+├── overview.test
+├── ui.test
+└── unit.test
+
+invoicing_dashboard/tests/
+└── ui.test
+
+line_item/tests/
+├── crud.test
+├── overview.test
+├── tax_rate_ui.test
+└── unit.test
