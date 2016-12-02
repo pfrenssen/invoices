@@ -129,14 +129,14 @@ trait BaseTestHelper {
    *
    * This checks for the presence of the 'error' class on the field.
    *
-   * @param array $fields
+   * @param array $field_names
    *   An indexed array of field names that should be checked.
    */
-  protected function assertFieldValidationFailed(array $fields) {
-    foreach ($fields as $field) {
+  protected function assertFieldValidationFailed(array $field_names) {
+    foreach ($field_names as $field_name) {
       $xpath = '//textarea[@name=:value and contains(@class, "error")]|//input[@name=:value and contains(@class, "error")]|//select[@name=:value and contains(@class, "error")]';
-      $elements = $this->xpath($this->buildXPathQuery($xpath, [':value' => $field]));
-      $this->assertTrue($elements, new FormattableMarkup('The field %field has the "error" class.', ['%field' => $field]));
+      $elements = $this->xpath($this->buildXPathQuery($xpath, [':value' => $field_name]));
+      $this->assertTrue($elements, new FormattableMarkup('The field %field has the "error" class.', ['%field' => $field_name]));
     }
   }
 
