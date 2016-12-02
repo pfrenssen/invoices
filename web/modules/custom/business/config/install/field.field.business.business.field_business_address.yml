@@ -44,5 +44,4 @@ settings:
     givenName: '0'
     additionalName: '0'
     familyName: '0'
-  langcode_override: ''
 field_type: address

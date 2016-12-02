@@ -6,6 +6,7 @@ package: Invoicing
 
 dependencies:
   - address
+  - entity_reference_validators
   - libphonenumber
   - views
 

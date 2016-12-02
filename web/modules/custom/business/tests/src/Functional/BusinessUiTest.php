@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Drupal\Tests\simpletest\Functional;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\business\Tests\BusinessTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
@@ -159,11 +160,19 @@ class BusinessUiTest extends InvoicesFunctionalTestBase {
     // to the same user.
     $this->drupalPostForm(NULL, ['field_user_businesses[2][target_id]' => $business1->getName() . ' (' . $business1->id() . ')'], t('Add another item'));
     $this->drupalPostForm(NULL, [], t('Save'));
-    // @todo Replace this with $this->assertFieldValidationFailed() and
-    //   $this->assertStatusMessages() when we are using traits.
-    // @see http://atrium.pocomas.be/invoicing/node/1161
-    // @todo use/port entity reference unique
-    $this->assertSession()->responseContains('field can contain only unique values');
+
+    // Check that both fields containing the duplicated value are marked as
+    // invalid.
+    $this->assertFieldValidationFailed([
+      'field_user_businesses[0][target_id]',
+      'field_user_businesses[2][target_id]',
+    ]);
+    // Check that a warning message is shown to the user.
+    $this->assertStatusMessages([
+      'error' => [
+        (string) new FormattableMarkup('The value %value has been entered multiple times.', ['%value' => $business1->getName() . ' (' . $business1->id() . ')']),
+      ],
+    ]);
   }
 
   /**
