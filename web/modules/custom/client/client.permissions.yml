@@ -1,0 +1,33 @@
+add client entities:
+  title: 'Create new Client entities'
+
+administer client entities:
+  title: 'Administer Client entities'
+  description: 'Allow to access the administration form to configure Client entities.'
+  restrict access: true
+
+delete client entities:
+  title: 'Delete Client entities'
+
+edit client entities:
+  title: 'Edit Client entities'
+
+access client overview:
+  title: 'Access the Client overview page'
+
+view published client entities:
+  title: 'View published Client entities'
+
+view unpublished client entities:
+  title: 'View unpublished Client entities'
+
+view all client revisions:
+  title: 'View all Client revisions'
+
+revert all client revisions:
+  title: 'Revert all Client revisions'
+  description: 'Role requires permission <em>view Client revisions</em> and <em>edit rights</em> for client entities in question or <em>administer client entities</em>.'
+
+delete all client revisions:
+  title: 'Delete all revisions'
+  description: 'Role requires permission to <em>view Client revisions</em> and <em>delete rights</em> for client entities in question or <em>administer client entities</em>.'

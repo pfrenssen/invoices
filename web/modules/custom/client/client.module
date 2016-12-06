@@ -1,0 +1,8 @@
+<?php
+
+declare (strict_types = 1);
+
+/**
+ * @file
+ * Main functions and hook implementations for the Client module.
+ */
