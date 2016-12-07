@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: business_owner
+label: 'Business owner'
+weight: 3
+is_admin: null
+permissions:
+  - 'edit own businesses'
+  - 'view own businesses'

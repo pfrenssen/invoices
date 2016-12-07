@@ -34,3 +34,5 @@ config_devel:
   - system.menu.main
   - system.theme
   - user.role.administrator
+  - user.role.business_owner
+  - user.role.client
