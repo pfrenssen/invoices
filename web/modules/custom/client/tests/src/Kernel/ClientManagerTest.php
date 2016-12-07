@@ -6,8 +6,10 @@ namespace Drupal\Tests\client\Kernel;
 
 use Drupal\business\Tests\BusinessTestHelper;
 use Drupal\client\Tests\ClientTestHelper;
+use Drupal\invoice\Tests\InvoiceTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\line_item\Tests\LineItemTestHelper;
 
 /**
  * Unit tests for the Client module.
@@ -21,6 +23,18 @@ class ClientManagerTest extends EntityKernelTestBase {
   use ClientTestHelper;
   use InvoiceTestHelper;
   use LineItemTestHelper;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'address',
+    'business',
+    'client',
+    'entity_reference_validators',
+    'libphonenumber',
+    'views',
+  ];
 
   /**
    * Test business entities.

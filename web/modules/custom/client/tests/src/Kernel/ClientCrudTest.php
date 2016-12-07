@@ -26,6 +26,7 @@ class ClientCrudTest extends EntityKernelTestBase {
   public static $modules = [
     'address',
     'business',
+    'client',
     'entity_reference_validators',
     'libphonenumber',
     'views',

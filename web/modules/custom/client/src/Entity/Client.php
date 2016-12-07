@@ -172,7 +172,7 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
   /**
    * {@inheritdoc}
    */
-  public function setRevisionCreationTime(int $timestamp) : ClientInterface {
+  public function setRevisionCreationTime($timestamp) {
     $this->set('revision_timestamp', $timestamp);
     return $this;
   }

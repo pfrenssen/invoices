@@ -268,15 +268,14 @@ trait BusinessTestHelper {
    *   A random business.
    */
   public function randomBusiness() {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $bid = db_select('business', 'b')
+    $bid = $this->connection->select('business', 'b')
       ->fields('b', ['bid'])
       ->orderRandom()
       ->range(0, 1)
       ->execute()
       ->fetchColumn();
 
-    return business_load($bid);
+    return Business::load($bid);
   }
 
   /**

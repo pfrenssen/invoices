@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Drupal\Tests\simpletest\Functional;
 
+use Drupal\business\Entity\Business;
 use Drupal\client\Tests\ClientTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
 use Drupal\invoices\Tests\InvoicesFunctionalTestBase;
@@ -23,60 +24,47 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
    */
   protected $usersToCreate = array(
     'administrator',
-    'business owner',
+    'business_owner',
   );
 
   /**
    * An array of test clients.
    *
-   * @var array
+   * @var \Drupal\client\Entity\Client[]
    */
   protected $clients;
 
   /**
    * A business owned by the second business owner.
    *
-   * @var Business
+   * @var \Drupal\business\Entity\Business
    */
   protected $business2;
 
   /**
    * A client owned by the second business owner.
    *
-   * @var Client
+   * @var \Drupal\client\Entity\Client
    */
   protected $client2;
 
   /**
-   * Returns test case metadata.
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Overview test',
-      'description' => 'Tests the client overview.',
-      'group' => 'Invoicing - Client',
-    );
-  }
-
-  /**
    * Tests the client overview.
-   *
-   * @var SimpleXMLElement $tablerow
    */
   public function testOverview() {
     // Create a second business owner with a business and client to test
     // negative cases.
-    $this->users['business owner 2'] = $this->drupalCreateUserWithRole('business owner');
+    $this->users['business_owner2'] = $this->drupalCreateUserWithRole('business_owner');
 
     $this->business2 = $this->createBusiness();
     $this->business2->save();
-    $this->addBusinessToUser($this->business2, $this->users['business owner 2']);
+    $this->addBusinessToUser($this->business2, $this->users['business_owner2']);
 
-    $this->drupalLogin($this->users['business owner 2']);
+    $this->drupalLogin($this->users['business_owner2']);
     $this->client2 = $this->createUiClient();
 
     // Log in the test user and create a number of test clients.
-    $this->drupalLogin($this->users['business owner']);
+    $this->drupalLogin($this->users['business_owner']);
     for ($i = 0; $i < 20; $i++) {
       // Make sure the client name starts with letters to avoid random test
       // failures to due differences in sorting of special characters between
@@ -193,7 +181,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
 
     // Create 2 business owners, each owning a business with 2 clients.
     for ($i = 0; $i < 2; $i++) {
-      $user = $this->drupalCreateUserWithRole('business owner');
+      $user = $this->drupalCreateUserWithRole('business_owner');
       $business = $this->createBusiness();
       $business->save();
       $this->addBusinessToUser($business, $user);

@@ -23,7 +23,7 @@ class ClientUITest extends InvoicesFunctionalTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $usersToCreate = array('business owner');
+  protected $usersToCreate = array('business_owner');
 
   /**
    * Returns test case metadata.
@@ -43,7 +43,7 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     parent::setup();
 
     // Log in.
-    $this->drupalLogin($this->users['business owner']);
+    $this->drupalLogin($this->users['business_owner']);
   }
 
   /**

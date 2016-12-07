@@ -43,7 +43,7 @@ class InvoicesFunctionalTestBase extends BrowserTestBase {
   protected $usersToCreate = array(
     'administrator',
     'authenticated user',
-    'business owner',
+    'business_owner',
     'client',
   );
 

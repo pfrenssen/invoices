@@ -25,6 +25,7 @@ class ClientEntityTest extends ContentEntityTestBase {
    */
   public static $modules = [
     'address',
+    'business',
     'client',
     'entity_reference_validators',
     'libphonenumber',

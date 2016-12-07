@@ -4,6 +4,8 @@ declare (strict_types = 1);
 
 namespace Drupal\client\Tests;
 
+use Drupal\client\Entity\Client;
+
 /**
  * Reusable test methods for testing clients.
  */
@@ -24,7 +26,8 @@ trait ClientTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertClientProperties(\Client $client, array $values, $message = '', $group = 'Other') {
+  function assertClientProperties(Client $client, array $values, string $message = '', string $group = 'Other') : bool {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     return $this->assertEntityProperties('client', $client, $values, $message, $group);
   }
 
@@ -39,7 +42,8 @@ trait ClientTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertClientTableEmpty($message = '', $group = 'Other') {
+  function assertClientTableEmpty(string $message = '', string $group = 'Other') : bool {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $result = (bool) db_select('client', 'c')->fields('c')->execute()->fetchAll();
     return $this->assertFalse($result, $message ?: 'The client database table is empty.', $group);
   }
@@ -55,7 +59,8 @@ trait ClientTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertClientTableNotEmpty($message = '', $group = 'Other') {
+  function assertClientTableNotEmpty(string $message = '', string $group = 'Other') : bool {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $result = (bool) db_select('client', 'c')->fields('c')->execute()->fetchAll();
     return $this->assertTrue($result, $message ?: 'The client database table is not empty.', $group);
   }
@@ -71,7 +76,8 @@ trait ClientTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertClientRevisionTableEmpty($message = '', $group = 'Other') {
+  function assertClientRevisionTableEmpty(string $message = '', string $group = 'Other') : bool {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $result = (bool) db_select('client_revision', 'cr')->fields('cr')->execute()->fetchAll();
     return $this->assertFalse($result, $message ?: 'The client revision database table is empty.', $group);
   }
@@ -87,7 +93,8 @@ trait ClientTestHelper {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertClientRevisionTableNotEmpty($message = '', $group = 'Other') {
+  function assertClientRevisionTableNotEmpty(string $message = '', string $group = 'Other') : bool {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $result = (bool) db_select('client_revision', 'cr')->fields('cr')->execute()->fetchAll();
     return $this->assertTrue($result, $message ?: 'The client revision database table is not empty.', $group);
   }
@@ -108,7 +115,8 @@ trait ClientTestHelper {
    * @throws \Exception
    *   Thrown if the required business ID parameter is not set.
    */
-  function createClient(array $values = array()) {
+  function createClient(array $values = []) : Client {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Check if the business ID is set, this is a required parameter.
     if (!isset($values['bid'])) {
       throw new \Exception('The "bid" property is required.');
@@ -138,7 +146,8 @@ trait ClientTestHelper {
    * @return \Client
    *   A new client entity.
    */
-  function createUiClient(array $values = array()) {
+  function createUiClient(array $values = []) : Client {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Provide some default values.
     $values += $this->randomClientValues();
 
@@ -170,8 +179,9 @@ trait ClientTestHelper {
    * @returns array
    *   An associative array of random values, keyed by property name.
    */
-  function randomClientValues() {
-    return array(
+  function randomClientValues() : array {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+    return [
       'name' => $this->randomString(),
       'field_client_address' => $this->randomAddressField(),
       'field_client_shipping_address' => $this->randomAddressField(),
@@ -179,8 +189,8 @@ trait ClientTestHelper {
       'field_client_notes' => $this->randomString(),
       'field_client_phone' => $this->randomPhoneNumberField(),
       'field_client_vat' => $this->randomString(),
-      'field_client_website' => array('url' => 'http://www.test.be'),
-    );
+      'field_client_website' => ['url' => 'http://www.test.be'],
+    ];
   }
 
   /**
@@ -194,14 +204,15 @@ trait ClientTestHelper {
    * @return array
    *   An associative array of property values, keyed by property name.
    */
-  protected function randomClientPropertyValues() {
-    return array(
+  protected function randomClientPropertyValues() : array {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+    return [
       'name' => $this->randomString(),
       'type' => $this->randomName(),
       'bid' => $this->randomBusiness()->identifier(),
       'created' => rand(0, 2000000000),
       'changed' => rand(0, 2000000000),
-    );
+    ];
   }
 
   /**
@@ -210,8 +221,9 @@ trait ClientTestHelper {
    * @returns array
    *   An associative array of field data, keyed by field name.
    */
-  public function randomClientFieldValues() {
-    $values = array();
+  public function randomClientFieldValues() : array {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+    $values = [];
 
     $values['field_client_address'][LANGUAGE_NONE][0] = $this->randomAddressField();
     $values['field_client_shipping_address'][LANGUAGE_NONE][0] = $this->randomAddressField();
@@ -237,8 +249,9 @@ trait ClientTestHelper {
    *
    * @see self::randomClientValues()
    */
-  public function convertClientValuesToFormPostValues(array $values) {
-    return array(
+  public function convertClientValuesToFormPostValues(array $values) : array {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+    return [
       'name' => $values['name'],
       'field_client_email[und][0][email]' => $values['field_client_email'],
       // @todo Support other countries in addition to Belgium.
@@ -255,7 +268,7 @@ trait ClientTestHelper {
       'field_client_phone[und][0][number]' => $values['field_client_phone']['number'],
       'field_client_notes[und][0][value]' => $values['field_client_notes'],
       'field_client_website[und][0][url]' => $values['field_client_website']['url'],
-    );
+    ];
   }
 
   /**
@@ -267,7 +280,8 @@ trait ClientTestHelper {
    *   An associative array of values to apply to the entity, keyed by property
    *   name.
    */
-  function updateClient(\Client $client, array $values) {
+  function updateClient(Client $client, array $values) {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $wrapper = entity_metadata_wrapper('client', $client);
     foreach ($values as $property => $value) {
       $wrapper->$property->set($value);
@@ -280,9 +294,10 @@ trait ClientTestHelper {
    * @return \Client
    *   A random client.
    */
-  function randomClient() {
+  function randomClient() : Client {
+    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $cid = db_select('client', 'c')
-      ->fields('c', array('cid'))
+      ->fields('c', ['cid'])
       ->orderRandom()
       ->range(0, 1)
       ->execute()
