@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.client.field_client_email
+  module:
+    - client
+id: client.client.field_client_email
+field_name: field_client_email
+entity_type: client
+bundle: client
+label: 'E-mail address'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: email

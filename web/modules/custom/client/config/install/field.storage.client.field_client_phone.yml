@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - client
+    - libphonenumber
+id: client.field_client_phone
+field_name: field_client_phone
+entity_type: client
+type: libphonenumber
+settings: {  }
+module: libphonenumber
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

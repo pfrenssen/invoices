@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.client.field_client_phone
+  module:
+    - client
+    - libphonenumber
+id: client.client.field_client_phone
+field_name: field_client_phone
+entity_type: client
+bundle: client
+label: 'Phone number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: libphonenumber
