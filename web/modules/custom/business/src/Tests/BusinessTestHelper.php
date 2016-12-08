@@ -6,7 +6,7 @@ namespace Drupal\business\Tests;
 
 use Drupal\business\Entity\Business;
 use Drupal\business\Entity\BusinessInterface;
-use Drupal\Core\Session\AccountInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Reusable test methods for testing businesses.
@@ -20,6 +20,8 @@ trait BusinessTestHelper {
    *   The Business entity to check.
    * @param array $values
    *   An associative array of values to check, keyed by property name.
+   *
+   * @todo Declare as void return type.
    */
   public function assertBusinessProperties(Business $business, array $values) {
     $this->assertEntityFieldValues($business, $values);
@@ -27,6 +29,8 @@ trait BusinessTestHelper {
 
   /**
    * Checks if the business table exists.
+   *
+   * @todo Declare as void return type.
    */
   public function assertBusinessTableExists() {
     $this->assertTrue($this->connection->schema()->tableExists('business'), 'The business database table exists.');
@@ -37,6 +41,8 @@ trait BusinessTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
+   *
+   * @todo Declare as void return type.
    */
   public function assertBusinessTableEmpty(string $message = '') {
     $result = (bool) $this->connection
@@ -53,6 +59,8 @@ trait BusinessTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
+   *
+   * @todo Declare as void return type.
    */
   public function assertBusinessTableNotEmpty(string $message = '') {
     $result = (bool) $this->connection
@@ -76,7 +84,7 @@ trait BusinessTestHelper {
    * @return \Drupal\business\Entity\BusinessInterface
    *   A new business entity.
    */
-  public function createBusiness(array $values = []) {
+  public function createBusiness(array $values = []) : BusinessInterface {
     // Provide some default values.
     $values += $this->randomBusinessValues();
     $business = Business::create();
@@ -100,7 +108,7 @@ trait BusinessTestHelper {
    * @return \Drupal\business\Entity\BusinessInterface
    *   A new business entity.
    */
-  public function createUiBusiness(array $values = []) {
+  public function createUiBusiness(array $values = []) : BusinessInterface {
     // Provide some default values.
     $values += $this->randomBusinessValues();
 
@@ -126,12 +134,10 @@ trait BusinessTestHelper {
   /**
    * Returns random values for all properties on the business entity.
    *
-   * Intended to be used with the entity metadata wrapper.
-   *
    * @returns array
    *   An associative array of random values, keyed by property name.
    */
-  public function randomBusinessValues() {
+  public function randomBusinessValues() : array {
     return [
       'name' => $this->randomString(),
       'created' => rand(0, 2000000000),
@@ -157,7 +163,7 @@ trait BusinessTestHelper {
    * @deprecated
    *   Use \Drupal\business\Tests\BusinessTestHelper::randomBusinessValues()
    */
-  public function randomBusinessFieldValues() {
+  public function randomBusinessFieldValues() : array {
     throw new \Exception(__METHOD__ . ' is deprecated.');
     $values = [];
 
@@ -188,7 +194,7 @@ trait BusinessTestHelper {
    * @return array
    *   An associative array of property values, keyed by property name.
    */
-  protected function randomBusinessPropertyValues() {
+  protected function randomBusinessPropertyValues() : array {
     throw new \Exception(__METHOD__ . ' is deprecated.');
     return [
       'type' => $this->randomName(),
@@ -210,7 +216,7 @@ trait BusinessTestHelper {
    *
    * @see self::randomBusinessValues()
    */
-  public function convertBusinessValuesToFormPostValues(array $values) {
+  public function convertBusinessValuesToFormPostValues(array $values) : array {
     // @todo Add accountable and trade registry number.
     return [
       'name[0][value]' => $values['name'],
@@ -251,14 +257,14 @@ trait BusinessTestHelper {
    *
    * @param \Drupal\business\Entity\BusinessInterface $business
    *   The business to add to the user.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param \Drupal\user\UserInterface $user
    *   The user the business should be added to.
-   *
-   * @deprecated
-   *   Use BusinessInterface::setOwner()
    */
-  public function addBusinessToUser(BusinessInterface $business, AccountInterface $user) {
-    throw new \Exception(__METHOD__ . ' is deprecated.');
+  public function addBusinessToUser(BusinessInterface $business, UserInterface $user) {
+    /** @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $businesses */
+    $businesses = $user->get('field_user_businesses');
+    $businesses->appendItem(['target_id' => $business->id()]);
+    $user->save();
   }
 
   /**
@@ -267,7 +273,7 @@ trait BusinessTestHelper {
    * @return \Drupal\business\Entity\BusinessInterface
    *   A random business.
    */
-  public function randomBusiness() {
+  public function randomBusiness() : BusinessInterface {
     $bid = $this->connection->select('business', 'b')
       ->fields('b', ['bid'])
       ->orderRandom()

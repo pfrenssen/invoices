@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Drupal\client\Tests;
 
 use Drupal\client\Entity\Client;
+use Drupal\client\Entity\ClientInterface;
 
 /**
  * Reusable test methods for testing clients.
@@ -14,7 +15,7 @@ trait ClientTestHelper {
   /**
    * Check if the properties of the given client match the given values.
    *
-   * @param \Client $client
+   * @param \Drupal\client\Entity\ClientInterface $client
    *   The Client entity to check.
    * @param array $values
    *   An associative array of values to check, keyed by property name.
@@ -23,8 +24,7 @@ trait ClientTestHelper {
    * @param string $group
    *   The type of assertion - examples are "Browser", "PHP".
    *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
+   * @todo Declare as void return type.
    */
   function assertClientProperties(Client $client, array $values, string $message = '', string $group = 'Other') : bool {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
@@ -36,16 +36,17 @@ trait ClientTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
+   * @todo Declare as void return type.
    */
-  function assertClientTableEmpty(string $message = '', string $group = 'Other') : bool {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $result = (bool) db_select('client', 'c')->fields('c')->execute()->fetchAll();
-    return $this->assertFalse($result, $message ?: 'The client database table is empty.', $group);
+  function assertClientTableEmpty(string $message) {
+    $result = (bool) $this->connection
+      ->select('client', 'c')
+      ->fields('c')
+      ->range(0, 1)
+      ->execute()
+      ->fetchAll();
+    $this->assertFalse($result, $message ?: 'The client database table is empty.');
   }
 
   /**
@@ -56,8 +57,7 @@ trait ClientTestHelper {
    * @param string $group
    *   The type of assertion - examples are "Browser", "PHP".
    *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
+   * @todo Declare as void return type.
    */
   function assertClientTableNotEmpty(string $message = '', string $group = 'Other') : bool {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
@@ -73,8 +73,7 @@ trait ClientTestHelper {
    * @param string $group
    *   The type of assertion - examples are "Browser", "PHP".
    *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
+   * @todo Declare as void return type.
    */
   function assertClientRevisionTableEmpty(string $message = '', string $group = 'Other') : bool {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
@@ -90,8 +89,7 @@ trait ClientTestHelper {
    * @param string $group
    *   The type of assertion - examples are "Browser", "PHP".
    *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
+   * @todo Declare as void return type.
    */
   function assertClientRevisionTableNotEmpty(string $message = '', string $group = 'Other') : bool {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
@@ -109,13 +107,13 @@ trait ClientTestHelper {
    *   An optional associative array of values, keyed by property name. Random
    *   values will be applied to all omitted properties.
    *
-   * @return \Client
+   * @return \Drupal\client\Entity\ClientInterface
    *   A new client entity.
    *
    * @throws \Exception
    *   Thrown if the required business ID parameter is not set.
    */
-  function createClient(array $values = []) : Client {
+  function createClient(array $values = []) : ClientInterface {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Check if the business ID is set, this is a required parameter.
     if (!isset($values['bid'])) {
@@ -143,10 +141,10 @@ trait ClientTestHelper {
    *   An optional associative array of values, keyed by property name. Random
    *   values will be applied to all omitted properties.
    *
-   * @return \Client
+   * @return \Drupal\client\Entity\ClientInterface
    *   A new client entity.
    */
-  function createUiClient(array $values = []) : Client {
+  function createUiClient(array $values = []) : ClientInterface {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Provide some default values.
     $values += $this->randomClientValues();
@@ -173,14 +171,10 @@ trait ClientTestHelper {
   /**
    * Returns random values for all editable properties on the client entity.
    *
-   * Intended to be used with the entity metadata wrapper.
-   * These include the fields from the 'client' bundle.
-   *
    * @returns array
    *   An associative array of random values, keyed by property name.
    */
   function randomClientValues() : array {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     return [
       'name' => $this->randomString(),
       'field_client_address' => $this->randomAddressField(),
@@ -274,13 +268,15 @@ trait ClientTestHelper {
   /**
    * Updates the given client with the given properties.
    *
-   * @param \Client $client
+   * @param \Drupal\client\Entity\ClientInterface $client
    *   The client entity to update.
    * @param array $values
    *   An associative array of values to apply to the entity, keyed by property
    *   name.
+   *
+   * @todo Declare as void return type.
    */
-  function updateClient(Client $client, array $values) {
+  function updateClient(ClientInterface $client, array $values) {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $wrapper = entity_metadata_wrapper('client', $client);
     foreach ($values as $property => $value) {
@@ -291,10 +287,10 @@ trait ClientTestHelper {
   /**
    * Returns a random client from the database.
    *
-   * @return \Client
+   * @return \Drupal\client\Entity\ClientInterface
    *   A random client.
    */
-  function randomClient() : Client {
+  function randomClient() : ClientInterface {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $cid = db_select('client', 'c')
       ->fields('c', ['cid'])
