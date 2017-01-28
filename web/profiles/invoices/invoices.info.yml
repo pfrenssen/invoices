@@ -9,6 +9,7 @@ distribution:
 dependencies:
   - block
   - business
+  - client
   - datetime
   - dynamic_page_cache
   - file

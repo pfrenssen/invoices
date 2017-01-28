@@ -114,7 +114,6 @@ trait ClientTestHelper {
    *   Thrown if the required business ID parameter is not set.
    */
   function createClient(array $values = []) : ClientInterface {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Check if the business ID is set, this is a required parameter.
     if (!isset($values['bid'])) {
       throw new \Exception('The "bid" property is required.');
@@ -123,10 +122,8 @@ trait ClientTestHelper {
     // Provide some default values.
     $values += $this->randomClientValues();
 
-    // Creating an empty client and then updating the properties through the
-    // entity metadata wrapper is easier than $field[LANGUAGE_NONE][0][...].
-    $client = client_create();
-    $this->updateClient($client, $values);
+    $client = Client::create();
+    $this->updateEntity($client, $values);
 
     return $client;
   }
@@ -275,9 +272,12 @@ trait ClientTestHelper {
    *   name.
    *
    * @todo Declare as void return type.
+   *
+   * @deprecated
+   *   Use BaseTestHelper::updateEntity() instead.
    */
   function updateClient(ClientInterface $client, array $values) {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
+    throw new \Exception(__METHOD__ . ' is deprecated.');
     $wrapper = entity_metadata_wrapper('client', $client);
     foreach ($values as $property => $value) {
       $wrapper->$property->set($value);

@@ -29,6 +29,7 @@ class ClientCrudTest extends EntityKernelTestBase {
     'client',
     'entity_reference_validators',
     'libphonenumber',
+    'link',
     'views',
   ];
 
@@ -88,7 +89,7 @@ class ClientCrudTest extends EntityKernelTestBase {
     // Update the client and check that the new values were written to the
     // database.
     $new_values = $this->randomClientValues();
-    $this->updateClient($client, $new_values);
+    $this->updateEntity($client, $new_values);
     $client->save();
     $this->assertClientProperties($client, $new_values, 'The client has been updated correctly.');
 

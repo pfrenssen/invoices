@@ -36,14 +36,14 @@ class ClientEntityTest extends ContentEntityTestBase {
    * {@inheritdoc}
    */
   public function getEntityTypeId() {
-    return 'business';
+    return 'client';
   }
 
   /**
    * {@inheritdoc}
    */
   public function getEntityBundleIds() {
-    return ['business'];
+    return ['client'];
   }
 
   /**
