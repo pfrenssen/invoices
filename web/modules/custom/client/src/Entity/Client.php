@@ -196,7 +196,7 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRevisionAuthor() : UserInterface {
+  public function getRevisionAuthor() : ?UserInterface {
     return $this->get('revision_uid')->entity;
   }
 
