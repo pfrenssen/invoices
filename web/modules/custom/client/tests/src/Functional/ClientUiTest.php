@@ -115,6 +115,9 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     $this->assertStatusMessages($messages, 'A message is shown informing the user that the client has been deleted.');
     $this->assertClientTableEmpty('The client database is empty after the client has been deleted.');
     $this->assertUrl('clients', [], 'The user is redirected to the client overview after deleting a client.');
+
+    // @todo Check that the default field for the "Revision log message" is not
+    //   visible.
   }
 
   /**

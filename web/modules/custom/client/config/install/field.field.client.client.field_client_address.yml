@@ -10,7 +10,7 @@ id: client.client.field_client_address
 field_name: field_client_address
 entity_type: client
 bundle: client
-label: Address
+label: 'Billing address'
 description: ''
 required: false
 translatable: false

@@ -241,7 +241,7 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setRequired(TRUE)
-      ->setLabel(t('Name'))
+      ->setLabel(t('Client name'))
       ->setRevisionable(TRUE)
       ->setSettings([
         'max_length' => 50,
