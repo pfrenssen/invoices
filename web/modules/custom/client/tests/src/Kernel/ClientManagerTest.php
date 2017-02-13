@@ -76,7 +76,8 @@ class ClientManagerTest extends EntityKernelTestBase {
     parent::setup();
 
     $this->installEntitySchema('business');
-    $this->installConfig(['business']);
+    $this->installEntitySchema('client');
+    $this->installConfig(['business', 'client']);
 
     // Create two test users, each owning one business with two clients.
     $this->businesses = [];

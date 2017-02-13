@@ -200,13 +200,13 @@ trait ClientTestHelper {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $values = [];
 
-    $values['field_client_address'][LANGUAGE_NONE][0] = $this->randomAddressField();
-    $values['field_client_shipping_address'][LANGUAGE_NONE][0] = $this->randomAddressField();
-    $values['field_client_email'][LANGUAGE_NONE][0]['email'] = $this->randomEmail();
-    $values['field_client_notes'][LANGUAGE_NONE][0]['value'] = $this->randomString();
-    $values['field_client_phone'][LANGUAGE_NONE][0] = $this->randomPhoneNumberField();
-    $values['field_client_vat'][LANGUAGE_NONE][0]['value'] = $this->randomString();
-    $values['field_client_website'][LANGUAGE_NONE][0]['url'] = 'http://www.test.be';
+    $values['field_client_address'][0] = $this->randomAddressField();
+    $values['field_client_shipping_address'][0] = $this->randomAddressField();
+    $values['field_client_email'][0]['value'] = $this->randomEmail();
+    $values['field_client_notes'][0]['value'] = $this->randomString();
+    $values['field_client_phone'][0] = $this->randomPhoneNumberField();
+    $values['field_client_vat'][0]['value'] = $this->randomString();
+    $values['field_client_website'][0]['url'] = 'http://www.test.be';
 
     return $values;
   }
@@ -227,7 +227,7 @@ trait ClientTestHelper {
   public function convertClientValuesToFormPostValues(array $values) : array {
     return [
       'name[0][value]' => $values['name'],
-      'field_client_email[0][email]' => $values['field_client_email'],
+      'field_client_email[0][value]' => $values['field_client_email'],
       // @todo Support other countries in addition to Belgium.
       'field_client_address[0][country_code]' => 'BE',
       'field_client_address[0][address_line1]' => $values['field_client_address']['address_line1'],
