@@ -4,13 +4,15 @@ declare (strict_types = 1);
 
 namespace Drupal\invoice\Tests;
 
+use Drupal\client\Entity\ClientInterface;
+
 /**
  * Reusable test methods for testing invoices.
  */
 trait InvoiceTestHelper {
 
   /**
-   * Check if the properties of the given invoice match the given values.
+   * Checks if the properties of the given invoice match the given values.
    *
    * @param \Invoice $invoice
    *   The Invoice entity to check.
@@ -20,44 +22,35 @@ trait InvoiceTestHelper {
    *   The message to display along with the assertion.
    * @param string $group
    *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  public function assertInvoiceProperties(\Invoice $invoice, array $values, $message = '', $group = 'Other') {
-    return $this->assertEntityProperties('invoice', $invoice, $values, $message, $group);
+  public function assertInvoiceProperties(InvoiceInterface $invoice, array $values, $message = '', $group = 'Other') : void {
+    $this->assertEntityProperties('invoice', $invoice, $values, $message, $group);
   }
 
   /**
-   * Check if the invoice database table is empty.
+   * Checks if the invoice database table is empty.
    *
    * @param string $message
    *   The message to display along with the assertion.
    * @param string $group
    *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  public function assertInvoiceTableEmpty($message = '', $group = 'Other') {
+  public function assertInvoiceTableEmpty($message = '', $group = 'Other') : void {
     $result = (bool) db_select('invoice', 'i')->fields('i')->execute()->fetchAll();
-    return $this->assertFalse($result, $message ?: 'The invoice database table is empty.', $group);
+    $this->assertFalse($result, $message ?: 'The invoice database table is empty.', $group);
   }
 
   /**
-   * Check if the invoice database table is not empty.
+   * Checks if the invoice database table is not empty.
    *
    * @param string $message
    *   The message to display along with the assertion.
    * @param string $group
    *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  public function assertInvoiceTableNotEmpty($message = '', $group = 'Other') {
+  public function assertInvoiceTableNotEmpty($message = '', $group = 'Other') : void {
     $result = (bool) db_select('invoice', 'i')->fields('i')->execute()->fetchAll();
-    return $this->assertTrue($result, $message ?: 'The invoice database table is not empty.', $group);
+    $this->assertTrue($result, $message ?: 'The invoice database table is not empty.', $group);
   }
 
   /**
@@ -73,7 +66,7 @@ trait InvoiceTestHelper {
    * @return \Invoice
    *   A new invoice entity.
    */
-  public function createInvoice(array $values = array()) {
+  public function createInvoice(array $values = []) : InvoiceInterface {
     // Provide some default values.
     $values += $this->randomInvoiceValues();
     $invoice = invoice_create();
@@ -94,7 +87,7 @@ trait InvoiceTestHelper {
    * @return \Invoice
    *   A new invoice entity.
    */
-  public function createUiInvoice(array $values = array()) {
+  public function createUiInvoice(array $values = []) : InvoiceInterface {
     // Provide some default values.
     $values += $this->randomInvoiceValues();
 
@@ -113,7 +106,7 @@ trait InvoiceTestHelper {
     $this->clickAddExistingProductButton();
     $this->clickAddExistingServiceButton();
 
-    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->drupalPostForm(NULL, $edit, t('Save'));
 
     // Retrieve the saved invoice by invoice number and return it.
     $invoice = $this->loadInvoiceByNumber($values['field_invoice_number']);
@@ -128,11 +121,11 @@ trait InvoiceTestHelper {
    * @return array
    *   An associative array of random values, keyed by property name.
    */
-  public function randomInvoiceValues() {
+  public function randomInvoiceValues() : array {
     $date_polarity = rand(0, 1) ? '-' : '+';
     $date_offset = rand(0, 7);
 
-    return array(
+    return [
       'field_invoice_client' => $this->randomClient(),
       'field_invoice_date' => (string) strtotime($date_polarity . $date_offset . ' day 00:00'),
       'field_invoice_number' => $this->randomString(),
@@ -141,9 +134,9 @@ trait InvoiceTestHelper {
       'field_invoice_due_date' => $this->randomDueDate(),
       'field_invoice_terms' => $this->randomString(),
       'field_invoice_status' => $this->randomInvoiceStatus(),
-      'field_invoice_products' => array($this->randomLineItem('product')),
-      'field_invoice_services' => array($this->randomLineItem('service')),
-    );
+      'field_invoice_products' => [$this->randomLineItem('product')],
+      'field_invoice_services' => [$this->randomLineItem('service')],
+    ];
   }
 
   /**
@@ -157,13 +150,13 @@ trait InvoiceTestHelper {
    * @return array
    *   An associative array of property values, keyed by property name.
    */
-  public function randomInvoicePropertyValues() {
-    return array(
+  public function randomInvoicePropertyValues() : array {
+    return [
       'type' => $this->randomName(),
-      'bid' => $this->randomBusiness()->identifier(),
+      'bid' => $this->randomBusiness()->id(),
       'created' => rand(0, 2000000000),
       'changed' => rand(0, 2000000000),
-    );
+    ];
   }
 
   /**
@@ -172,8 +165,8 @@ trait InvoiceTestHelper {
    * @returns array
    *   An associative array of field data, keyed by field name.
    */
-  public function randomInvoiceFieldValues() {
-    $values = array();
+  public function randomInvoiceFieldValues() : array {
+    $values = [];
 
     $date_polarity = rand(0, 1) ? '-' : '+';
     $date_offset = rand(0, 7);
@@ -182,7 +175,7 @@ trait InvoiceTestHelper {
     $product = $this->randomLineItem('product');
     $service = $this->randomLineItem('service');
 
-    $values['field_invoice_client'][LANGUAGE_NONE][0]['target_id'] = $client->identifier();
+    $values['field_invoice_client'][LANGUAGE_NONE][0]['target_id'] = $client->id();
     $values['field_invoice_date'][LANGUAGE_NONE][0]['value'] = (string) strtotime($date_polarity . $date_offset . ' day 00:00');
     $values['field_invoice_number'][LANGUAGE_NONE][0]['value'] = $this->randomString();
     // Round the discount and format it to use two decimals so it matches the
@@ -192,8 +185,8 @@ trait InvoiceTestHelper {
     $values['field_invoice_due_date'][LANGUAGE_NONE][0]['value'] = (string) $this->randomDueDate();
     $values['field_invoice_terms'][LANGUAGE_NONE][0]['value'] = $this->randomString();
     $values['field_invoice_status'][LANGUAGE_NONE][0]['value'] = $this->randomInvoiceStatus();
-    $values['field_invoice_products'][LANGUAGE_NONE][0]['target_id'] = $product->identifier();
-    $values['field_invoice_services'][LANGUAGE_NONE][0]['target_id'] = $service->identifier();
+    $values['field_invoice_products'][LANGUAGE_NONE][0]['target_id'] = $product->id();
+    $values['field_invoice_services'][LANGUAGE_NONE][0]['target_id'] = $service->id();
 
     return $values;
   }
@@ -204,14 +197,14 @@ trait InvoiceTestHelper {
    * @return int
    *   The key of one of the due date values.
    */
-  public function randomDueDate() {
-    return array_rand(array(
+  public function randomDueDate() : int {
+    return array_rand([
       '0' => 'due on receipt',
       '7' => '7 days',
       '15' => '15 days',
       '30' => '30 days',
       '60' => '60 days',
-    ));
+    ]);
   }
 
   /**
@@ -220,12 +213,12 @@ trait InvoiceTestHelper {
    * @return string
    *   Either 'draft' or 'sent'.
    */
-  public function randomInvoiceStatus() {
-    return array_rand(array(
+  public function randomInvoiceStatus() : string {
+    return array_rand([
       'draft' => 'draft',
       'sent' => 'sent',
       'paid' => 'paid',
-    ));
+    ]);
   }
 
   /**
@@ -238,7 +231,7 @@ trait InvoiceTestHelper {
    *
    * @return array
    *   An associative array of values, keyed by form field name, as used by
-   *   parent::drupalPost().
+   *   parent::drupalPostForm().
    *
    * @throws \Exception
    *   - Thrown if a value is given for field_invoice_client but this is not a
@@ -250,22 +243,22 @@ trait InvoiceTestHelper {
    *
    * @see self::randomInvoiceValues()
    */
-  public function convertInvoiceValuesToFormPostValues(array $values) {
+  public function convertInvoiceValuesToFormPostValues(array $values) : array {
     // Prepare the input for the client entity reference field.
     // @todo Support creating a new client as well as referencing an existing
     //   one.
     if (!empty($values['field_invoice_client'])) {
-      if (!$values['field_invoice_client'] instanceof \Client) {
+      if (!$values['field_invoice_client'] instanceof ClientInterface) {
         throw new \Exception('The value for field_invoice_client should be an instance of Client.');
       }
-      $values['field_invoice_client'] = $this->entityReferenceFieldValue($values['field_invoice_client']->name, $values['field_invoice_client']->identifier());
+      $values['field_invoice_client'] = $this->entityReferenceFieldValue($values['field_invoice_client']->name, $values['field_invoice_client']->id());
     }
 
     // Prepare the input for the products and services entity reference fields.
     // @todo Support creating new line items as well as referencing existing
     //   ones.
     // @todo Support creating multiple items.
-    $line_items = array();
+    $line_items = [];
     foreach (array_keys($this->getLineItemTypes()) as $type) {
       if (!empty($values["field_invoice_${type}s"])) {
         /* @var $line_item \LineItem */
@@ -276,11 +269,11 @@ trait InvoiceTestHelper {
         if ($line_item->bundle() != $type) {
           throw new \Exception("The values for field_invoice_${type}s should have the '$type' bundle.");
         }
-        $line_items[$type] = $this->entityReferenceFieldValue($line_item->identifier(), $line_item->identifier());
+        $line_items[$type] = $this->entityReferenceFieldValue($line_item->id(), $line_item->id());
       }
     }
 
-    return array(
+    return [
       'field_invoice_client[und][form][entity_id]' => $values['field_invoice_client'],
       'field_invoice_number[und][0][value]' => $values['field_invoice_number'],
       'field_invoice_date[und][0][value][month]' => date('n', $values['field_invoice_date']),
@@ -293,7 +286,7 @@ trait InvoiceTestHelper {
       'field_invoice_status[und]' => $values['field_invoice_status'],
       'field_invoice_products[und][form][entity_id]' => !empty($line_items['product']) ? $line_items['product'] : '',
       'field_invoice_services[und][form][entity_id]' => !empty($line_items['service']) ? $line_items['service'] : '',
-    );
+    ];
   }
 
   /**
@@ -307,7 +300,7 @@ trait InvoiceTestHelper {
    * @return \Invoice
    *   The desired invoice.
    */
-  public function loadInvoiceByNumber($invoice_number, $reset = FALSE) {
+  public function loadInvoiceByNumber($invoice_number, $reset = FALSE) : InvoiceInterface {
     $query = new \EntityFieldQuery();
     $query
       ->entityCondition('entity_type', 'invoice')
@@ -329,7 +322,7 @@ trait InvoiceTestHelper {
    *   An associative array of values to apply to the entity, keyed by property
    *   name.
    */
-  public function updateInvoice(\Invoice $invoice, array $values) {
+  public function updateInvoice(\Invoice $invoice, array $values) : void {
     $wrapper = entity_metadata_wrapper('invoice', $invoice);
     foreach ($values as $property => $value) {
       $wrapper->$property->set($value);
@@ -346,13 +339,13 @@ trait InvoiceTestHelper {
    *   The client to add to the invoice. If omitted a random client will be
    *   used.
    */
-  public function addExistingClientToUiInvoice(\Client $client = NULL) {
+  public function addExistingClientToUiInvoice(\Client $client = NULL) : void {
     // Default to a random client.
     $client = $client ?: $this->randomClient();
 
-    $values = array(
-      'field_invoice_client[und][form][entity_id]' => $this->entityReferenceFieldValue($client->name, $client->identifier()),
-    );
+    $values = [
+      'field_invoice_client[und][form][entity_id]' => $this->entityReferenceFieldValue($client->name, $client->id()),
+    ];
 
     $this->clickAddExistingClientButton();
     $this->submitInlineAddExistingClientForm($values);
@@ -361,14 +354,14 @@ trait InvoiceTestHelper {
   /**
    * Clicks the "Add new client" button.
    */
-  public function clickAddNewClientButton() {
+  public function clickAddNewClientButton() : void {
     $this->clickButtonWithId('edit-field-invoice-client-und-actions-ief-add');
   }
 
   /**
    * Clicks the "Add existing client" button.
    */
-  public function clickAddExistingClientButton() {
+  public function clickAddExistingClientButton() : void {
     $this->clickButtonWithId('edit-field-invoice-client-und-actions-ief-add-existing');
   }
 
@@ -381,21 +374,21 @@ trait InvoiceTestHelper {
    * @param array $edit
    *   The values to fill in in the form.
    */
-  public function submitInlineAddExistingClientForm(array $edit) {
+  public function submitInlineAddExistingClientForm(array $edit) : void {
     $this->clickButtonWithId('edit-field-invoice-client-und-form-actions-ief-reference-save', $edit);
   }
 
   /**
    * Clicks the "Add new service" button.
    */
-  public function clickAddNewServiceButton() {
+  public function clickAddNewServiceButton() : void {
     $this->clickButtonWithId('edit-field-invoice-services-und-actions-ief-add');
   }
 
   /**
    * Clicks the "Add existing service" button.
    */
-  public function clickAddExistingServiceButton() {
+  public function clickAddExistingServiceButton() : void {
     $this->clickButtonWithId('edit-field-invoice-services-und-actions-ief-add-existing');
   }
 
@@ -408,21 +401,21 @@ trait InvoiceTestHelper {
    * @param array $edit
    *   The values to fill in in the form.
    */
-  public function submitInlineServiceForm(array $edit) {
+  public function submitInlineServiceForm(array $edit) : void {
     $this->clickButtonWithId('edit-field-invoice-services-und-form-actions-ief-add-save', $edit);
   }
 
   /**
    * Clicks the "Add new product" button.
    */
-  public function clickAddNewProductButton() {
+  public function clickAddNewProductButton() : void {
     $this->clickButtonWithId('edit-field-invoice-products-und-actions-ief-add');
   }
 
   /**
    * Clicks the "Add existing product" button.
    */
-  public function clickAddExistingProductButton() {
+  public function clickAddExistingProductButton() : void {
     $this->clickButtonWithId('edit-field-invoice-products-und-actions-ief-add-existing');
   }
 
@@ -435,7 +428,7 @@ trait InvoiceTestHelper {
    * @param array $edit
    *   The values to fill in in the form.
    */
-  public function submitInlineProductForm(array $edit) {
+  public function submitInlineProductForm(array $edit) : void {
     $this->clickButtonWithId('edit-field-invoice-products-und-form-actions-ief-add-save', $edit);
   }
 
@@ -451,7 +444,7 @@ trait InvoiceTestHelper {
    * @param array $edit
    *   Optional array containing field values to pass on to drupalPostAJAX().
    */
-  protected function clickButtonWithId($id, array $edit = array()) {
+  protected function clickButtonWithId($id, array $edit = []) : void {
     // The button name contains an unpredictable hash. Retrieve it by ID.
     $button_element = $this->xpath('//input[contains(@id, "' . $id . '")]');
     $this->drupalPostAJAX(NULL, $edit, (string) $button_element[0]['name']);

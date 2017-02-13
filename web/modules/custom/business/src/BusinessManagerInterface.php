@@ -23,7 +23,7 @@ interface BusinessManagerInterface {
    *   An array with all the businesses linked to this user. If no businesses
    *   were found an empty array will be returned.
    */
-  public function getBusinessesFromUser(AccountInterface $account = NULL) : array;
+  public function getBusinessesByUser(AccountInterface $account = NULL) : array;
 
   /**
    * Get the business IDs from a given user.
@@ -38,7 +38,7 @@ interface BusinessManagerInterface {
    *   An array with IDs of the businesses linked to this user. If no businesses
    *   are found an empty array will be returned.
    */
-  public function getBusinessIdsFromUser(AccountInterface $account = NULL, bool $reset = FALSE) : array;
+  public function getBusinessIdsByUser(AccountInterface $account = NULL, bool $reset = FALSE) : array;
 
   /**
    * Returns whether a given business is owned by a given user.

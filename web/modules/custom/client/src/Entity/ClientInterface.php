@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Drupal\client\Entity;
 
+use Drupal\business\Entity\BusinessInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -16,40 +17,61 @@ use Drupal\user\EntityOwnerInterface;
 interface ClientInterface extends RevisionableInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
-   * Gets the Client name.
+   * Returns the client name.
    *
    * @return string
-   *   Name of the Client.
+   *   The client name.
    */
   public function getName() : string;
 
   /**
-   * Sets the Client name.
+   * Sets the client name.
    *
    * @param string $name
-   *   The Client name.
+   *   The client name.
    *
    * @return \Drupal\client\Entity\ClientInterface
-   *   The called Client entity.
+   *   The updated client.
+   *
+   * @todo type hint on self.
    */
   public function setName(string $name) : ClientInterface;
 
   /**
-   * Gets the Client creation timestamp.
+   * Returns the business this client belongs to.
+   *
+   * @return \Drupal\business\Entity\BusinessInterface
+   *   The business this client belongs to.
+   */
+  public function getBusiness() : BusinessInterface;
+
+  /**
+   * Sets the business this client belongs to.
+   *
+   * @param \Drupal\business\Entity\BusinessInterface $business
+   *   The business this client belongs to.
+   *
+   * @return self
+   *   The updated client.
+   */
+  public function setBusiness(BusinessInterface $business) : ClientInterface;
+
+  /**
+   * Returns the creation timestamp.
    *
    * @return int
-   *   Creation timestamp of the Client.
+   *   The creation timestamp.
    */
   public function getCreatedTime() : int;
 
   /**
-   * Sets the Client creation timestamp.
+   * Sets the creation timestamp.
    *
    * @param int $timestamp
-   *   The Client creation timestamp.
+   *   The creation timestamp.
    *
    * @return \Drupal\client\Entity\ClientInterface
-   *   The called Client entity.
+   *   The updated client.
    */
   public function setCreatedTime(int $timestamp);
 

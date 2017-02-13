@@ -21,6 +21,7 @@ class BusinessAccessControlHandler extends EntityAccessControlHandler {
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\business\Entity\BusinessInterface $entity */
+    // @todo Update with actual permissions from business.permissions.yml.
     switch ($operation) {
       case 'view':
         return AccessResult::allowed();

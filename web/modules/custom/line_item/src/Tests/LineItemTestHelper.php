@@ -84,10 +84,10 @@ trait LineItemTestHelper {
    * @return \LineItem
    *   A new line item entity.
    */
-  function createLineItem($type = NULL, array $values = array()) {
+  function createLineItem($type = NULL, array $values = []) {
     // Provide some default values.
     $values += $this->randomLineItemValues($type);
-    $line_item = line_item_create(array('type' => $values['type']));
+    $line_item = line_item_create(['type' => $values['type']]);
     $this->updateLineItem($line_item, $values);
 
     return $line_item;
@@ -105,7 +105,7 @@ trait LineItemTestHelper {
   function randomLineItemValues($type = NULL) {
     $type = $type ?: $this->randomLineItemType();
 
-    $values = array(
+    $values = [
       'bid' => $this->randomBusiness(),
       'field_line_item_description' => $this->randomString(),
       'field_line_item_discount' => $this->randomDecimal(),
@@ -113,17 +113,17 @@ trait LineItemTestHelper {
       'field_line_item_tax' => $this->randomDecimal(),
       'field_line_item_unit_cost' => $this->randomDecimal(),
       'type' => $type,
-    );
+    ];
 
     if ($type == 'service') {
-      $values['field_line_item_time_unit'] = array_rand(array(
+      $values['field_line_item_time_unit'] = array_rand([
         'minutes' => 'minutes',
         'hours' => 'hours',
         'days' => 'days',
         'weeks' => 'weeks',
         'months' => 'months',
         'years' => 'years',
-      ));
+      ]);
     }
 
     return $values;
@@ -146,10 +146,10 @@ trait LineItemTestHelper {
    *   An associative array of line item names, keyed by bundle name.
    */
   public function getLineItemTypes() {
-    return array(
+    return [
       'product' => t('Product'),
       'service' => t('Service'),
-    );
+    ];
   }
 
   /**
@@ -190,7 +190,7 @@ trait LineItemTestHelper {
    */
   function randomLineItem($type = NULL) {
     $query = db_select('line_item', 'li')
-      ->fields('li', array('lid'))
+      ->fields('li', ['lid'])
       ->orderRandom()
       ->range(0, 1);
 
@@ -249,11 +249,11 @@ trait LineItemTestHelper {
    *   An associative array of random values, keyed by property name.
    */
   function randomTaxRateValues() {
-    $values = array(
+    $values = [
       'bid' => $this->randomBusiness()->identifier(),
       'name' => $this->randomString(),
       'rate' => $this->randomDecimal(),
-    );
+    ];
 
     return $values;
   }
@@ -271,7 +271,7 @@ trait LineItemTestHelper {
    * @return \TaxRate
    *   A new tax rate object.
    */
-  function createTaxRate(array $values = array()) {
+  function createTaxRate(array $values = []) {
     // Provide default values.
     $values += $this->randomTaxRateValues();
 
@@ -312,7 +312,7 @@ trait LineItemTestHelper {
    * @return \TaxRate
    *   A new TaxRate object.
    */
-  function createUiTaxRate(array $values = array()) {
+  function createUiTaxRate(array $values = []) {
     // Provide some default values.
     $values += $this->randomTaxRateValues();
 
@@ -321,13 +321,13 @@ trait LineItemTestHelper {
     }
 
     // Convert the property values to form values and submit the form.
-    $this->drupalPost('settings/tax-rates/add', $values, t('Save'));
+    $this->drupalPostForm('settings/tax-rates/add', $values, t('Save'));
 
     // Check that a success message is displayed.
     $this->assertRaw(t('New tax rate has been added.'));
 
     // Check target Url after redirection.
-    $this->assertUrl('settings/tax-rates', array(), 'The user is redirected to the tax rates overview after adding a new tax rate.');
+    $this->assertUrl('settings/tax-rates', [], 'The user is redirected to the tax rates overview after adding a new tax rate.');
 
     // Retrieve the saved tax rate by ID number and return it.
     $result = db_select('tax_rates', 'tr')
@@ -359,13 +359,13 @@ trait LineItemTestHelper {
    * @return \TaxRate
    *   The updated TaxRate object.
    */
-  function updateUiTaxRate(\TaxRate $tax_rate, array $values = array()) {
+  function updateUiTaxRate(\TaxRate $tax_rate, array $values = []) {
     // Unset the values that cannot be changed through the UI.
     unset($values['bid']);
     unset($values['tid']);
 
     // Convert the new values to form values and submit the form.
-    $this->drupalPost('settings/tax-rates/' . $tax_rate->tid . '/edit', $values, t('Save'));
+    $this->drupalPostForm('settings/tax-rates/' . $tax_rate->tid . '/edit', $values, t('Save'));
 
     // Check that a success message is displayed.
     $this->assertRaw(t('The changes have been saved.'));
@@ -398,11 +398,11 @@ trait LineItemTestHelper {
    */
   function deleteUiTaxRate(\TaxRate $tax_rate) {
     // Get the specific tax rate delete form and delete the tax rate instance.
-    $this->drupalPost('settings/tax-rates/' . $tax_rate->tid . '/delete', array(), t('Delete'));
+    $this->drupalPostForm('settings/tax-rates/' . $tax_rate->tid . '/delete', [], t('Delete'));
 
     // Attempt to retrieve the deleted tax rate by ID number.
     $result = db_select('tax_rates', 'tr')
-      ->fields('tr', array('tid'))
+      ->fields('tr', ['tid'])
       ->range(0, 1)
       ->execute()
       ->fetchAllAssoc('tid');

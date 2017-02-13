@@ -22,10 +22,10 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $usersToCreate = array(
+  protected $usersToCreate = [
     'administrator',
     'business_owner',
-  );
+  ];
 
   /**
    * An array of test clients.
@@ -72,7 +72,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
       // collation, while the database can be configured with an arbitrary
       // collation.
       $name = $this->randomName(4) . $this->randomString();
-      $client = $this->createUiClient(array('name' => $name));
+      $client = $this->createUiClient(['name' => $name]);
       $this->clients[$client->cid] = $client;
     }
 
@@ -85,7 +85,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
 
     // Check that the "Add client" local action is present.
     $xpath = '//ul[@class="action-links"]/li/a[@href="/client/add" and contains(text(), :text)]';
-    $this->assertXPathElements($xpath, 1, array(':text' => t('Add client')), 'The "Add client" local action is present.');
+    $this->assertXPathElements($xpath, 1, [':text' => t('Add client')], 'The "Add client" local action is present.');
 
     // Check that the pager is not present. We added 20 clients which is the
     // maximum number that fits on one page.
@@ -110,48 +110,48 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
       $phone = $client->field_client_phone->value();
       $number = phone_libphonenumber_format($phone['number'], $phone['countrycode'], $phone['extension']);
 
-      $testcases = array(
-        array(
+      $testcases = [
+        [
           'message' => 'The first column contains the client name.',
           'expected' => $client->name->value(),
           'actual' => (string) $tablerow->td[0]->a,
-        ),
-        array(
+        ],
+        [
           'message' => 'The first column is linked to the client detail page.',
           'expected' => '/client/' . $client->getIdentifier(),
           'actual' => (string) $tablerow->td[0]->a['href'],
-        ),
-        array(
+        ],
+        [
           'message' => 'The second column contains the email address.',
           'expected' => $client->field_client_email->value(),
           'actual' => (string) $tablerow->td[1]->a,
-        ),
-        array(
+        ],
+        [
           'message' => 'The second column is linked to the email address.',
           'expected' => 'mailto:' . $client->field_client_email->value(),
           'actual' => (string) $tablerow->td[1]->a['href'],
-        ),
-        array(
+        ],
+        [
           'message' => 'The third column contains the phone number.',
           'expected' => $number,
           'actual' => (string) $tablerow->td[2]->div->span,
-        ),
-        array(
+        ],
+        [
           'message' => 'The fourth column is linked to the website.',
           'expected' => $website['url'],
           'actual' => (string) $tablerow->td[3]->a[0]['href'],
-        ),
-        array(
+        ],
+        [
           'message' => 'The fifth column contains the "edit" action link.',
           'expected' => t('edit'),
           'actual' => (string) $tablerow->td[4]->a[0],
-        ),
-        array(
+        ],
+        [
           'message' => 'The fifth column is linked to the client edit page.',
           'expected' => '/client/' . $client->getIdentifier() . '/edit',
           'actual' => (string) $tablerow->td[4]->a[0]['href'],
-        ),
-      );
+        ],
+      ];
 
       foreach ($testcases as $testcase) {
         $this->assertEqual(trim($testcase['expected']), trim($testcase['actual']), $testcase['message']);
@@ -194,10 +194,10 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         // collation, while the database can be configured with an arbitrary
         // collation.
         $name = $this->randomName(4) . $this->randomString();
-        $client = $this->createClient(array(
-          'bid' => $business->identifier(),
+        $client = $this->createClient([
+          'business' => $business->id(),
           'name' => $name,
-        ));
+        ]);
         $client->save();
         $this->clients[$client->cid] = $client;
       }
@@ -208,7 +208,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
 
     // Check that the "Add client" local action is present.
     $xpath = '//ul[@class="action-links"]/li/a[@href="/client/add" and contains(text(), :text)]';
-    $this->assertXPathElements($xpath, 1, array(':text' => t('Add client')), 'The "Add client" local action is present.');
+    $this->assertXPathElements($xpath, 1, [':text' => t('Add client')], 'The "Add client" local action is present.');
 
     // Check that the clients are present in the overview in alphabetical order.
     uasort($this->clients, function ($a, $b) {
@@ -222,8 +222,8 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
       /* @var $tablerow SimpleXMLElement */
       /* @var $client EntityDrupalWrapper */
       /* @var $business Business */
-      $client = entity_metadata_wrapper('client', array_shift($this->clients));
-      $business = $client->bid->value();
+      $client = array_shift($this->clients);
+      $business = $client->getBusiness();
 
       $website = $client->field_client_website->value();
 
@@ -231,58 +231,58 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
       $phone = $client->field_client_phone->value();
       $number = phone_libphonenumber_format($phone['number'], $phone['countrycode'], $phone['extension']);
 
-      $testcases = array(
-        array(
+      $testcases = [
+        [
           'message' => 'The first column contains the business name.',
           'expected' => $business->getName(),
           'actual' => (string) $tablerow->td[0]->a,
-        ),
-        array(
+        ],
+        [
           'message' => 'The first column is linked to the business.',
-          'expected' => '/business/' . $business->identifier(),
+          'expected' => '/business/' . $business->id(),
           'actual' => (string) $tablerow->td[0]->a['href'],
-        ),
-        array(
+        ],
+        [
           'message' => 'The second column contains the client name.',
           'expected' => $client->name->value(),
           'actual' => (string) $tablerow->td[1]->a,
-        ),
-        array(
+        ],
+        [
           'message' => 'The second column is linked to the client detail page.',
-          'expected' => '/client/' . $client->getIdentifier(),
+          'expected' => '/client/' . $client->id(),
           'actual' => (string) $tablerow->td[1]->a['href'],
-        ),
-        array(
+        ],
+        [
           'message' => 'The third column contains the email address.',
           'expected' => $client->field_client_email->value(),
           'actual' => (string) $tablerow->td[2]->a,
-        ),
-        array(
+        ],
+        [
           'message' => 'The third column is linked to the email address.',
           'expected' => 'mailto:' . $client->field_client_email->value(),
           'actual' => (string) $tablerow->td[2]->a['href'],
-        ),
-        array(
+        ],
+        [
           'message' => 'The fourth column contains the phone number.',
           'expected' => $number,
           'actual' => (string) $tablerow->td[3]->div->span,
-        ),
-        array(
+        ],
+        [
           'message' => 'The fifth column is linked to the website.',
           'expected' => $website['url'],
           'actual' => (string) $tablerow->td[4]->a[0]['href'],
-        ),
-        array(
+        ],
+        [
           'message' => 'The sixth column contains the "edit" action link.',
           'expected' => t('edit'),
           'actual' => (string) $tablerow->td[5]->a[0],
-        ),
-        array(
+        ],
+        [
           'message' => 'The sixth column is linked to the client edit page.',
           'expected' => '/client/' . $client->getIdentifier() . '/edit',
           'actual' => (string) $tablerow->td[5]->a[0]['href'],
-        ),
-      );
+        ],
+      ];
 
       foreach ($testcases as $testcase) {
         $this->assertEqual(trim($testcase['expected']), trim($testcase['actual']), $testcase['message']);

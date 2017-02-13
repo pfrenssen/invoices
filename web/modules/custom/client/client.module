@@ -6,3 +6,339 @@ declare (strict_types = 1);
  * @file
  * Main functions and hook implementations for the Client module.
  */
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * @deprecated
+ */
+function _client_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  switch ($root_path) {
+    // Add action link to 'client/add' on the Clients overview.
+    case 'clients':
+      $item = menu_get_item('client/add');
+      if ($item['access']) {
+        $data['actions']['output'][] = [
+          '#theme' => 'menu_local_action',
+          '#link' => $item,
+        ];
+      }
+      break;
+
+    // Add action link to 'invoice/add' on the Client detail page.
+    case 'client/%':
+      // This page is managed by Page Manager. The client is part of the CTools
+      // context.
+      if (!empty($router_item['map'][1]->data) && $router_item['map'][1]->data instanceof Client) {
+        // @codingStandardsIgnoreStart
+        /** @var Client $client */
+        // @codingStandardsIgnoreEnd
+        $client = $router_item['map'][1]->data;
+        if (client_is_owned_by_user($client)) {
+          $item = menu_get_item('invoice/add');
+          // Pass the client ID as a query argument so the client can be
+          // prepopulated in the invoice form.
+          $item['localized_options'] = [
+            'query' => ['cid' => $client->identifier()],
+          ];
+          if ($item['access']) {
+            $data['actions']['output'][] = [
+              '#theme' => 'menu_local_action',
+              '#link' => $item,
+            ];
+          }
+        }
+      }
+      else {
+        throw new Exception('Client not found in detail page.');
+      }
+      break;
+  }
+}
+
+/**
+ * Loads clients from the database.
+ *
+ * This function should be used whenever you need to load more than one client
+ * from the database. Clients are loaded into memory and will not require
+ * database access if loaded again during the same page request.
+ *
+ * @param array $cids
+ *   An array of client IDs.
+ * @param bool $reset
+ *   Whether to reset the internal cache.
+ *
+ * @return Client[]
+ *   An array of client objects indexed by cid.
+ *
+ * @see entity_load()
+ * @see EntityFieldQuery
+ *
+ * @deprecated
+ */
+function client_load_multiple(array $cids = [], $reset = FALSE) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  return entity_load('client', $cids, [], $reset);
+}
+
+/**
+ * Loads a client object from the database.
+ *
+ * @param int $cid
+ *   The client ID.
+ * @param bool $reset
+ *   Whether to reset the cache.
+ *
+ * @return Client|FALSE
+ *   A fully-populated client object, or FALSE if the client is not found.
+ *
+ * @throws InvalidArgumentException
+ *   Thrown when the passed ID is not valid.
+ *
+ * @deprecated
+ */
+function client_load($cid, $reset = FALSE) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  $cid = (int) $cid;
+  if (empty($cid)) {
+    throw new InvalidArgumentException('Invalid client id.');
+  }
+  $clients = client_load_multiple((array) $cid, $reset);
+
+  return $clients ? reset($clients) : FALSE;
+}
+
+/**
+ * Deletes a client.
+ *
+ * @param Client $client
+ *   The client to delete.
+ *
+ * @deprecated
+ */
+function client_delete(Client $client) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  $client->delete();
+}
+
+/**
+ * Deletes multiple clients.
+ *
+ * @param array $cids
+ *   An array of client IDs.
+ *
+ * @deprecated
+ */
+function client_delete_multiple(array $cids) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  entity_get_controller('client')->delete($cids);
+}
+
+/**
+ * Creates a new client entity.
+ *
+ * @param array $values
+ *   An associative array of values to apply to the entity, keyed by property
+ *   name.
+ *
+ * @return Client
+ *   The new client entity.
+ *
+ * @deprecated
+ */
+function client_create($values = []) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  // Default to the 'client' bundle.
+  $values += ['type' => 'client'];
+  return entity_get_controller('client')->create($values);
+}
+
+/**
+ * Saves a client to the database.
+ *
+ * @param Client $client
+ *   The client entity.
+ *
+ * @return mixed
+ *   Returns FALSE if the transaction failed. If it succeeded, returns SAVED_NEW
+ *   or SAVED_UPDATED, depending on the operation performed.
+ *
+ * @deprecated
+ */
+function client_save(Client $client) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  $client->is_new_revision = TRUE;
+  $client->default_revision = TRUE;
+  return $client->save();
+}
+
+/**
+ * Implements callback_entity_info_uri().
+ *
+ * @deprecated
+ */
+function client_uri(Client $client) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  return [
+    'path' => 'client/' . $client->cid,
+  ];
+}
+
+/**
+ * Title callback: Returns the title of the client.
+ *
+ * @param Client $client
+ *   The client object.
+ *
+ * @return string
+ *   An unsanitized string that is the title of the client.
+ *
+ * @see client_menu()
+ *
+ * @deprecated
+ */
+function client_page_title(Client $client) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  return $client->name;
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * @deprecated
+ */
+function _client_form_alter(&$form, &$form_state, $form_id) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  if (!empty($form['field_client_website'])) {
+    $form['field_client_website']['#element_validate'][] = 'client_validate_website_field';
+  }
+}
+
+/**
+ * Validator for the client_website field.
+ *
+ * @deprecated
+ */
+function client_validate_website_field($element, &$form_state) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  if (!empty($form_state['values']['field_client_website'][LANGUAGE_NONE][0]['url'])) {
+    $url = link_cleanup_url($form_state['values']['field_client_website'][LANGUAGE_NONE][0]['url']);
+    if (link_validate_url($url) !== LINK_EXTERNAL) {
+      form_error($element, t('The "!name" must be an external path', ['!name' => t('Website')]));
+    }
+  }
+}
+
+/**
+ * Returns whether a given client is owned by a given user.
+ *
+ * @param Client $client
+ *   The client to check.
+ * @param \stdClass $account
+ *   Optional user account to check. Defaults to the currently logged in user.
+ *
+ * @return bool
+ *   TRUE if the client is owned by the user, FALSE otherwise.
+ *
+ * @deprecated
+ *   use ClientManager::isOwnedByUser() instead.
+ */
+function client_is_owned_by_user(Client $client, \stdClass $account = NULL) {
+  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
+  // Default to the logged in user.
+  global $user;
+  $account = $account ?: $user;
+
+  return in_array($client->bid, array_keys(business_get_businesses_from_user($account)));
+}
+
+/**
+ * Returns whether the client is used in any invoices.
+ *
+ * @param Client $client
+ *   The client to check.
+ *
+ * @return bool
+ *   TRUE if the client is used in invoices, FALSE otherwise.
+ *
+ * @deprecated
+ *   Use ClientManager::hasInvoices() instead.
+ */
+function client_has_invoices($client) {
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
+}
+
+/**
+ * Returns the invoices that are issued for the given client.
+ *
+ * @param Client $client
+ *   The client for which to retrieve the invoices.
+ *
+ * @return Invoice[]
+ *   An array of invoices.
+ *
+ * @deprecated
+ *   use clientmanager::getinvoices() instead.
+ */
+function client_get_invoices($client) {
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
+}
+
+/**
+ * Returns the ids of the invoices that are issued for the given client.
+ *
+ * @param Client $client
+ *   The client for which to retrieve the invoices.
+ *
+ * @return array
+ *   An array of invoice ids.
+ *
+ * @deprecated
+ *   Use ClientManager::getInvoiceIds() instead.
+ */
+function client_get_invoice_ids($client) {
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
+}
+
+/**
+ * Get the client IDs for a specific user, defaults to the logged in user.
+ *
+ * @param \stdClass $account
+ *   The account of the user to get the client IDs for. If omitted, the logged
+ *   in user will be used.
+ * @param bool $reset
+ *   Whether or not to reset the static cache. Defaults to FALSE.
+ *
+ * @return array
+ *   An array with all the client IDs linked to this user. When no clients are
+ *   found an empty array will be returned.
+ *
+ * @deprecated
+ *   Clients are not linked to users but to businesses. Retrieve the businesses
+ *   from the user manually and call ClientManager::getClientIdsForBusiness().
+ */
+function client_get_client_ids_from_user(\stdClass $account = NULL, $reset = FALSE) {
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
+}
+
+/**
+ * Get the clients for a specific user, defaults to the logged in user.
+ *
+ * @param \stdClass $account
+ *   The account of the user to get the clients for. If omitted, the logged in
+ *   user will be used.
+ * @param bool $reset
+ *   Whether or not to reset the static cache. Defaults to FALSE.
+ *
+ * @return Client[]
+ *   An array with all the clients linked to this user. When no clients are
+ *   found an empty array will be returned.
+ *
+ * @deprecated
+ *   Clients are not linked to users but to businesses. Retrieve the businesses
+ *   from the user manually and call ClientManager::getClientsForBusiness().
+ */
+function client_get_clients_from_user(\stdClass $account = NULL, $reset = FALSE) {
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
+}

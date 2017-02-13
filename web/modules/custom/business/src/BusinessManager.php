@@ -50,18 +50,18 @@ class BusinessManager implements BusinessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getBusinessesFromUser(AccountInterface $account = NULL, bool $reset = FALSE) : array {
+  public function getBusinessesByUser(AccountInterface $account = NULL, bool $reset = FALSE) : array {
     if ($reset) {
       throw new \Exception('The $reset parameter is deprecated. Use ::resetCache().');
     }
-    $bids = $this->getBusinessIdsFromUser($account);
+    $bids = $this->getBusinessIdsByUser($account);
     return $this->storage->loadMultiple($bids);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getBusinessIdsFromUser(AccountInterface $account = NULL, bool $reset = FALSE) : array {
+  public function getBusinessIdsByUser(AccountInterface $account = NULL, bool $reset = FALSE) : array {
     if ($reset) {
       throw new \Exception('The $reset parameter is deprecated. Use ::resetCache().');
     }
@@ -88,7 +88,7 @@ class BusinessManager implements BusinessManagerInterface {
    */
   public function businessIsOwnedByUser(Business $business, AccountInterface $account = NULL) : bool {
     $account = $account ?: $this->currentUser;
-    return in_array($business->id(), $this->getBusinessIdsFromUser($account));
+    return in_array($business->id(), $this->getBusinessIdsByUser($account));
   }
 
   /**

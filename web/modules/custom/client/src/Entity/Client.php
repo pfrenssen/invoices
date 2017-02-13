@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Drupal\client\Entity;
 
+use Drupal\business\Entity\BusinessInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -114,6 +115,21 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
    */
   public function setName(string $name) : ClientInterface {
     $this->set('name', $name);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBusiness(): BusinessInterface {
+    return $this->get('business')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBusiness(BusinessInterface $business) : ClientInterface {
+    $this->set('business', $business);
     return $this;
   }
 
@@ -240,6 +256,30 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -4,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['business'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Business'))
+      ->setDescription(t('The business this client belongs to.'))
+      ->setRevisionable(FALSE)
+      ->setSetting('target_type', 'business')
+      ->setSetting('handler', 'default')
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'weight' => 0,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 5,
+        'settings' => [
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder' => '',
+        ],
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);

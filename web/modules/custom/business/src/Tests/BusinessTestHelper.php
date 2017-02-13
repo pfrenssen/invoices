@@ -20,19 +20,15 @@ trait BusinessTestHelper {
    *   The Business entity to check.
    * @param array $values
    *   An associative array of values to check, keyed by property name.
-   *
-   * @todo Declare as void return type.
    */
-  public function assertBusinessProperties(Business $business, array $values) {
+  public function assertBusinessProperties(Business $business, array $values) : void {
     $this->assertEntityFieldValues($business, $values);
   }
 
   /**
    * Checks if the business table exists.
-   *
-   * @todo Declare as void return type.
    */
-  public function assertBusinessTableExists() {
+  public function assertBusinessTableExists() : void {
     $this->assertTrue($this->connection->schema()->tableExists('business'), 'The business database table exists.');
   }
 
@@ -41,10 +37,8 @@ trait BusinessTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @todo Declare as void return type.
    */
-  public function assertBusinessTableEmpty(string $message = '') {
+  public function assertBusinessTableEmpty(string $message = '') : void {
     $result = (bool) $this->connection
       ->select('business', 'b')
       ->fields('b')
@@ -59,10 +53,8 @@ trait BusinessTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @todo Declare as void return type.
    */
-  public function assertBusinessTableNotEmpty(string $message = '') {
+  public function assertBusinessTableNotEmpty(string $message = '') : void {
     $result = (bool) $this->connection
       ->select('business', 'b')
       ->fields('b')
@@ -212,7 +204,7 @@ trait BusinessTestHelper {
    *
    * @returns array
    *   An associative array of values, keyed by form field name, as used by
-   *   parent::drupalPost().
+   *   parent::drupalPostForm().
    *
    * @see self::randomBusinessValues()
    */

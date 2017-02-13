@@ -96,7 +96,7 @@ class ClientManagerTest extends EntityKernelTestBase {
 
       // Create two clients for the business.
       for ($j = 0; $j < 2; $j++) {
-        $client = $this->createClient(['bid' => $this->businesses[$i]->id()]);
+        $client = $this->createClient(['business' => $this->businesses[$i]->id()]);
         $client->save();
         $this->clients[] = $client;
       }
@@ -111,7 +111,7 @@ class ClientManagerTest extends EntityKernelTestBase {
     // any invoices.
     for ($i = 0; $i < 6; $i++) {
       $invoice = $this->createInvoice([
-        'bid' => $this->clients[$i % 4 % 3]->bid,
+        'business' => $this->clients[$i % 4 % 3]->getBusiness(),
         'field_invoice_client' => $this->clients[$i % 4 % 3],
       ]);
       $invoice->save();

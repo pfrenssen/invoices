@@ -15,57 +15,57 @@ use Drupal\business\Entity\BusinessInterface;
  */
 function business_entity_info() {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
-  $entity_info = array();
+  $entity_info = [];
 
-  $entity_info['business'] = array(
+  $entity_info['business'] = [
     'label' => t('Business'),
     'plural label' => t('Businesses'),
     'entity class' => 'Business',
     'controller class' => 'EntityAPIController',
     'base table' => 'business',
     'fieldable' => TRUE,
-    'entity keys' => array(
+    'entity keys' => [
       'id' => 'bid',
       'bundle' => 'type',
-    ),
-    'bundle keys' => array(
+    ],
+    'bundle keys' => [
       'bundle' => 'type',
-    ),
-    'bundles' => array(),
+    ],
+    'bundles' => [],
     'label callback' => 'business_label',
     'uri callback' => 'entity_class_uri',
     'access callback' => 'business_access',
     'module' => 'business',
-    'translation' => array(
-      'entity_translation' => array(
+    'translation' => [
+      'entity_translation' => [
         'class' => 'EntityTranslationBusinessHandler',
-        'default settings' => array(
+        'default settings' => [
           'default_language' => LANGUAGE_NONE,
           'hide_language_selector' => TRUE,
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   // Add bundle info but bypass entity_load() as we cannot use it here.
   $types = db_select('business_type', 'ibt')
-    ->fields('ibt', array('type', 'name'))
+    ->fields('ibt', ['type', 'name'])
     ->execute()
     ->fetchAllKeyed();
 
   foreach ($types as $type => $name) {
-    $entity_info['business']['bundles'][$type] = array(
+    $entity_info['business']['bundles'][$type] = [
       'label' => $name,
-      'admin' => array(
+      'admin' => [
         'path' => 'admin/structure/businesses/manage/%business_type',
         'real path' => 'admin/structure/businesses/manage/' . $type,
         'bundle argument' => 4,
-        'access arguments' => array('administer businesses'),
-      ),
-    );
+        'access arguments' => ['administer businesses'],
+      ],
+    ];
   }
 
-  $entity_info['business_type'] = array(
+  $entity_info['business_type'] = [
     'label' => t('Business type'),
     'plural label' => t('Business types'),
     'entity class' => 'Entity',
@@ -74,20 +74,20 @@ function business_entity_info() {
     'fieldable' => FALSE,
     'bundle of' => 'business',
     'exportable' => TRUE,
-    'entity keys' => array(
+    'entity keys' => [
       'id' => 'type',
       'name' => 'type',
       'label' => 'name',
-    ),
+    ],
     'access callback' => 'business_type_access',
     'label callback' => 'business_type_label',
     'module' => 'business',
-    'admin ui' => array(
+    'admin ui' => [
       'path' => 'admin/structure/businesses',
       'file' => 'business.admin.inc',
       'controller class' => 'EntityDefaultUIController',
-    ),
-  );
+    ],
+  ];
 
   return $entity_info;
 }
@@ -130,57 +130,57 @@ function business_entity_property_info_alter(&$info) {
  */
 function business_menu() {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
-  $items = array();
+  $items = [];
 
   // We only support one basic business type for the moment. This may be
   // extended in the future.
   $business_type = business_type_load('business');
-  $items['business/add'] = array(
+  $items['business/add'] = [
     'title' => 'Add business',
     'page callback' => 'business_add_page',
-    'page arguments' => array($business_type),
+    'page arguments' => [$business_type],
     'access callback' => 'business_access',
-    'access arguments' => array('create', $business_type),
+    'access arguments' => ['create', $business_type],
     'file' => 'business.pages.inc',
-  );
+  ];
 
-  $items['business/%business/edit'] = array(
+  $items['business/%business/edit'] = [
     'title' => 'Edit',
     'page callback' => 'business_edit_page',
-    'page arguments' => array(1),
+    'page arguments' => [1],
     'access callback' => 'business_access',
-    'access arguments' => array('update', 1),
+    'access arguments' => ['update', 1],
     'type' => MENU_LOCAL_TASK,
     'file' => 'business.pages.inc',
     'weight' => 5,
-  );
+  ];
 
-  $items['business/%business/delete'] = array(
+  $items['business/%business/delete'] = [
     'title' => 'Delete',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('business_delete_confirm_form', 1),
+    'page arguments' => ['business_delete_confirm_form', 1],
     'access callback' => 'business_access',
-    'access arguments' => array('delete', 1),
+    'access arguments' => ['delete', 1],
     'type' => MENU_LOCAL_TASK,
     'file' => 'business.pages.inc',
     'weight' => 10,
-  );
+  ];
 
-  $items['business/%business/view'] = array(
+  $items['business/%business/view'] = [
     'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 0,
-  );
+  ];
 
-  $items['business/%business'] = array(
+  $items['business/%business'] = [
     'title' => '',
     'page callback' => 'business_detail_page',
-    'page arguments' => array(1),
+    'page arguments' => [1],
     'access callback' => 'business_access',
-    'access arguments' => array('view', 1),
+    'access arguments' => ['view', 1],
     'type' => MENU_CALLBACK,
     'file' => 'business.pages.inc',
-  );
+  ];
 
   return $items;
 }
@@ -190,36 +190,36 @@ function business_menu() {
  */
 function business_permission() {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
-  $permissions = array(
-    'administer business types' => array(
+  $permissions = [
+    'administer business types' => [
       'title' => t('Administer business types'),
       'description' => t('Create and delete fields for business types, and set their permissions.'),
-    ),
-    'administer businesses' => array(
+    ],
+    'administer businesses' => [
       'title' => t('Administer businesses'),
       'description' => t('Edit and delete all businesses'),
-    ),
-    'delete own businesses' => array(
+    ],
+    'delete own businesses' => [
       'title' => t('Delete own businesses'),
-    ),
-    'edit own businesses' => array(
+    ],
+    'edit own businesses' => [
       'title' => t('Edit own businesses'),
-    ),
-    'view own businesses' => array(
+    ],
+    'view own businesses' => [
       'title' => t('View own businesses'),
-    ),
-  );
+    ],
+  ];
 
   // Generate permissions per business type.
   foreach (business_get_types() as $type) {
-    $permissions += array(
-      "edit any $type->type business" => array(
-        'title' => t('%type_name: Edit any business', array('%type_name' => $type->name)),
-      ),
-      "view any $type->type business" => array(
-        'title' => t('%type_name: View any business', array('%type_name' => $type->name)),
-      ),
-    );
+    $permissions += [
+      "edit any $type->type business" => [
+        'title' => t('%type_name: Edit any business', ['%type_name' => $type->name]),
+      ],
+      "view any $type->type business" => [
+        'title' => t('%type_name: View any business', ['%type_name' => $type->name]),
+      ],
+    ];
   }
 
   return $permissions;
@@ -337,7 +337,7 @@ function business_type_load($type) {
  */
 function business_type_get_names() {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
-  $types = array();
+  $types = [];
 
   foreach (business_get_types() as $machine_name => $type) {
     $types[$machine_name] = $type->name;
@@ -386,9 +386,9 @@ function business_type_label(\Entity $entity, $entity_type) {
  * @see entity_load()
  * @see EntityFieldQuery
  */
-function business_load_multiple(array $bids = array(), $reset = FALSE) {
+function business_load_multiple(array $bids = [], $reset = FALSE) {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
-  return entity_load('business', $bids, array(), $reset);
+  return entity_load('business', $bids, [], $reset);
 }
 
 /**
@@ -459,10 +459,10 @@ function business_delete_multiple(array $bids) {
  *
  * @deprecated
  */
-function business_create($values = array()) {
+function business_create($values = []) {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
   // Default to the 'business' bundle.
-  $values += array('type' => 'business');
+  $values += ['type' => 'business'];
   return entity_get_controller('business')->create($values);
 }
 
@@ -488,9 +488,9 @@ function business_save(Business $business) {
  */
 function business_uri(Business $business) {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
-  return array(
+  return [
     'path' => 'business/' . $business->bid,
-  );
+  ];
 }
 
 /**
@@ -540,10 +540,10 @@ function business_name_available($name) {
 function business_type_create($type, $name) {
   throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
   db_insert('business_type')
-    ->fields(array(
+    ->fields([
       'type' => $type,
       'name' => $name,
-    ))
+    ])
     ->execute();
 }
 
@@ -584,7 +584,7 @@ function business_field_access($op, $field, $entity_type, $entity, $account) {
  *   are found an empty array will be returned.
  *
  * @deprecated
- *   Use BusinessManager::getBusinessIdsFromUser()
+ *   Use BusinessManager::getBusinessIdsByUser()
  */
 function business_get_business_ids_from_user(\stdClass $account = NULL, $reset = FALSE) {
   if ($reset) {
@@ -606,7 +606,7 @@ function business_get_business_ids_from_user(\stdClass $account = NULL, $reset =
  *   An array with all the businesses linked to this user. If no businesses were
  *   found an empty array will be returned.
  *
- * @deprecated Use BusinessManager::getBusinessesFromUser()
+ * @deprecated Use BusinessManager::getBusinessesByUser()
  */
 function business_get_businesses_from_user(\stdClass $account = NULL, $reset = FALSE) {
   if ($reset) {
@@ -645,7 +645,7 @@ function business_get_active_business() {
  * @deprecated
  *   Use BusinessManager::businessIsOwnedByUser()
  */
-function business_is_owned_by_user(Business $business, \stdClass $account = NULL) {
+function business_is_owned_by_user($business, $account = NULL) {
   throw new \Exception(__FUNCTION__ . ' is deprecated.');
 }
 
@@ -660,7 +660,7 @@ function business_is_owned_by_user(Business $business, \stdClass $account = NULL
  * @deprecated
  *   Use BusinessInterface::setOwner()
  */
-function business_add_to_user(Business $business, \stdClass $account) {
+function business_add_to_user($business, $account) {
   throw new \Exception(__FUNCTION__ . ' is deprecated.');
 }
 
@@ -717,7 +717,7 @@ function template_preprocess_business(&$variables) {
   $variables['page'] = $variables['view_mode'] == 'full' && business_is_page($business);
 
   // Helpful $content variable for templates.
-  $variables += array('content' => array());
+  $variables += ['content' => []];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
   }

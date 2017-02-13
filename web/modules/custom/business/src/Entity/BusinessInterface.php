@@ -16,40 +16,40 @@ use Drupal\user\EntityOwnerInterface;
 interface BusinessInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
-   * Gets the Business name.
+   * Returns the name of the business.
    *
    * @return string
-   *   Name of the Business.
+   *   The name of the Business.
    */
   public function getName() : string;
 
   /**
-   * Sets the Business name.
+   * Sets the name of the business.
    *
    * @param string $name
-   *   The Business name.
+   *   The business name to set.
    *
    * @return \Drupal\business\Entity\BusinessInterface
-   *   The called Business entity.
+   *   The updated business entity.
    */
   public function setName(string $name) : BusinessInterface;
 
   /**
-   * Gets the Business creation timestamp.
+   * Returns the creation timestamp.
    *
    * @return int
-   *   Creation timestamp of the Business.
+   *   The creation timestamp.
    */
   public function getCreatedTime() : int;
 
   /**
-   * Sets the Business creation timestamp.
+   * Sets the creation timestamp.
    *
    * @param int $timestamp
-   *   The Business creation timestamp.
+   *   The creation timestamp to set.
    *
    * @return \Drupal\business\Entity\BusinessInterface
-   *   The called Business entity.
+   *   The updated business entity.
    */
   public function setCreatedTime(int $timestamp) : BusinessInterface;
 

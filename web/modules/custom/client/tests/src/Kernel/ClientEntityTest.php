@@ -29,6 +29,7 @@ class ClientEntityTest extends ContentEntityTestBase {
     'client',
     'entity_reference_validators',
     'libphonenumber',
+    'link',
     'views',
   ];
 

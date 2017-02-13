@@ -21,14 +21,10 @@ trait ClientTestHelper {
    *   An associative array of values to check, keyed by property name.
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @todo Declare as void return type.
    */
-  function assertClientProperties(Client $client, array $values, string $message = '', string $group = 'Other') : bool {
+  function assertClientProperties(Client $client, array $values, string $message = '') : void {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    return $this->assertEntityProperties('client', $client, $values, $message, $group);
+    $this->assertEntityProperties('client', $client, $values, $message);
   }
 
   /**
@@ -36,10 +32,8 @@ trait ClientTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   *
-   * @todo Declare as void return type.
    */
-  function assertClientTableEmpty(string $message) {
+  function assertClientTableEmpty(string $message) : void {
     $result = (bool) $this->connection
       ->select('client', 'c')
       ->fields('c')
@@ -54,15 +48,11 @@ trait ClientTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @todo Declare as void return type.
    */
-  function assertClientTableNotEmpty(string $message = '', string $group = 'Other') : bool {
+  function assertClientTableNotEmpty(string $message = '') : void {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $result = (bool) db_select('client', 'c')->fields('c')->execute()->fetchAll();
-    return $this->assertTrue($result, $message ?: 'The client database table is not empty.', $group);
+    $this->assertTrue($result, $message ?: 'The client database table is not empty.');
   }
 
   /**
@@ -70,15 +60,15 @@ trait ClientTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @todo Declare as void return type.
    */
-  function assertClientRevisionTableEmpty(string $message = '', string $group = 'Other') : bool {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $result = (bool) db_select('client_revision', 'cr')->fields('cr')->execute()->fetchAll();
-    return $this->assertFalse($result, $message ?: 'The client revision database table is empty.', $group);
+  function assertClientRevisionTableEmpty(string $message = '') : void {
+    $result = (bool) $this->connection
+      ->select('client_revision', 'cr')
+      ->fields('cr')
+      ->range(0, 1)
+      ->execute()
+      ->fetchAll();
+    $this->assertFalse($result, $message ?: 'The client revision database table is empty.');
   }
 
   /**
@@ -86,15 +76,11 @@ trait ClientTestHelper {
    *
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @todo Declare as void return type.
    */
-  function assertClientRevisionTableNotEmpty(string $message = '', string $group = 'Other') : bool {
+  function assertClientRevisionTableNotEmpty(string $message = '') : void {
     throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     $result = (bool) db_select('client_revision', 'cr')->fields('cr')->execute()->fetchAll();
-    return $this->assertTrue($result, $message ?: 'The client revision database table is not empty.', $group);
+    $this->assertTrue($result, $message ?: 'The client revision database table is not empty.');
   }
 
   /**
@@ -115,8 +101,8 @@ trait ClientTestHelper {
    */
   function createClient(array $values = []) : ClientInterface {
     // Check if the business ID is set, this is a required parameter.
-    if (!isset($values['bid'])) {
-      throw new \Exception('The "bid" property is required.');
+    if (!isset($values['business'])) {
+      throw new \Exception('The "business" property is required.');
     }
 
     // Provide some default values.
@@ -142,27 +128,25 @@ trait ClientTestHelper {
    *   A new client entity.
    */
   function createUiClient(array $values = []) : ClientInterface {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     // Provide some default values.
     $values += $this->randomClientValues();
 
     // Convert the entity property values to form values and submit the form.
     $edit = $this->convertClientValuesToFormPostValues($values);
-    $this->drupalPost('client/add', $edit, t('Save'));
+    $this->drupalPostForm('client/add', $edit, t('Save'));
 
     // Retrieve the saved client by name and email address and return it.
-    $query = new \EntityFieldQuery();
+    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+    $query = $this->container->get('entity.query')->get('client');
     $query
-      ->entityCondition('entity_type', 'client')
-      ->entityCondition('bundle', 'client')
-      ->propertyCondition('name', $values['name'])
-      ->fieldCondition('field_client_email', 'email', $values['field_client_email'])
+      ->condition('name', $values['name'])
+      ->condition('field_client_email', $values['field_client_email'])
       ->range(0, 1);
     $result = $query->execute();
     $cids = array_keys($result['client']);
     $this->assertTrue($cids, 'Client was successfully created through the UI.');
 
-    return client_load($cids[0]);
+    return Client::load($cids[0]);
   }
 
   /**
@@ -200,7 +184,7 @@ trait ClientTestHelper {
     return [
       'name' => $this->randomString(),
       'type' => $this->randomName(),
-      'bid' => $this->randomBusiness()->identifier(),
+      'business' => $this->randomBusiness()->identifier(),
       'created' => rand(0, 2000000000),
       'changed' => rand(0, 2000000000),
     ];
@@ -236,29 +220,28 @@ trait ClientTestHelper {
    *
    * @returns array
    *   An associative array of values, keyed by form field name, as used by
-   *   parent::drupalPost().
+   *   parent::drupalPostForm().
    *
    * @see self::randomClientValues()
    */
   public function convertClientValuesToFormPostValues(array $values) : array {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
     return [
-      'name' => $values['name'],
-      'field_client_email[und][0][email]' => $values['field_client_email'],
+      'name[0][value]' => $values['name'],
+      'field_client_email[0][email]' => $values['field_client_email'],
       // @todo Support other countries in addition to Belgium.
-      'field_client_address[und][0][country]' => 'BE',
-      'field_client_address[und][0][thoroughfare]' => $values['field_client_address']['thoroughfare'],
-      'field_client_address[und][0][postal_code]' => $values['field_client_address']['postal_code'],
-      'field_client_address[und][0][locality]' => $values['field_client_address']['locality'],
+      'field_client_address[0][country_code]' => 'BE',
+      'field_client_address[0][address_line1]' => $values['field_client_address']['address_line1'],
+      'field_client_address[0][postal_code]' => $values['field_client_address']['postal_code'],
+      'field_client_address[0][locality]' => $values['field_client_address']['locality'],
       // @todo Support other countries in addition to Belgium.
-      'field_client_shipping_address[und][0][country]' => 'BE',
-      'field_client_shipping_address[und][0][thoroughfare]' => $values['field_client_shipping_address']['thoroughfare'],
-      'field_client_shipping_address[und][0][postal_code]' => $values['field_client_shipping_address']['postal_code'],
-      'field_client_shipping_address[und][0][locality]' => $values['field_client_shipping_address']['locality'],
-      'field_client_vat[und][0][value]' => $values['field_client_vat'],
-      'field_client_phone[und][0][number]' => $values['field_client_phone']['number'],
-      'field_client_notes[und][0][value]' => $values['field_client_notes'],
-      'field_client_website[und][0][url]' => $values['field_client_website']['url'],
+      'field_client_shipping_address[0][country_code]' => 'BE',
+      'field_client_shipping_address[0][address_line1]' => $values['field_client_shipping_address']['address_line1'],
+      'field_client_shipping_address[0][postal_code]' => $values['field_client_shipping_address']['postal_code'],
+      'field_client_shipping_address[0][locality]' => $values['field_client_shipping_address']['locality'],
+      'field_client_vat[0][value]' => $values['field_client_vat'],
+      'field_client_phone[0][raw_input]' => $values['field_client_phone']['raw_input'],
+      'field_client_notes[0][value]' => $values['field_client_notes'],
+      'field_client_website[0][url]' => $values['field_client_website']['url'],
     ];
   }
 
@@ -271,12 +254,10 @@ trait ClientTestHelper {
    *   An associative array of values to apply to the entity, keyed by property
    *   name.
    *
-   * @todo Declare as void return type.
-   *
    * @deprecated
    *   Use BaseTestHelper::updateEntity() instead.
    */
-  function updateClient(ClientInterface $client, array $values) {
+  function updateClient(ClientInterface $client, array $values) : void {
     throw new \Exception(__METHOD__ . ' is deprecated.');
     $wrapper = entity_metadata_wrapper('client', $client);
     foreach ($values as $property => $value) {
