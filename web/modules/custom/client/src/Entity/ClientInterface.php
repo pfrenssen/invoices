@@ -5,8 +5,9 @@ declare (strict_types = 1);
 namespace Drupal\client\Entity;
 
 use Drupal\business\Entity\BusinessInterface;
-use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
@@ -14,7 +15,7 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup client
  */
-interface ClientInterface extends RevisionableInterface, EntityChangedInterface, EntityOwnerInterface {
+interface ClientInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, RevisionLogInterface {
 
   /**
    * Returns the client name.

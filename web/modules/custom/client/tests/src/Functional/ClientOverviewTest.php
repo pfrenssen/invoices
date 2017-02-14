@@ -138,7 +138,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The fourth column is linked to the website.',
-          'expected' => $website['url'],
+          'expected' => $website['uri'],
           'actual' => (string) $tablerow->td[3]->a[0]['href'],
         ],
         [
@@ -269,7 +269,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The fifth column is linked to the website.',
-          'expected' => $website['url'],
+          'expected' => $website['uri'],
           'actual' => (string) $tablerow->td[4]->a[0]['href'],
         ],
         [

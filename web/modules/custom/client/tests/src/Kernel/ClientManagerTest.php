@@ -4,7 +4,6 @@ declare (strict_types = 1);
 
 namespace Drupal\Tests\client\Kernel;
 
-use Drupal\business\BusinessManager;
 use Drupal\business\Tests\BusinessTestHelper;
 use Drupal\client\Tests\ClientTestHelper;
 use Drupal\invoice\Tests\InvoiceTestHelper;
@@ -34,6 +33,7 @@ class ClientManagerTest extends EntityKernelTestBase {
     'client',
     'entity_reference_validators',
     'libphonenumber',
+    'link',
     'views',
   ];
 

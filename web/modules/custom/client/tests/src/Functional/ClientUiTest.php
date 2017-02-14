@@ -49,27 +49,27 @@ class ClientUITest extends InvoicesFunctionalTestBase {
    */
   public function testClientForm() {
     // Check that the database table exists and is empty.
-    $this->assertTrue(db_table_exists('client'), 'The client database table exists.');
+    $this->assertTrue($this->connection->schema()->tableExists('client'), 'The client database table exists.');
     $this->assertClientTableEmpty('The client database is initially empty.');
 
     // Check that error messages are displayed about required fields when
     // creating a new client.
     $this->drupalPostForm('client/add', [], t('Save'));
     $required_fields = [
-      'name' => t('Client name'),
-      'field_client_email[und][0][email]' => t('Email address'),
+      'name[0][value]' => t('Client name'),
+      'field_client_email[0][value]' => t('E-mail address'),
     ];
     $this->assertRequiredFieldMessages($required_fields);
 
     // Check form validation errors.
     $invalid_values = [
-      'field_client_email[und][0][email]' => $this->randomString(),
-      'field_client_website[und][0][url]' => 'node/1',
+      'field_client_email[0][value]' => $this->randomString(),
+      'field_client_website[0][url]' => 'node/1',
     ];
     $messages = [
       'error' => [
         t('!name field is required.', ['!name' => t('Client name')]),
-        t('"%mail" is not a valid email address', ['%mail' => $invalid_values['field_client_email[und][0][email]']]),
+        t('"%mail" is not a valid email address', ['%mail' => $invalid_values['field_client_email[0][value]']]),
         t('The "Website" must be an external path'),
       ],
     ];
@@ -212,7 +212,7 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     $this->assertXPathElements('//div[contains(@class, "entity-client")]//h2/a[contains(text(), :name)]', 1, [':name' => $client->name], 'The client name is shown in the client summary.');
     $this->assertXPathElements('//div[contains(@class, "field-name-field-client-addres")]', 1, [], 'The client addres is shown in the client summary.');
     $email = field_get_items('client', $client, 'field_client_email');
-    $this->assertXPathElements('//div[contains(@class, "field-name-field-client-email")]//a[text() = :email]', 1, [':email' => $email[0]['email']], 'The client email is shown in the client summary.');
+    $this->assertXPathElements('//div[contains(@class, "field-name-field-client-email")]//a[text() = :email]', 1, [':email' => $email[0]['value']], 'The client email is shown in the client summary.');
     $vat = field_get_items('client', $client, 'field_client_vat');
     $this->assertXPathElements('//div[contains(@class, "field-name-field-client-vat")]//div[text() = :vat]', 1, [':vat' => $vat[0]['value']], 'The client vat number is shown in the client summary.');
   }

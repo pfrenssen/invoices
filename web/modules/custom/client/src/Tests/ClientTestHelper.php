@@ -50,8 +50,12 @@ trait ClientTestHelper {
    *   The message to display along with the assertion.
    */
   function assertClientTableNotEmpty(string $message = '') : void {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $result = (bool) db_select('client', 'c')->fields('c')->execute()->fetchAll();
+    $result = (bool) $this->connection
+      ->select('client', 'c')
+      ->fields('c')
+      ->range(0, 1)
+      ->execute()
+      ->fetchAll();
     $this->assertTrue($result, $message ?: 'The client database table is not empty.');
   }
 
@@ -164,7 +168,9 @@ trait ClientTestHelper {
       'field_client_notes' => $this->randomString(),
       'field_client_phone' => $this->randomPhoneNumberField(),
       'field_client_vat' => $this->randomString(),
-      'field_client_website' => ['url' => 'http://www.test.be'],
+      // @todo Which is correct?
+      'field_client_website' => 'http://www.test.be',
+      //'field_client_website' => ['uri' => 'http://www.test.be'],
     ];
   }
 
@@ -206,7 +212,7 @@ trait ClientTestHelper {
     $values['field_client_notes'][0]['value'] = $this->randomString();
     $values['field_client_phone'][0] = $this->randomPhoneNumberField();
     $values['field_client_vat'][0]['value'] = $this->randomString();
-    $values['field_client_website'][0]['url'] = 'http://www.test.be';
+    $values['field_client_website'][0]['uri'] = 'http://www.test.be';
 
     return $values;
   }
@@ -241,7 +247,9 @@ trait ClientTestHelper {
       'field_client_vat[0][value]' => $values['field_client_vat'],
       'field_client_phone[0][raw_input]' => $values['field_client_phone']['raw_input'],
       'field_client_notes[0][value]' => $values['field_client_notes'],
-      'field_client_website[0][url]' => $values['field_client_website']['url'],
+      // @todo Which is correct?
+      'field_client_website[0][uri]' => $values['field_client_website'],
+      // 'field_client_website[0][uri]' => $values['field_client_website']['uri'],
     ];
   }
 
