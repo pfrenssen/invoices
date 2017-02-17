@@ -1,11 +1,22 @@
-
-# Client menu items definition
+# Client menu items.
 entity.client.collection:
   title: 'Client list'
   route_name: entity.client.collection
   description: 'List Client entities'
   parent: system.admin_structure
   weight: 100
+
+client.main.navigation.collection:
+  title: 'Clients'
+  route_name: entity.client.collection
+  menu_name: main
+  weight: 0
+
+client.main.navigation.add_form:
+  title: 'Add client'
+  route_name: entity.client.add_form
+  menu_name: main
+  weight: 0
 
 client.admin.structure.settings:
   title: Client settings
