@@ -5,12 +5,6 @@ entity.business.collection:
   parent: system.admin_structure
   weight: 0
 
-business.main.navigation.collection:
-  title: 'Businesses'
-  route_name: entity.business.collection
-  menu_name: main
-  weight: 0
-
 business.main.navigation.add_form:
   title: 'Add business'
   route_name: entity.business.add_form

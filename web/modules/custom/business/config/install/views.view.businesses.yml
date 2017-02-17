@@ -5,6 +5,7 @@ dependencies:
     - field.storage.business.field_business_email
     - field.storage.business.field_business_mobile
     - field.storage.business.field_business_phone
+    - system.menu.main
   module:
     - business
     - libphonenumber
@@ -479,6 +480,15 @@ display:
     display_options:
       display_extenders: {  }
       path: businesses
+      menu:
+        type: normal
+        title: Businesses
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
+        menu_name: main
     cache_metadata:
       max-age: 0
       contexts:
