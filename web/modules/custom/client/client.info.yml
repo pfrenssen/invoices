@@ -31,3 +31,4 @@ config_devel:
   - field.storage.client.field_client_shipping_address
   - field.storage.client.field_client_vat
   - field.storage.client.field_client_website
+  - views.view.clients
