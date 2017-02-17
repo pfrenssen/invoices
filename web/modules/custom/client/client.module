@@ -97,16 +97,10 @@ function client_load_multiple(array $cids = [], $reset = FALSE) {
  *   Thrown when the passed ID is not valid.
  *
  * @deprecated
+ *   Use Client::load() instead.
  */
 function client_load($cid, $reset = FALSE) {
-  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
-  $cid = (int) $cid;
-  if (empty($cid)) {
-    throw new InvalidArgumentException('Invalid client id.');
-  }
-  $clients = client_load_multiple((array) $cid, $reset);
-
-  return $clients ? reset($clients) : FALSE;
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
 }
 
 /**
@@ -116,10 +110,10 @@ function client_load($cid, $reset = FALSE) {
  *   The client to delete.
  *
  * @deprecated
+ *   Call $client->delete() instead.
  */
-function client_delete(Client $client) {
-  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
-  $client->delete();
+function client_delete($client) {
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
 }
 
 /**
@@ -242,15 +236,11 @@ function client_validate_website_field($element, &$form_state) {
  *   TRUE if the client is owned by the user, FALSE otherwise.
  *
  * @deprecated
- *   use ClientManager::isOwnedByUser() instead.
+ *   Clients are not linked to users but to businesses. Retrieve the businesses
+ *   from the user manually and call ClientManager::isOwnedByBusiness().
  */
-function client_is_owned_by_user(Client $client, \stdClass $account = NULL) {
-  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
-  // Default to the logged in user.
-  global $user;
-  $account = $account ?: $user;
-
-  return in_array($client->bid, array_keys(business_get_businesses_from_user($account)));
+function client_is_owned_by_user($client, $account = NULL) {
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
 }
 
 /**

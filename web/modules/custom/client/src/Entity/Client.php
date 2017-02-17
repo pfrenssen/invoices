@@ -24,7 +24,7 @@ use Drupal\user\UserInterface;
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\client\ClientListBuilder",
- *     "views_data" = "Drupal\client\Entity\ClientViewsData",
+ *     "views_data" = "Drupal\views\EntityViewsData",
  *     "translation" = "Drupal\client\ClientTranslationHandler",
  *     "form" = {
  *       "default" = "Drupal\client\Form\ClientForm",
@@ -159,8 +159,8 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOwnerId() : ?string {
-    return $this->get('uid')->target_id;
+  public function getOwnerId() : ?int {
+    return (int) $this->get('uid')->target_id;
   }
 
   /**

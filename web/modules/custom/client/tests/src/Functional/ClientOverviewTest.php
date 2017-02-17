@@ -8,6 +8,7 @@ use Drupal\business\Entity\Business;
 use Drupal\client\Tests\ClientTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
 use Drupal\invoices\Tests\InvoicesFunctionalTestBase;
+use libphonenumber\PhoneNumberFormat;
 
 /**
  * Tests the client overview.
@@ -71,17 +72,17 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
       // PHP and the database. PHP uses the system locale to determine the
       // collation, while the database can be configured with an arbitrary
       // collation.
-      $name = $this->randomName(4) . $this->randomString();
+      $name = $this->randomMachineName(4) . $this->randomString();
       $client = $this->createUiClient(['name' => $name]);
-      $this->clients[$client->cid] = $client;
+      $this->clients[$client->id()] = $client;
     }
 
     // Load the client overview.
     $this->drupalGet('clients');
-    $this->assertResponse(200, 'The client overview is accessible.');
+    $this->assertSession()->statusCodeEquals(200);
 
     // Check that the client of the other business owner is not visible.
-    $this->assertNoText(trim(check_plain($this->client2->name)), 'A client from another business owner is not visible.');
+    $this->assertSession()->pageTextNotContains(trim($this->client2->name));
 
     // Check that the "Add client" local action is present.
     $xpath = '//ul[@class="action-links"]/li/a[@href="/client/add" and contains(text(), :text)]';
@@ -99,27 +100,20 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     // Loop over the displayed table rows and compare them with each client in
     // order.
     $tablerows = $this->xpath('//div[contains(@class, "view-clients")]//table/tbody/tr');
+    /* @var \Behat\Mink\Element\NodeElement $tablerow */
     foreach ($tablerows as $tablerow) {
-      /* @var $tablerow SimpleXMLElement */
-      /* @var $client EntityDrupalWrapper */
-      $client = entity_metadata_wrapper('client', array_shift($this->clients));
-
-      $website = $client->field_client_website->value();
-
-      // Format the phone number as an international number.
-      $phone = $client->field_client_phone->value();
-      $number = phone_libphonenumber_format($phone['number'], $phone['countrycode'], $phone['extension']);
+      $client = array_shift($this->clients);
 
       $testcases = [
         [
           'message' => 'The first column contains the client name.',
-          'expected' => $client->name->value(),
-          'actual' => (string) $tablerow->td[0]->a,
+          'expected' => $client->name->value,
+          'actual' => $tablerow->find('css', 'td:nth-child(1)>a')->getText(),
         ],
         [
           'message' => 'The first column is linked to the client detail page.',
-          'expected' => '/client/' . $client->getIdentifier(),
-          'actual' => (string) $tablerow->td[0]->a['href'],
+          'expected' => '/client/' . $client->id(),
+          'actual' => $tablerow->find('css', 'td:nth-child(1)>a')->getAttribute('href'),
         ],
         [
           'message' => 'The second column contains the email address.',
@@ -133,12 +127,18 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The third column contains the phone number.',
-          'expected' => $number,
+          'expected' => $client->field_client_phone->getFormattedNumber,
+          'expected' => $client->get('field_client_phone')->first()->getFormattedNumber(PhoneNumberFormat::INTERNATIONAL),
           'actual' => (string) $tablerow->td[2]->div->span,
         ],
         [
+          'message' => 'The third column is linked to the phone number.',
+          'expected' => 'tel:' . $client->get('field_client_phone')->first()->getFormattedNumber(),
+          'actual' => $tablerow->find('css', 'td:nth-child(3)>a')->getAttribute('href'),
+        ],
+        [
           'message' => 'The fourth column is linked to the website.',
-          'expected' => $website['uri'],
+          'expected' => $client->field_client_website->uri,
           'actual' => (string) $tablerow->td[3]->a[0]['href'],
         ],
         [
@@ -148,7 +148,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The fifth column is linked to the client edit page.',
-          'expected' => '/client/' . $client->getIdentifier() . '/edit',
+          'expected' => '/client/' . $client->id() . '/edit',
           'actual' => (string) $tablerow->td[4]->a[0]['href'],
         ],
       ];
@@ -193,13 +193,13 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         // PHP and the database. PHP uses the system locale to determine the
         // collation, while the database can be configured with an arbitrary
         // collation.
-        $name = $this->randomName(4) . $this->randomString();
+        $name = $this->randomMachineName(4) . $this->randomString();
         $client = $this->createClient([
           'business' => $business->id(),
           'name' => $name,
         ]);
         $client->save();
-        $this->clients[$client->cid] = $client;
+        $this->clients[$client->id()] = $client;
       }
     }
 
@@ -207,12 +207,12 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     $this->drupalGet('clients');
 
     // Check that the "Add client" local action is present.
-    $xpath = '//ul[@class="action-links"]/li/a[@href="/client/add" and contains(text(), :text)]';
-    $this->assertXPathElements($xpath, 1, [':text' => t('Add client')], 'The "Add client" local action is present.');
+    $xpath = '//nav[@class="action-links"]/li/a[@href="/client/add" and contains(text(), :text)]';
+    $this->assertXPathElements($xpath, 1, [':text' => (string) t('Add client')], 'The "Add client" local action is present.');
 
     // Check that the clients are present in the overview in alphabetical order.
     uasort($this->clients, function ($a, $b) {
-      return strcasecmp($a->name, $b->name);
+      return strcasecmp($a->name->value, $b->name->value);
     });
 
     // Loop over the displayed table rows and compare them with each client in
@@ -279,13 +279,13 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The sixth column is linked to the client edit page.',
-          'expected' => '/client/' . $client->getIdentifier() . '/edit',
+          'expected' => '/client/' . $client->id() . '/edit',
           'actual' => (string) $tablerow->td[5]->a[0]['href'],
         ],
       ];
 
       foreach ($testcases as $testcase) {
-        $this->assertEqual(trim($testcase['expected']), trim($testcase['actual']), $testcase['message']);
+        $this->assertEquals(trim($testcase['expected']), trim($testcase['actual']), $testcase['message']);
       }
     }
 

@@ -14,14 +14,8 @@ entity.client.edit_form:
   base_route: entity.client.canonical
   title: 'Edit'
 
-entity.client.version_history:
-  route_name: entity.client.version_history
-  base_route: entity.client.canonical
-  title: 'Revisions'
-
 entity.client.delete_form:
   route_name:  entity.client.delete_form
   base_route:  entity.client.canonical
   title: Delete
   weight: 10
-

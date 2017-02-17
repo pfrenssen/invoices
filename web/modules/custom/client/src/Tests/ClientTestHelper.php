@@ -19,12 +19,9 @@ trait ClientTestHelper {
    *   The Client entity to check.
    * @param array $values
    *   An associative array of values to check, keyed by property name.
-   * @param string $message
-   *   The message to display along with the assertion.
    */
-  function assertClientProperties(Client $client, array $values, string $message = '') : void {
-    throw new \Exception('Convert ' . __METHOD__ . ' to D8.');
-    $this->assertEntityProperties('client', $client, $values, $message);
+  function assertClientProperties(ClientInterface $client, array $values) : void {
+    $this->assertEntityFieldValues($client, $values);
   }
 
   /**
@@ -147,10 +144,9 @@ trait ClientTestHelper {
       ->condition('field_client_email', $values['field_client_email'])
       ->range(0, 1);
     $result = $query->execute();
-    $cids = array_keys($result['client']);
-    $this->assertTrue($cids, 'Client was successfully created through the UI.');
+    $this->assertTrue($result, 'Client was successfully created through the UI.');
 
-    return Client::load($cids[0]);
+    return Client::load(reset($result));
   }
 
   /**
@@ -288,7 +284,7 @@ trait ClientTestHelper {
       ->execute()
       ->fetchColumn();
 
-    return client_load($cid);
+    return Client::load($cid);
   }
 
 }

@@ -87,7 +87,7 @@ class BusinessManagerTest extends EntityKernelTestBase {
   /**
    * Tests the retrieval of the businesses associated with a given user.
    *
-   * @covers ::getBusinessesFromUser
+   * @covers ::getBusinessesByUser
    */
   public function testGetBusinessesFromUser() {
     $business_key = 0;
@@ -136,7 +136,7 @@ class BusinessManagerTest extends EntityKernelTestBase {
    *   to be returned.
    */
   protected function assertBusinessGetBusinessesFromUser(AccountInterface $account = NULL, $bids = []) {
-    $businesses = $this->businessManager->getBusinessesFromUser($account);
+    $businesses = $this->businessManager->getBusinessesByUser($account);
     $this->assertEquals(count($bids), count($businesses), 'The user has been linked to correct number of businesses.');
     $keys = array_keys($businesses);
     $this->assertEquals($bids, $keys, 'The correct array keys are used.');

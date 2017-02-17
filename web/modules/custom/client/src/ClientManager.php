@@ -4,7 +4,6 @@ declare (strict_types = 1);
 
 namespace Drupal\client;
 
-use Drupal\business\BusinessManagerInterface;
 use Drupal\business\Entity\BusinessInterface;
 use Drupal\client\Entity\Client;
 use Drupal\client\Entity\ClientInterface;
@@ -45,13 +44,6 @@ class ClientManager implements ClientManagerInterface {
   protected $storage;
 
   /**
-   * The business manager service.
-   *
-   * @var \Drupal\business\BusinessManagerInterface
-   */
-  protected $businessManager;
-
-  /**
    * Constructs the BusinessManager service.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
@@ -59,19 +51,17 @@ class ClientManager implements ClientManagerInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, BusinessManagerInterface $business_manager) {
+  public function __construct(AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager) {
     $this->currentUser = $current_user;
     $this->entityTypeManager = $entity_type_manager;
     $this->storage = $entity_type_manager->getStorage('client');
-    $this->businessManager = $business_manager;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isOwnedByUser(ClientInterface $client, AccountInterface $account = NULL) : bool {
-    $account = $account ?: $this->currentUser;
-    return in_array($client->getBusiness()->id(), $this->businessManager->getBusinessIdsByUser($account));
+  public function isOwnedByBusiness(ClientInterface $client, BusinessInterface $business) : bool {
+    return $client->getBusiness()->id() === $business->id();
   }
 
   /**

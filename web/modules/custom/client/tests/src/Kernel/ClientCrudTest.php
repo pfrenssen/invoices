@@ -83,15 +83,15 @@ class ClientCrudTest extends EntityKernelTestBase {
     $this->assertClientTableNotEmpty('The client database table is no longer empty after creating a client.');
 
     // Check that the client data can be read from the database.
-    $retrieved_client = client_load($client->cid);
-    $this->assertClientProperties($retrieved_client, $values, 'The client that was saved to the database can be read correctly.');
+    $retrieved_client = $this->loadUnchangedEntity('client', $client->id());
+    $this->assertClientProperties($retrieved_client, $values);
 
     // Update the client and check that the new values were written to the
     // database.
     $new_values = $this->randomClientValues();
     $this->updateEntity($client, $new_values);
     $client->save();
-    $this->assertClientProperties($client, $new_values, 'The client has been updated correctly.');
+    $this->assertClientProperties($client, $new_values);
 
     // Delete the client. The database should be empty again.
     $client->delete();

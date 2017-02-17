@@ -7,7 +7,6 @@ namespace Drupal\client;
 use Drupal\business\Entity\BusinessInterface;
 use Drupal\client\Entity\Client;
 use Drupal\client\Entity\ClientInterface;
-use Drupal\Core\Session\AccountInterface;
 
 /**
  * Interface for ClientManager services.
@@ -15,17 +14,17 @@ use Drupal\Core\Session\AccountInterface;
 interface ClientManagerInterface {
 
   /**
-   * Returns whether a given client is owned by a given user.
+   * Returns whether the given client is owned by the given business.
    *
    * @param \Drupal\client\Entity\ClientInterface $client
    *   The client to check.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   Optional user account to check. Defaults to the currently logged in user.
+   * @param \Drupal\business\Entity\BusinessInterface $business
+   *   The business to check.
    *
    * @return bool
-   *   TRUE if the client is owned by the user, FALSE otherwise.
+   *   TRUE if the client is owned by the business, FALSE otherwise.
    */
-  public function isOwnedByUser(ClientInterface $client, AccountInterface $account = NULL) : bool;
+  public function isOwnedByBusiness(ClientInterface $client, BusinessInterface $business) : bool;
 
   /**
    * Returns whether the client is used in any invoices.

@@ -104,6 +104,7 @@ class ClientManagerTest extends EntityKernelTestBase {
     }
 
     // Create a line item of each type so it can be referenced in invoices.
+    $this->markTestSkipped('Convert the Line Item module before continuing porting this test.');
     $this->createLineItem('product')->save();
     $this->createLineItem('service')->save();
 
