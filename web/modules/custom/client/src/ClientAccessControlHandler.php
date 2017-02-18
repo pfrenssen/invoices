@@ -73,13 +73,13 @@ class ClientAccessControlHandler extends EntityAccessControlHandler implements E
 
     switch ($operation) {
       case 'view':
-        throw new \Exception("Convert $operation permission to D8");
+        // Access is granted if the client is owned by the user, and the user
+        // has the 'view own clients' permission.
+        if (in_array($entity->getBusiness()->id(), $this->businessManager->getBusinessIdsByUser($account))) {
+          return AccessResult::allowedIfHasPermission($account, 'view own clients');
+        }
 
-        return AccessResult::allowed();
-
-        $access = user_access("view any $client->type client", $account);
-        $access |= user_access('view own clients', $account) && client_is_owned_by_user($client, $account);
-        return $access;
+        return AccessResult::forbidden();
 
       case 'update':
         // Access is granted if the client is owned by the user, and the user
