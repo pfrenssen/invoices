@@ -14,6 +14,7 @@ dependencies:
   - dynamic_page_cache
   - file
   - image
+  - invoices_core
   - options
   - page_cache
   - toolbar

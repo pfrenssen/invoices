@@ -2,6 +2,8 @@
 
 declare (strict_types = 1);
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * @file
  * Main functions and hook implementations for the Client module.
@@ -200,27 +202,25 @@ function client_page_title(Client $client) {
 /**
  * Implements hook_form_alter().
  *
- * @deprecated
+ * Provides a helpful error message if an invalid website URL is entered in a
+ * form.
  */
-function _client_form_alter(&$form, &$form_state, $form_id) {
-  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
-  if (!empty($form['field_client_website'])) {
-    $form['field_client_website']['#element_validate'][] = 'client_validate_website_field';
+function client_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (!empty($form['field_client_website']['widget'][0]['uri'])) {
+    $form['field_client_website']['widget'][0]['uri']['#element_validate'][] = 'client_validate_website_field';
   }
 }
 
 /**
  * Validator for the client_website field.
  *
- * @deprecated
+ * Provides a helpful error message if an internal website URL is entered in a
+ * form.
  */
-function client_validate_website_field($element, &$form_state) {
-  throw new \Exception('Convert ' . __FUNCTION__ . ' to D8.');
-  if (!empty($form_state['values']['field_client_website'][LANGUAGE_NONE][0]['url'])) {
-    $url = link_cleanup_url($form_state['values']['field_client_website'][LANGUAGE_NONE][0]['url']);
-    if (link_validate_url($url) !== LINK_EXTERNAL) {
-      form_error($element, t('The "!name" must be an external path', ['!name' => t('Website')]));
-    }
+function client_validate_website_field($element, FormStateInterface $form_state) {
+  $uri = $form_state->getValue($element['#parents']);
+  if (!empty($uri) && parse_url($uri, PHP_URL_SCHEME) === 'internal') {
+    $form_state->setError($element, t('Please enter a full website URL such as http://example.com.'));
   }
 }
 

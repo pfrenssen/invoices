@@ -624,11 +624,11 @@ function business_get_businesses_from_user(\stdClass $account = NULL, $reset = F
  *
  * @return Business
  *   The active business for the current user.
+ *
+ * @deprecated Use BusinessManager::getActiveBusiness()
  */
 function business_get_active_business() {
-  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
-  $businesses = business_get_businesses_from_user();
-  return $businesses ? reset($businesses) : NULL;
+  throw new \Exception(__FUNCTION__ . ' is deprecated.');
 }
 
 /**
@@ -685,7 +685,7 @@ function business_label(Business $entity, $entity_type) {
 /**
  * Implements hook_theme().
  */
-function business_theme() {
+function business_theme() : array {
   return [
     'business' => [
       'render element' => 'elements',
@@ -702,8 +702,7 @@ function business_theme() {
  *   An associative array containing:
  *   - elements: An array of render elements to display.
  */
-function template_preprocess_business(&$variables) {
-  // @todo Mark this function as return void.
+function template_preprocess_business(&$variables) : void {
   $variables['view_mode'] = $variables['elements']['#view_mode'];
   $variables['business'] = $variables['elements']['#business'];
   /** @var \Drupal\business\Entity\BusinessInterface $business */

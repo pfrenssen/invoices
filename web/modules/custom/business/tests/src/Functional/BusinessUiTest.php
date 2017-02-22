@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Drupal\Tests\simpletest\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Tags;
 use Drupal\Core\Url;
 use Drupal\business\Tests\BusinessTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
@@ -170,7 +171,7 @@ class BusinessUiTest extends InvoicesFunctionalTestBase {
     // Check that a warning message is shown to the user.
     $this->assertStatusMessages([
       'error' => [
-        (string) new FormattableMarkup('The value %value has been entered multiple times.', ['%value' => $business1->getName() . ' (' . $business1->id() . ')']),
+        (string) new FormattableMarkup('The value %value has been entered multiple times.', ['%value' => Tags::encode($business1->getName() . ' (' . $business1->id() . ')')]),
       ],
     ]);
   }

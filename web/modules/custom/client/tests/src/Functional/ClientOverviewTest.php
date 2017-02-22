@@ -4,7 +4,6 @@ declare (strict_types = 1);
 
 namespace Drupal\Tests\simpletest\Functional;
 
-use Drupal\business\Entity\Business;
 use Drupal\client\Tests\ClientTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
 use Drupal\invoices\Tests\InvoicesFunctionalTestBase;
@@ -107,7 +106,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
       $testcases = [
         [
           'message' => 'The first column contains the client name.',
-          'expected' => $client->name->value,
+          'expected' => $client->getName(),
           'actual' => $tablerow->find('css', 'td:nth-child(1)>a')->getText(),
         ],
         [
@@ -117,39 +116,43 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The second column contains the email address.',
-          'expected' => $client->field_client_email->value(),
-          'actual' => (string) $tablerow->td[1]->a,
+          'expected' => $client->getEmail(),
+          'actual' => $tablerow->find('css', 'td:nth-child(2)>a')->getText(),
         ],
         [
           'message' => 'The second column is linked to the email address.',
           'expected' => 'mailto:' . $client->field_client_email->value(),
-          'actual' => (string) $tablerow->td[1]->a['href'],
+          'actual' => $tablerow->find('css', 'td:nth-child(2)>a')->getAttribute('href'),
         ],
         [
           'message' => 'The third column contains the phone number.',
-          'expected' => $client->field_client_phone->getFormattedNumber,
-          'expected' => $client->get('field_client_phone')->first()->getFormattedNumber(PhoneNumberFormat::INTERNATIONAL),
-          'actual' => (string) $tablerow->td[2]->div->span,
+          'expected' => $client->getPhoneNumber()->getFormattedNumber(PhoneNumberFormat::INTERNATIONAL),
+          'actual' => $tablerow->find('css', 'td:nth-child(3)>div>span')->getText(),
         ],
         [
           'message' => 'The third column is linked to the phone number.',
-          'expected' => 'tel:' . $client->get('field_client_phone')->first()->getFormattedNumber(),
+          'expected' => 'tel:' . $client->getPhoneNumber()->getFormattedNumber(),
           'actual' => $tablerow->find('css', 'td:nth-child(3)>a')->getAttribute('href'),
         ],
         [
+          'message' => 'The fourth column contains the website.',
+          'expected' => $client->getWebsite(),
+          'actual' => $tablerow->find('css', 'td:nth-child(4)>a')->getText(),
+        ],
+        [
           'message' => 'The fourth column is linked to the website.',
-          'expected' => $client->field_client_website->uri,
-          'actual' => (string) $tablerow->td[3]->a[0]['href'],
+          'expected' => $client->getWebsite(),
+          'actual' => $tablerow->find('css', 'td:nth-child(4)>a')->getAttribute('href'),
         ],
         [
           'message' => 'The fifth column contains the "edit" action link.',
-          'expected' => t('edit'),
-          'actual' => (string) $tablerow->td[4]->a[0],
+          'expected' => (string) t('edit'),
+          'actual' => $tablerow->find('css', 'td:nth-child(5)>a')->getText(),
         ],
         [
           'message' => 'The fifth column is linked to the client edit page.',
           'expected' => '/client/' . $client->id() . '/edit',
-          'actual' => (string) $tablerow->td[4]->a[0]['href'],
+          'actual' => $tablerow->find('css', 'td:nth-child(5)>a')->getAttribute('href'),
         ],
       ];
 
@@ -219,68 +222,69 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     // order.
     $tablerows = $this->xpath('//div[contains(@class, "view-clients")]//table/tbody/tr');
     foreach ($tablerows as $tablerow) {
-      /* @var $tablerow SimpleXMLElement */
-      /* @var $client EntityDrupalWrapper */
-      /* @var $business Business */
       $client = array_shift($this->clients);
       $business = $client->getBusiness();
-
-      $website = $client->field_client_website->value();
-
-      // Format the phone number as an international number.
-      $phone = $client->field_client_phone->value();
-      $number = phone_libphonenumber_format($phone['number'], $phone['countrycode'], $phone['extension']);
 
       $testcases = [
         [
           'message' => 'The first column contains the business name.',
           'expected' => $business->getName(),
-          'actual' => (string) $tablerow->td[0]->a,
+          'actual' => $tablerow->find('css', 'td:nth-child(1)>a')->getText(),
         ],
         [
           'message' => 'The first column is linked to the business.',
           'expected' => '/business/' . $business->id(),
-          'actual' => (string) $tablerow->td[0]->a['href'],
+          'actual' => $tablerow->find('css', 'td:nth-child(1)>a')->getAttribute('href'),
         ],
         [
           'message' => 'The second column contains the client name.',
-          'expected' => $client->name->value(),
-          'actual' => (string) $tablerow->td[1]->a,
+          'expected' => $client->getName(),
+          'actual' => $tablerow->find('css', 'td:nth-child(2)>a')->getText(),
         ],
         [
           'message' => 'The second column is linked to the client detail page.',
           'expected' => '/client/' . $client->id(),
-          'actual' => (string) $tablerow->td[1]->a['href'],
+          'actual' => $tablerow->find('css', 'td:nth-child(2)>a')->getAttribute('href'),
         ],
         [
           'message' => 'The third column contains the email address.',
-          'expected' => $client->field_client_email->value(),
-          'actual' => (string) $tablerow->td[2]->a,
+          'expected' => $client->getEmail(),
+          'actual' => $tablerow->find('css', 'td:nth-child(3)>a')->getText(),
         ],
         [
           'message' => 'The third column is linked to the email address.',
-          'expected' => 'mailto:' . $client->field_client_email->value(),
-          'actual' => (string) $tablerow->td[2]->a['href'],
+          'expected' => 'mailto:' . $client->getEmail(),
+          'actual' => $tablerow->find('css', 'td:nth-child(3)>a')->getAttribute('href'),
         ],
         [
           'message' => 'The fourth column contains the phone number.',
-          'expected' => $number,
-          'actual' => (string) $tablerow->td[3]->div->span,
+          'expected' => $client->getPhoneNumber()->getFormattedNumber(PhoneNumberFormat::INTERNATIONAL),
+          'actual' => $tablerow->find('css', 'td:nth-child(4)>a')->getText(),
+        ],
+        [
+          'message' => 'The fourth column is linked to the phone number.',
+          'expected' => 'tel:' . $client->getPhoneNumber()->getFormattedNumber(),
+          'actual' => $tablerow->find('css', 'td:nth-child(4)>a')->getAttribute('href'),
+        ],
+        [
+          'message' => 'The fifth column contains the website.',
+          'expected' => $client->getWebsite(),
+          'actual' => $tablerow->find('css', 'td:nth-child(5)>a')->getText(),
         ],
         [
           'message' => 'The fifth column is linked to the website.',
-          'expected' => $website['uri'],
-          'actual' => (string) $tablerow->td[4]->a[0]['href'],
+          'expected' => $client->getWebsite(),
+          'actual' => $tablerow->find('css', 'td:nth-child(5)>a')->getAttribute('href'),
         ],
         [
           'message' => 'The sixth column contains the "edit" action link.',
-          'expected' => t('edit'),
-          'actual' => (string) $tablerow->td[5]->a[0],
+          'expected' => (string) t('edit'),
+          'actual' => $tablerow->find('css', 'td:nth-child(6)>a')->getText(),
         ],
         [
           'message' => 'The sixth column is linked to the client edit page.',
           'expected' => '/client/' . $client->id() . '/edit',
-          'actual' => (string) $tablerow->td[5]->a[0]['href'],
+          'actual' => $tablerow->find('css', 'td:nth-child(6)>a')->getAttribute('href'),
         ],
       ];
 

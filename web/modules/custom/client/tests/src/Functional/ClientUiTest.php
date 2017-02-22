@@ -71,7 +71,7 @@ class ClientUITest extends InvoicesFunctionalTestBase {
       'error' => [
         (string) t('@name field is required.', ['@name' => t('Client name')]),
         (string) t('The email address %mail is not valid.', ['%mail' => $invalid_values['field_client_email[0][value]']]),
-        (string) t('The "Website" must be an external path'),
+        (string) t('Please enter a full website URL such as http://example.com.'),
       ],
     ];
     $this->drupalPostForm('client/add', $invalid_values, t('Save'));

@@ -78,6 +78,7 @@ class BusinessManagerTest extends EntityKernelTestBase {
         $business = $this->createBusiness();
         $business->setOwner($user);
         $business->save();
+        $this->addBusinessToUser($business, $user);
         $this->businesses[] = $business;
       }
       $this->users[$user_key] = $user;

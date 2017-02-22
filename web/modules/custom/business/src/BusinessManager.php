@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Drupal\business;
 
 use Drupal\business\Entity\Business;
+use Drupal\business\Entity\BusinessInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -74,9 +75,21 @@ class BusinessManager implements BusinessManagerInterface {
     // Check if the result has been statically cached.
     if (empty($this->bids[$uid])) {
       // Retrieve the business IDs.
-      $result = $this->storage->getQuery()
-        ->condition('uid', $uid)
-        ->execute();
+      $query = \Drupal::database()->select('business', 'b');
+      $query->join('user__field_user_businesses', 'u', 'b.bid = u.field_user_businesses_target_id');
+      $query
+        ->fields('b', ['bid'])
+        ->condition('u.entity_id', $uid);
+      $result = $query
+        ->execute()
+        ->fetchCol();
+
+      // The entity storage always returns IDs as strings. Cast them to
+      // integers, so we adhere to strict typing.
+      $result = array_map(function ($value) {
+        return (int) $value;
+      }, $result);
+
       $this->bids[$uid] = $result;
     }
 
@@ -89,6 +102,22 @@ class BusinessManager implements BusinessManagerInterface {
   public function businessIsOwnedByUser(Business $business, AccountInterface $account = NULL) : bool {
     $account = $account ?: $this->currentUser;
     return in_array($business->id(), $this->getBusinessIdsByUser($account));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getActiveBusinessId(): ?int {
+    $business_ids = $this->getBusinessIdsByUser();
+    return $business_ids ? reset($business_ids) : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getActiveBusiness(): ?BusinessInterface {
+    $business_id = $this->getActiveBusinessId();
+    return $business_id ? $this->storage->load($business_id) : NULL;
   }
 
   /**

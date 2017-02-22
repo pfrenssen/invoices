@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Drupal\client\Entity;
 
+use Drupal\business\Entity\Business;
 use Drupal\business\Entity\BusinessInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -11,6 +12,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionableContentEntityBase;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
+use Drupal\libphonenumber\LibPhoneNumberInterface;
 use Drupal\user\UserInterface;
 
 /**
@@ -70,8 +73,13 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) : void {
     parent::preCreate($storage_controller, $values);
+
+    /** @var \Drupal\business\BusinessManagerInterface $business_manager */
+    $business_manager = \Drupal::service('business.manager');
+
     $values += [
       'uid' => \Drupal::currentUser()->id(),
+      'business' => $business_manager->getActiveBusinessId(),
     ];
   }
 
@@ -80,6 +88,9 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
    */
   public function preSave(EntityStorageInterface $storage) : void {
     parent::preSave($storage);
+    if (!$this->getBusinessId()) {
+      throw new \Exception('Can not save a client which is not associated with a business.');
+    }
 
     foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
       $translation = $this->getTranslation($langcode);
@@ -122,16 +133,31 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
   /**
    * {@inheritdoc}
    */
-  public function getBusiness(): BusinessInterface {
-    return $this->get('business')->value;
+  public function getBusinessId() : ?int {
+    $business_id = $this->get('business')->target_id;
+    return !empty($business_id) ? (int) $business_id : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBusiness(): ?BusinessInterface {
+    return Business::load($this->getBusinessId());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setBusinessId(int $business_id) : ClientInterface {
+    $this->set('business', $business_id);
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setBusiness(BusinessInterface $business) : ClientInterface {
-    $this->set('business', $business);
-    return $this;
+    return $this->setBusinessId($business->id());
   }
 
   /**
@@ -177,6 +203,28 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
   public function setOwner(UserInterface $account) : ClientInterface {
     $this->set('uid', $account->id());
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEmail(): ?string {
+    return $this->get('field_client_email')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPhoneNumber(): ?LibPhoneNumberInterface {
+    return $this->get('field_client_phone')->first();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWebsite(): ?Url {
+    $uri = $this->get('field_client_website');
+    return !empty($uri) ? Url::fromUri($uri) : NULL;
   }
 
   /**
@@ -237,6 +285,7 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
       ->setRevisionable(FALSE)
       ->setSetting('target_type', 'business')
       ->setSetting('handler', 'default')
+      ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',

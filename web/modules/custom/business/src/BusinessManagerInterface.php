@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Drupal\business;
 
 use Drupal\business\Entity\Business;
+use Drupal\business\Entity\BusinessInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -52,6 +53,32 @@ interface BusinessManagerInterface {
    *   TRUE if the business is owned by the user, FALSE otherwise.
    */
   public function businessIsOwnedByUser(Business $business, AccountInterface $account = NULL) : bool;
+
+  /**
+   * Gets the ID of the active business for the current user.
+   *
+   * @todo This currently simply returns the first business owned by the logged
+   *   in user. Once we are able to get the active business from the context
+   *   (e.g. by using Spaces, PURL or Context) this should return that instead.
+   *
+   * @return int|null
+   *   The ID of the active business for the current user, or NULL if no user is
+   *   logged in, or the logged in user doesn't have any businesses.
+   */
+  public function getActiveBusinessId(): ?int;
+
+  /**
+   * Gets the active business for the current user.
+   *
+   * @todo This currently simply returns the first business owned by the logged
+   *   in user. Once we are able to get the active business from the context
+   *   (e.g. by using Spaces, PURL or Context) this should return that instead.
+   *
+   * @return \Drupal\business\Entity\BusinessInterface|null
+   *   The active business for the current user, or NULL if no user is logged
+   *   in, or the logged in user doesn't have any businesses.
+   */
+  public function getActiveBusiness(): ?BusinessInterface;
 
   /**
    * Resets the static cache.

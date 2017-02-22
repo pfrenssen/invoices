@@ -77,7 +77,7 @@ class ClientCrudTest extends EntityKernelTestBase {
 
     // Check if a new client can be saved to the database.
     $values = $this->randomClientValues();
-    $values['business'] = $this->randomBusiness();
+    $values['business'] = $this->randomBusiness()->id();
     $client = $this->createClient($values);
     $client->save();
     $this->assertClientTableNotEmpty('The client database table is no longer empty after creating a client.');
