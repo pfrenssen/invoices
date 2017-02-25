@@ -26,7 +26,7 @@ class ClientForm extends ContentEntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created new client %label.', [
+        drupal_set_message($this->t('New client %label has been added.', [
           '%label' => $entity->label(),
         ]));
         break;

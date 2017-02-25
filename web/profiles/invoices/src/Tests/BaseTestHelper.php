@@ -80,7 +80,7 @@ trait BaseTestHelper {
    *   An associative array of values to apply to the entity, keyed by field
    *   name.
    */
-  protected function updateEntity(ContentEntityInterface $entity, array $values) {
+  protected function updateEntity(ContentEntityInterface $entity, array $values) : void {
     foreach ($values as $property => $value) {
       $entity->set($property, $value);
     }
@@ -97,7 +97,7 @@ trait BaseTestHelper {
    * @throws \Exception
    *   Thrown when an unknown field is compared.
    */
-  protected function assertEntityFieldValues(ContentEntityInterface $entity, array $values) {
+  protected function assertEntityFieldValues(ContentEntityInterface $entity, array $values) : void {
     foreach ($values as $field_name => $expected_value) {
       $field_item_list = $entity->get($field_name);
       // Check if a single value or multiple values are expected.
@@ -132,7 +132,7 @@ trait BaseTestHelper {
    * @param array $field_names
    *   An indexed array of field names that should be checked.
    */
-  protected function assertFieldValidationFailed(array $field_names) {
+  protected function assertFieldValidationFailed(array $field_names) : void {
     foreach ($field_names as $field_name) {
       $xpath = '//textarea[@name=:value and contains(@class, "error")]|//input[@name=:value and contains(@class, "error")]|//select[@name=:value and contains(@class, "error")]';
       $elements = $this->xpath($this->buildXPathQuery($xpath, [':value' => $field_name]));
@@ -146,7 +146,7 @@ trait BaseTestHelper {
    * @param string $message
    *   The message to display along with the assertion.
    */
-  protected function assertNoPager(string $message = '') {
+  protected function assertNoPager(string $message = '') : void {
     $message = $message ?: 'No pager is present on the page.';
     $xpath = '//nav[@class = "pager"]';
     $this->assertXPathElements($xpath, 0, [], $message);
@@ -158,7 +158,7 @@ trait BaseTestHelper {
    * @param string $message
    *   The message to display along with the assertion.
    */
-  protected function assertPager(string $message = '') {
+  protected function assertPager(string $message = '') : void {
     $message = $message ?: 'A pager is present on the page.';
     $xpath = '//nav[@class = "pager"]';
     $this->assertXPathElements($xpath, 1, [], $message);
@@ -176,7 +176,7 @@ trait BaseTestHelper {
    *   by message type (either 'status', 'warning' or 'error'). Every type
    *   contains an indexed array of status messages.
    */
-  protected function assertStatusMessages(array $messages) {
+  protected function assertStatusMessages(array $messages) : void {
     // Messages can contain a mix of HTML and sanitized HTML, for example:
     // '<em class="placeholder">&lt;script&gt;alert();&lt;&#039;script&gt;</em>'
     // Unfortunately, check_plain() and SimpleXML::asXml() encode quotes and
@@ -237,10 +237,8 @@ trait BaseTestHelper {
    *   by message type (either 'status', 'warning' or 'error'). Every type
    *   contains an indexed array of status messages. When omitted the standard
    *   messages of the Field module will be used.
-   * @param string $message
-   *   The message to display along with the assertion.
    */
-  protected function assertRequiredFieldMessages(array $required_fields, array $messages = [], string $message = '') {
+  protected function assertRequiredFieldMessages(array $required_fields, array $messages = []) : void {
     // Use the standard message of the Field module by default.
     if (!$messages) {
       foreach ($required_fields as $required_field) {
@@ -265,7 +263,7 @@ trait BaseTestHelper {
    * @param string $message
    *   The message to display along with the assertion.
    */
-  protected function assertXPathElements(string $xpath, int $count, array $arguments = [], string $message = '') {
+  protected function assertXPathElements(string $xpath, int $count, array $arguments = [], string $message = '') : void {
     // Provide a default message.
     $message = $message ?: (string) new PluralTranslatableMarkup($count, 'The element matching the XPath expression is present in the page.', 'The @count elements matching the XPath expression are present in the page.');
 
@@ -381,7 +379,8 @@ trait BaseTestHelper {
     // @see addressfield_field_presave()
     // @todo Is this still necessary in D8 with the Address module?
     return [
-      'country_code' => chr(mt_rand(65, 90)) . chr(mt_rand(65, 90)),
+      // @todo Support countries other than Belgium.
+      'country_code' => 'BE',
       'locality' => trim(str_replace('  ', ' ', $this->randomString())),
       'postal_code' => (string) rand(1000, 9999),
       'address_line1' => trim(str_replace('  ', ' ', $this->randomString())),

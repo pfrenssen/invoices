@@ -68,10 +68,10 @@ class InvoicesFunctionalTestBase extends BrowserTestBase {
     }
 
     // If a business user was created, also create a business.
-    if (in_array('business owner', $this->usersToCreate)) {
+    if (in_array('business_owner', $this->usersToCreate)) {
       $this->business = $this->createBusiness();
       $this->business->save();
-      $this->addBusinessToUser($this->business, $this->users['business owner']);
+      $this->addBusinessToUser($this->business, $this->users['business_owner']);
     }
   }
 

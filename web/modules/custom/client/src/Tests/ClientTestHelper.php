@@ -230,13 +230,11 @@ trait ClientTestHelper {
     return [
       'name[0][value]' => $values['name'],
       'field_client_email[0][value]' => $values['field_client_email'],
-      // @todo Support other countries in addition to Belgium.
-      'field_client_address[0][country_code]' => 'BE',
+      'field_client_address[0][country_code]' => $values['field_client_address']['country_code'],
       'field_client_address[0][address_line1]' => $values['field_client_address']['address_line1'],
       'field_client_address[0][postal_code]' => $values['field_client_address']['postal_code'],
       'field_client_address[0][locality]' => $values['field_client_address']['locality'],
-      // @todo Support other countries in addition to Belgium.
-      'field_client_shipping_address[0][country_code]' => 'BE',
+      'field_client_shipping_address[0][country_code]' => $values['field_client_shipping_address']['country_code'],
       'field_client_shipping_address[0][address_line1]' => $values['field_client_shipping_address']['address_line1'],
       'field_client_shipping_address[0][postal_code]' => $values['field_client_shipping_address']['postal_code'],
       'field_client_shipping_address[0][locality]' => $values['field_client_shipping_address']['locality'],

@@ -91,7 +91,8 @@ class ClientAccessControlHandler extends EntityAccessControlHandler implements E
         return AccessResult::forbidden();
 
       case 'delete':
-        throw new \Exception("Convert $operation permission to D8");
+        // @todo Convert to D8 once we have invoices.
+        return AccessResult::forbidden();
 
         return AccessResult::allowedIfHasPermission($account, 'delete client entities');
 

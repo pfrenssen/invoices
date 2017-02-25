@@ -4,7 +4,6 @@ declare (strict_types = 1);
 
 namespace Drupal\Tests\simpletest\Functional;
 
-use Drupal\client\Entity\Client;
 use Drupal\client\Tests\ClientTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
 use Drupal\invoices\Tests\InvoicesFunctionalTestBase;
@@ -81,44 +80,45 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     // Fill in all the fields and check if they are saved correctly.
     $values = $this->randomClientValues();
     $client = $this->createUiClient($values);
-    $messages = ['status' => [t('New client %name has been added.', ['%name' => $values['name']])]];
+    $messages = ['status' => [(string) t('New client %name has been added.', ['%name' => $values['name']])]];
     $this->assertStatusMessages($messages);
     $this->assertClientTableNotEmpty('The client database table is no longer empty after creating a client.');
-    $this->assertClientProperties($client, $values, 'The client has been correctly saved to the database.');
-    $this->assertUrl('clients', [], 'The user is redirected to the client overview after creating a new client.');
+    $this->assertClientProperties($client, $values);
+    $this->assertSession()->addressEquals('clients');
 
     // Check that the form fields have correct values when the client is edited.
     $this->drupalGet('client/' . $client->id() . '/edit');
     $form_values = $this->convertClientValuesToFormPostValues($values);
     foreach ($form_values as $name => $value) {
-      $this->assertFieldByName($name, $value, format_string('When editing an existing client the %name field has the right value.', ['%name' => $name]));
+      $this->assertSession()->fieldValueEquals($name, $value);
     }
 
     // Change the values and check that the entity is correctly updated.
     $new_values = $this->randomClientValues();
     $this->drupalPostForm('client/' . $client->id() . '/edit', $this->convertClientValuesToFormPostValues($new_values), t('Save'));
     $client = $this->loadUnchangedEntity('client', $client->id());
-    $messages = ['status' => [t('The changes have been saved.', ['%name' => $values['name']])]];
+    $messages = ['status' => [(string) t('The changes have been saved.', ['%name' => $values['name']])]];
     $this->assertStatusMessages($messages);
-    $this->assertClientProperties($client, $new_values, 'The updated client has been correctly saved to the database.');
-    $this->assertUrl('clients', [], 'The user is redirected to the client overview after editing a client.');
+    $this->assertClientProperties($client, $new_values);
+    $this->assertSession()->addressEquals('clients');
 
     // Check that the user is redirected to the confirmation page when clicking
     // the 'Delete' button on the client edit page.
     $this->drupalPostForm('client/' . $client->id() . '/edit', [], t('Delete'));
-    $this->assertUrl('client/' . $client->id() . '/delete', [], 'The user is redirected to the confirmation form when clicking the "Delete" button in the client edit form.');
+    $this->assertSession()->addressEquals('client/' . $client->id() . '/delete');
     $this->assertRaw(t('Are you sure you want to delete %name?', ['%name' => $client->name]), 'The confirmation message is shown when deleting a user.');
     $this->assertRaw(t('This action cannot be undone.'), 'The disclaimer is shown when deleting a user.');
 
     // Check that the client can be deleted.
     $this->drupalPostForm('client/' . $client->id() . '/delete', [], t('Delete'));
-    $messages = ['status' => [t('Client %name has been deleted.', ['%name' => $client->name])]];
+    $messages = ['status' => [(string) t('Client %name has been deleted.', ['%name' => $client->name])]];
     $this->assertStatusMessages($messages);
     $this->assertClientTableEmpty('The client database is empty after the client has been deleted.');
-    $this->assertUrl('clients', [], 'The user is redirected to the client overview after deleting a client.');
+    $this->assertSession()->addressEquals('clients');
 
     // @todo Check that the default field for the "Revision log message" is not
     //   visible.
+    $this->markTestIncomplete('Check that the Revision Log Message field is not visible.');
   }
 
   /**
@@ -207,7 +207,7 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     // Click the link and verify that you land on the correct page. This is the
     // second link with this label, there is also one in the navigation menu.
     $this->clickLink(t('Add invoice'), 1);
-    $this->assertUrl('invoice/add', ['query' => ['cid' => $client->id()]], 'We land on the correct url with the correct query parameters after clicking the Create invoice link.');
+    $this->assertSession()->addressEquals('invoice/add', ['query' => ['cid' => $client->id()]], 'We land on the correct url with the correct query parameters after clicking the Create invoice link.');
 
     // Check that the client is prefilled with the correct value.
     debug($client->name);
@@ -223,13 +223,7 @@ class ClientUITest extends InvoicesFunctionalTestBase {
    * {@inheritdoc}
    */
   public function randomClientValues() {
-    $values = $this->traitRandomClientValues();
-
-    // @todo Support other countries in addition to Belgium.
-    $values['field_client_address']['country'] = 'BE';
-    $values['field_client_shipping_address']['country'] = 'BE';
-
-    return $values;
+    return $this->traitRandomClientValues();
   }
 
   /**
