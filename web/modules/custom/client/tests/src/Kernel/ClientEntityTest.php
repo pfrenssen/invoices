@@ -21,6 +21,13 @@ class ClientEntityTest extends ContentEntityTestBase {
   use ClientTestHelper;
 
   /**
+   * A test business.
+   *
+   * @var \Drupal\business\Entity\BusinessInterface
+   */
+  protected $business;
+
+  /**
    * {@inheritdoc}
    */
   public static $modules = [
@@ -30,8 +37,26 @@ class ClientEntityTest extends ContentEntityTestBase {
     'entity_reference_validators',
     'libphonenumber',
     'link',
+    'user',
     'views',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+
+    // Also install the entity schema of the Business entity, because the active
+    // business needs to be retrieved from the database when a new Client entity
+    // is created.
+    $this->installEntitySchema('business');
+    $this->installConfig(['business']);
+
+    // Create a test business that can be associated with clients.
+    $this->business = $this->createBusiness();
+    $this->business->save();
+  }
 
   /**
    * {@inheritdoc}
@@ -51,7 +76,7 @@ class ClientEntityTest extends ContentEntityTestBase {
    * {@inheritdoc}
    */
   protected function getValues($type) {
-    return $this->randomClientValues();
+    return $this->randomClientValues() + ['business' => $this->business->id()];
   }
 
 }
