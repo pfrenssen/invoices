@@ -1,0 +1,4 @@
+services:
+  client.manager:
+    class: Drupal\client\ClientManager
+    arguments: ['@current_user', '@entity_type.manager']
