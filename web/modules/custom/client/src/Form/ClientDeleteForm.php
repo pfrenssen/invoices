@@ -13,4 +13,13 @@ use Drupal\Core\Entity\ContentEntityDeleteForm;
  */
 class ClientDeleteForm extends ContentEntityDeleteForm {
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getQuestion() {
+    return $this->t('Are you sure you want to delete %label?', [
+      '%label' => $this->getEntity()->label(),
+    ]);
+  }
+
 }

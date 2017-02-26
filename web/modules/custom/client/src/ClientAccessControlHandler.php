@@ -91,16 +91,19 @@ class ClientAccessControlHandler extends EntityAccessControlHandler implements E
         return AccessResult::forbidden();
 
       case 'delete':
-        // @todo Convert to D8 once we have invoices.
-        return AccessResult::forbidden();
-
-        return AccessResult::allowedIfHasPermission($account, 'delete client entities');
-
         // Clients may only be deleted if they are not used in invoices.
-        $access = user_access("edit any $client->type client", $account);
-        $access |= user_access('administer own clients', $account) && client_is_owned_by_user($client, $account);
-        $access &= !client_has_invoices($client);
-        return $access;
+        // @todo Uncomment when we have converted invoices.
+        // if ($this->clientManager->clientHasInvoices($entity)) {
+        //   return AccessResult::forbidden();
+        // }
+
+        // Access is granted if the client is owned by the user, and the user
+        // has the 'administer own clients' permission.
+        if (in_array($entity->getBusiness()->id(), $this->businessManager->getBusinessIdsByUser($account))) {
+          return AccessResult::allowedIfHasPermission($account, 'administer own clients');
+        }
+
+        return AccessResult::forbidden();
     }
 
     // Unknown operation, no opinion.

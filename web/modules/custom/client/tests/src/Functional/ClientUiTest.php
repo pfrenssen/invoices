@@ -96,6 +96,7 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     // Change the values and check that the entity is correctly updated.
     $new_values = $this->randomClientValues();
     $this->drupalPostForm('client/' . $client->id() . '/edit', $this->convertClientValuesToFormPostValues($new_values), t('Save'));
+    /** @var \Drupal\client\Entity\ClientInterface $client */
     $client = $this->loadUnchangedEntity('client', $client->id());
     $messages = ['status' => [(string) t('The changes have been saved.', ['%name' => $values['name']])]];
     $this->assertStatusMessages($messages);
@@ -108,14 +109,21 @@ class ClientUITest extends InvoicesFunctionalTestBase {
 
     // Check that the user is redirected to the confirmation page when clicking
     // the 'Delete' button on the client edit page.
-    $this->drupalPostForm('client/' . $client->id() . '/edit', [], t('Delete'));
+    $this->clickLink(t('Delete'));
     $this->assertSession()->addressEquals('client/' . $client->id() . '/delete');
-    $this->assertRaw(t('Are you sure you want to delete %name?', ['%name' => $client->name]), 'The confirmation message is shown when deleting a user.');
-    $this->assertRaw(t('This action cannot be undone.'), 'The disclaimer is shown when deleting a user.');
+    $this->assertSession()->responseContains((string) t('Are you sure you want to delete %name?', ['%name' => $client->getName()]));
+    $this->assertSession()->responseContains((string) t('This action cannot be undone.'));
 
     // Check that the client can be deleted.
-    $this->drupalPostForm('client/' . $client->id() . '/delete', [], t('Delete'));
-    $messages = ['status' => [(string) t('Client %name has been deleted.', ['%name' => $client->name])]];
+    $this->drupalPostForm('client/' . $client->id() . '/delete', [], (string) t('Delete'));
+    $messages = [
+      'status' => [
+        (string) t('The @entity-type %label has been deleted.', [
+          '@entity-type' => $client->getEntityType()->getLowercaseLabel(),
+          '%label' => $client->getName(),
+        ]),
+      ],
+    ];
     $this->assertStatusMessages($messages);
     $this->assertClientTableEmpty('The client database is empty after the client has been deleted.');
     $this->assertSession()->addressEquals('clients');

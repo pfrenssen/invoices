@@ -34,7 +34,7 @@ class ClientForm extends ContentEntityForm {
       default:
         drupal_set_message($this->t('The changes have been saved.'));
     }
-    $form_state->setRedirect('entity.client.canonical', ['client' => $entity->id()]);
+    $form_state->setRedirect('entity.client.collection');
   }
 
 }
