@@ -13,6 +13,7 @@ dependencies:
 
 config_devel:
   - core.entity_form_display.client.client.default
+  - core.entity_view_display.client.client.default
   - field.field.client.client.field_client_accountable
   - field.field.client.client.field_client_address
   - field.field.client.client.field_client_email
