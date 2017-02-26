@@ -102,6 +102,10 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     $this->assertClientProperties($client, $new_values);
     $this->assertSession()->addressEquals('clients');
 
+    // Check that the "Revision log message" default field is not visible.
+    $this->drupalGet('client/' . $client->id() . '/edit');
+    $this->assertSession()->fieldNotExists('revision_log_message[0][value]');
+
     // Check that the user is redirected to the confirmation page when clicking
     // the 'Delete' button on the client edit page.
     $this->drupalPostForm('client/' . $client->id() . '/edit', [], t('Delete'));
@@ -115,10 +119,6 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     $this->assertStatusMessages($messages);
     $this->assertClientTableEmpty('The client database is empty after the client has been deleted.');
     $this->assertSession()->addressEquals('clients');
-
-    // @todo Check that the default field for the "Revision log message" is not
-    //   visible.
-    $this->markTestIncomplete('Check that the Revision Log Message field is not visible.');
   }
 
   /**

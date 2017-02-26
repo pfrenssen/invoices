@@ -312,6 +312,10 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the entity was last edited.'));
 
+    // Make sure that the revision log field that is inherited from
+    // RevisionableContentEntityBase can be configured in the form display.
+    $fields['revision_log_message']->setDisplayConfigurable('form', TRUE);
+
     return $fields;
   }
 

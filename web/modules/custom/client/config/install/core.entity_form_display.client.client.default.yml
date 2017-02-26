@@ -91,4 +91,5 @@ content:
     third_party_settings: {  }
 hidden:
   business: true
+  revision_log_message: true
   uid: true
