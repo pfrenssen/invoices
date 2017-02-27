@@ -161,7 +161,7 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     $xpath = '//div[contains(@class, "field--name-field-client-website")]';
     $this->assertXPathElements($xpath, 1, [], 'The website field is rendered.');
 
-    // Check if the tabs are rendered.
+    // Check that the tabs are rendered.
     $xpath = '//ul[contains(@class, "tabs")]//a[@href=:href]';
     $route_parameters = ['client' => $client->id()];
     $url = Url::fromRoute('entity.client.canonical', $route_parameters);
@@ -177,27 +177,29 @@ class ClientUITest extends InvoicesFunctionalTestBase {
    */
   public function testClientRevision() {
     // Check that the database table exists and is empty.
-    $this->assertTrue(db_table_exists('client_revision'), 'The client revision database table exists.');
+    $this->assertTrue($this->connection->schema()->tableExists('client_revision'), 'The client revision database table exists.');
     $this->assertClientRevisionTableEmpty();
 
     // Check that when creating a client, a revision is made.
     $client = $this->createUiClient();
     $this->assertClientTableNotEmpty();
-    $result = db_select('client_revision', 'cr')
+    $result = $this->connection->select('client_revision', 'cr')
       ->fields('cr')
       ->condition('cid', $client->id(), '=')
       ->execute()
       ->fetchAll();
-    $this->assertEqual(1, $result[0]->vid, 'The first revision has been created.');
+    $this->assertEquals(1, $result[0]->vid, 'The first revision has been created.');
 
     // Check that when editing a client, a new revision is made.
-    $this->drupalPostForm('client/' . $client->id() . '/edit', ['name' => $this->randomString()], t('Save'));
-    $result = db_select('client_revision', 'cr')
+    $this->drupalPostForm('client/' . $client->id() . '/edit', [
+      'name' => $this->randomString(),
+    ], t('Save'));
+    $result = $this->connection->select('client_revision', 'cr')
       ->fields('cr')
       ->condition('cid', $client->id(), '=')
       ->execute()
       ->fetchAll();
-    $this->assertEqual(2, $result[1]->vid, 'The second revision has been created.');
+    $this->assertEquals(2, $result[1]->vid, 'The second revision has been created.');
   }
 
   /**
