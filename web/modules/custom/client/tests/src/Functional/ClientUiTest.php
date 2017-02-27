@@ -17,9 +17,7 @@ use Drupal\invoices\Tests\InvoicesFunctionalTestBase;
 class ClientUITest extends InvoicesFunctionalTestBase {
 
   use BaseTestHelper;
-  use ClientTestHelper {
-    randomClientValues as traitRandomClientValues;
-  }
+  use ClientTestHelper;
 
   /**
    * {@inheritdoc}
@@ -228,13 +226,6 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     $this->assertXPathElements('//div[contains(@class, "field-name-field-client-email")]//a[text() = :email]', 1, [':email' => $email[0]['value']], 'The client email is shown in the client summary.');
     $vat = field_get_items('client', $client, 'field_client_vat');
     $this->assertXPathElements('//div[contains(@class, "field-name-field-client-vat")]//div[text() = :vat]', 1, [':vat' => $vat[0]['value']], 'The client vat number is shown in the client summary.');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function randomClientValues() {
-    return $this->traitRandomClientValues();
   }
 
 }
