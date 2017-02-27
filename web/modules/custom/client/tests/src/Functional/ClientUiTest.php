@@ -219,13 +219,14 @@ class ClientUITest extends InvoicesFunctionalTestBase {
     $this->assertSession()->addressEquals('invoice/add', ['query' => ['cid' => $client->id()]], 'We land on the correct url with the correct query parameters after clicking the Create invoice link.');
 
     // Check that the client is prefilled with the correct value.
-    debug($client->name);
-    $this->assertXPathElements('//div[contains(@class, "entity-client")]//h2/a[contains(text(), :name)]', 1, [':name' => $client->name], 'The client name is shown in the client summary.');
+    $this->assertXPathElements('//div[contains(@class, "entity-client")]//h2/a[contains(text(), :name)]', 1, [':name' => $client->getName()], 'The client name is shown in the client summary.');
     $this->assertXPathElements('//div[contains(@class, "field-name-field-client-addres")]', 1, [], 'The client addres is shown in the client summary.');
     $email = field_get_items('client', $client, 'field_client_email');
     $this->assertXPathElements('//div[contains(@class, "field-name-field-client-email")]//a[text() = :email]', 1, [':email' => $email[0]['value']], 'The client email is shown in the client summary.');
     $vat = field_get_items('client', $client, 'field_client_vat');
     $this->assertXPathElements('//div[contains(@class, "field-name-field-client-vat")]//div[text() = :vat]', 1, [':vat' => $vat[0]['value']], 'The client vat number is shown in the client summary.');
+
+    $this->markTestIncomplete('Test that a client cannot be deleted if it is linked to invoices. See ClientAccessControlHandler.');
   }
 
 }
