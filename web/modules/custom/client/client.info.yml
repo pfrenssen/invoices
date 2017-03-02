@@ -6,9 +6,12 @@ package: Invoices
 
 dependencies:
   - address
+  - business
+  - invoices_core
   - libphonenumber
   - link
   - text
+  - user
   - views
 
 config_devel:

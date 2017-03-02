@@ -6,11 +6,14 @@ dependencies:
     - field.storage.client.field_client_phone
     - field.storage.client.field_client_website
     - system.menu.main
+    - user.role.administrator
+    - user.role.business_owner
   module:
     - business
     - client
     - libphonenumber
     - link
+    - user
 id: clients
 label: Clients
 module: views
@@ -27,8 +30,10 @@ display:
     position: 0
     display_options:
       access:
-        type: none
-        options: {  }
+        type: role
+        options:
+          role:
+            administrator: administrator
       cache:
         type: tag
         options: {  }
@@ -519,7 +524,9 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
+        - user.roles
       tags:
         - 'config:field.storage.client.field_client_email'
         - 'config:field.storage.client.field_client_phone'
@@ -552,6 +559,7 @@ display:
       defaults:
         relationships: false
         fields: false
+        arguments: false
       fields:
         bid:
           id: bid
@@ -1058,12 +1066,14 @@ display:
           entity_type: client
           plugin_id: entity_link_edit
       display_comment: 'This is altered by invoicing_core_views_pre_view() to be also visible on the /clients path for administrators.'
+      arguments: {  }
     cache_metadata:
       max-age: 0
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url.query_args
+        - user.roles
       tags:
         - 'config:field.storage.client.field_client_email'
         - 'config:field.storage.client.field_client_phone'
@@ -1080,12 +1090,19 @@ display:
         type: normal
         title: Clients
         menu_name: main
+      access:
+        type: role
+        options:
+          role:
+            business_owner: business_owner
     cache_metadata:
       max-age: 0
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - url
         - url.query_args
+        - user.roles
       tags:
         - 'config:field.storage.client.field_client_email'
         - 'config:field.storage.client.field_client_phone'
