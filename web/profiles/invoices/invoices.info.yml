@@ -35,6 +35,3 @@ config_devel:
   - core.entity_form_display.user.user.default
   - system.menu.main
   - system.theme
-  - user.role.administrator
-  - user.role.business_owner
-  - user.role.client

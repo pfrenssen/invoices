@@ -1,0 +1,10 @@
+name: Invoices Core
+type: module
+description: Core functionality for the Invoices application.
+core: 8.x
+package: Invoices
+
+config_devel:
+  - user.role.administrator
+  - user.role.business_owner
+  - user.role.client
