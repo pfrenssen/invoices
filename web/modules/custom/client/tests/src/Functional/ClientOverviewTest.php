@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Drupal\Tests\simpletest\Functional;
 
+use Drupal\client\Entity\ClientInterface;
 use Drupal\client\Tests\ClientTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
 use Drupal\invoices\Tests\InvoicesFunctionalTestBase;
@@ -81,19 +82,19 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Check that the client of the other business owner is not visible.
-    $this->assertSession()->pageTextNotContains(trim($this->client2->name));
+    $this->assertSession()->pageTextNotContains(trim($this->client2->getName()));
 
     // Check that the "Add client" local action is present.
     $xpath = '//ul[@class="action-links"]/li/a[@href="/client/add" and contains(text(), :text)]';
-    $this->assertXPathElements($xpath, 1, [':text' => t('Add client')], 'The "Add client" local action is present.');
+    $this->assertXPathElements($xpath, 1, [':text' => (string) t('Add client')], 'The "Add client" local action is present.');
 
     // Check that the pager is not present. We added 20 clients which is the
     // maximum number that fits on one page.
     $this->assertNoPager();
 
     // Check that the clients are present in the overview in alphabetical order.
-    uasort($this->clients, function ($a, $b) {
-      return strcasecmp($a->name, $b->name);
+    uasort($this->clients, function (ClientInterface $a, ClientInterface $b) {
+      return strcasecmp($a->getName(), $b->getName());
     });
 
     // Loop over the displayed table rows and compare them with each client in
@@ -172,7 +173,9 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     // Check that adding "/all" to the URL does not reveal the clients of the
     // other business owner.
     $this->drupalGet('clients/all');
-    $this->assertNoText(trim(check_plain($this->client2->name)), 'A client from another business owner is not visible when adding "/all" to the URL.');
+    $this->assertSession()->pageTextNotContains(trim($this->client2->getName()));
+
+    // @todo Also check that the bid cannot be added to the URL.
   }
 
   /**
@@ -189,7 +192,6 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
       $business->save();
       $this->addBusinessToUser($business, $user);
       $this->users[] = $user;
-      $this->businesses[] = $business;
       for ($j = 0; $j < 2; $j++) {
         // Make sure the client name starts with letters to avoid random test
         // failures to due differences in sorting of special characters between
@@ -214,8 +216,8 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     $this->assertXPathElements($xpath, 1, [':text' => (string) t('Add client')], 'The "Add client" local action is present.');
 
     // Check that the clients are present in the overview in alphabetical order.
-    uasort($this->clients, function ($a, $b) {
-      return strcasecmp($a->name->value, $b->name->value);
+    uasort($this->clients, function (ClientInterface $a, ClientInterface $b) {
+      return strcasecmp($a->getName(), $b->getName());
     });
 
     // Loop over the displayed table rows and compare them with each client in
