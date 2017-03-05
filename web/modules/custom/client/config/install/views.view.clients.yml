@@ -6,8 +6,6 @@ dependencies:
     - field.storage.client.field_client_phone
     - field.storage.client.field_client_website
     - system.menu.main
-    - user.role.administrator
-    - user.role.business_owner
   module:
     - business
     - client
@@ -30,10 +28,9 @@ display:
     position: 0
     display_options:
       access:
-        type: role
+        type: perm
         options:
-          role:
-            administrator: administrator
+          perm: 'access client overview'
       cache:
         type: tag
         options: {  }
@@ -562,7 +559,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user.roles
+        - user.permissions
       tags:
         - 'config:field.storage.client.field_client_email'
         - 'config:field.storage.client.field_client_phone'
@@ -574,10 +571,15 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: clients
+      path: admin/clients
       menu:
-        type: normal
+        type: none
         title: Clients
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
         menu_name: main
       display_description: ''
       relationships:
@@ -1101,7 +1103,7 @@ display:
           text: edit
           entity_type: client
           plugin_id: entity_link_edit
-      display_comment: 'This is altered by invoicing_core_views_pre_view() to be also visible on the /clients path for administrators.'
+      display_comment: 'This is altered by invoices_core_views_pre_view() to be also visible on the /clients path for administrators.'
       arguments: {  }
     cache_metadata:
       max-age: 0
@@ -1109,7 +1111,7 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url.query_args
-        - user.roles
+        - user.permissions
       tags:
         - 'config:field.storage.client.field_client_email'
         - 'config:field.storage.client.field_client_phone'
@@ -1165,12 +1167,7 @@ display:
           plugin_id: numeric
       defaults:
         arguments: false
-        access: false
-      access:
-        type: role
-        options:
-          role:
-            business_owner: business_owner
+        access: true
     cache_metadata:
       max-age: 0
       contexts:
@@ -1178,7 +1175,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user.roles
+        - user.permissions
       tags:
         - 'config:field.storage.client.field_client_email'
         - 'config:field.storage.client.field_client_phone'

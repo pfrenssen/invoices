@@ -77,8 +77,9 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
       $this->clients[$client->id()] = $client;
     }
 
-    // Load the client overview.
-    $this->drupalGet('clients');
+    // After creating a client we should be on the client overview, and we
+    // should have access.
+    $this->assertSession()->addressEquals('clients');
     $this->assertSession()->statusCodeEquals(200);
 
     // Check that the client of the other business owner is not visible.
