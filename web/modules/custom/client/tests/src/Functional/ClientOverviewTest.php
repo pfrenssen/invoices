@@ -86,7 +86,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     $this->assertSession()->pageTextNotContains(trim($this->client2->getName()));
 
     // Check that the "Add client" local action is present.
-    $xpath = '//ul[@class="action-links"]/li/a[@href="/client/add" and contains(text(), :text)]';
+    $xpath = '//nav[@class="action-links"]/li/a[@href="/client/add" and contains(text(), :text)]';
     $this->assertXPathElements($xpath, 1, [':text' => (string) t('Add client')], 'The "Add client" local action is present.');
 
     // Check that the pager is not present. We added 20 clients which is the
