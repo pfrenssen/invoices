@@ -123,13 +123,13 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The second column is linked to the email address.',
-          'expected' => 'mailto:' . $client->field_client_email->value(),
+          'expected' => 'mailto:' . $client->getEmail(),
           'actual' => $tablerow->find('css', 'td:nth-child(2)>a')->getAttribute('href'),
         ],
         [
           'message' => 'The third column contains the phone number.',
           'expected' => $client->getPhoneNumber()->getFormattedNumber(PhoneNumberFormat::INTERNATIONAL),
-          'actual' => $tablerow->find('css', 'td:nth-child(3)>div>span')->getText(),
+          'actual' => $tablerow->find('css', 'td:nth-child(3)>a')->getText(),
         ],
         [
           'message' => 'The third column is linked to the phone number.',
@@ -138,12 +138,12 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The fourth column contains the website.',
-          'expected' => $client->getWebsite(),
+          'expected' => $client->getWebsite()->toUriString(),
           'actual' => $tablerow->find('css', 'td:nth-child(4)>a')->getText(),
         ],
         [
           'message' => 'The fourth column is linked to the website.',
-          'expected' => $client->getWebsite(),
+          'expected' => $client->getWebsite()->toUriString(),
           'actual' => $tablerow->find('css', 'td:nth-child(4)>a')->getAttribute('href'),
         ],
         [
@@ -153,13 +153,13 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The fifth column is linked to the client edit page.',
-          'expected' => '/client/' . $client->id() . '/edit',
+          'expected' => '/client/' . $client->id() . '/edit?destination=/clients',
           'actual' => $tablerow->find('css', 'td:nth-child(5)>a')->getAttribute('href'),
         ],
       ];
 
       foreach ($testcases as $testcase) {
-        $this->assertEqual(trim($testcase['expected']), trim($testcase['actual']), $testcase['message']);
+        $this->assertEquals(trim($testcase['expected']), trim($testcase['actual']), $testcase['message']);
       }
     }
 

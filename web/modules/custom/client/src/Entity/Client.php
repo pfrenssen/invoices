@@ -223,7 +223,7 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
    * {@inheritdoc}
    */
   public function getWebsite(): ?Url {
-    $uri = $this->get('field_client_website');
+    $uri = $this->get('field_client_website')->uri;
     return !empty($uri) ? Url::fromUri($uri) : NULL;
   }
 
