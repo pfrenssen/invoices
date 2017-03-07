@@ -121,7 +121,7 @@ function invoices_core_get_wkhtmltopdf_path() {
  * - Adds an additional validate handler on the user login forms that will allow
  *   to resend the activation e-mail.
  */
-function invoices_core_form_alter(&$form, &$form_state, $form_id) {
+function _invoices_core_form_alter(&$form, &$form_state, $form_id) {
   throw new \Exception(__FUNCTION__ . ': convert to D8.');
   if (in_array($form_id, ['user_login', 'user_login_block'])) {
     // Replace the standard user name validation handler with our own.
