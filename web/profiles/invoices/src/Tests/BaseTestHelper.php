@@ -165,6 +165,24 @@ trait BaseTestHelper {
   }
 
   /**
+   * Checks that the given headers are used for the given table.
+   *
+   * @param string $xpath
+   *   The XPath of the table or a containing element.
+   * @param array $expected_headers
+   *   An array of expected table header content.
+   */
+  protected function assertTableHeaders(string $xpath, array $expected_headers) {
+    $header_elements = $this->xpath($xpath . '//thead/tr/th');
+    foreach ($header_elements as $header_element) {
+      $expected_header = array_shift($expected_headers);
+      $this->assertEquals($expected_header, $header_element->getText());
+    }
+
+    // Check that there are no additional headers displayed.
+    $this->assertFalse($expected_headers);
+  }
+  /**
    * Check if the displayed messages match the given messages.
    *
    * This performs the following checks:

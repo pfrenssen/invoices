@@ -93,6 +93,15 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     // maximum number that fits on one page.
     $this->assertNoPager();
 
+    // Check that the table headers are shown.
+    $this->assertTableHeaders('//div[contains(concat(" ", @class, " "), "view-clients")]', [
+      (string) t('Client'),
+      (string) t('E-mail address'),
+      (string) t('Phone number'),
+      (string) t('Website'),
+      (string) t('Actions'),
+    ]);
+
     // Check that the clients are present in the overview in alphabetical order.
     uasort($this->clients, function (ClientInterface $a, ClientInterface $b) {
       return strcasecmp($a->getName(), $b->getName());
