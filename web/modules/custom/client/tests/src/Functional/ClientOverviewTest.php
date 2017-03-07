@@ -191,7 +191,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
   /**
    * Tests the client overview for administrators.
    */
-  public function testClientOverview() {
+  public function testClientOverviewForAdministrators() {
     // Log in as administrator.
     $this->drupalLogin($this->users['administrator']);
 
@@ -225,6 +225,16 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     $xpath = '//nav[@class="action-links"]/li/a[@href="/client/add" and contains(text(), :text)]';
     $this->assertXPathElements($xpath, 1, [':text' => (string) t('Add client')], 'The "Add client" local action is present.');
 
+    // Check that the table headers are shown.
+    $this->assertTableHeaders('//div[contains(concat(" ", @class, " "), "view-clients")]', [
+      (string) t('Business'),
+      (string) t('Client'),
+      (string) t('E-mail address'),
+      (string) t('Phone number'),
+      (string) t('Website'),
+      (string) t('Actions'),
+    ]);
+
     // Check that the clients are present in the overview in alphabetical order.
     uasort($this->clients, function (ClientInterface $a, ClientInterface $b) {
       return strcasecmp($a->getName(), $b->getName());
@@ -233,6 +243,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
     // Loop over the displayed table rows and compare them with each client in
     // order.
     $tablerows = $this->xpath('//div[contains(@class, "view-clients")]//table/tbody/tr');
+    /* @var \Behat\Mink\Element\NodeElement $tablerow */
     foreach ($tablerows as $tablerow) {
       $client = array_shift($this->clients);
       $business = $client->getBusiness();
@@ -280,12 +291,12 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The fifth column contains the website.',
-          'expected' => $client->getWebsite(),
+          'expected' => $client->getWebsite()->toUriString(),
           'actual' => $tablerow->find('css', 'td:nth-child(5)>a')->getText(),
         ],
         [
           'message' => 'The fifth column is linked to the website.',
-          'expected' => $client->getWebsite(),
+          'expected' => $client->getWebsite()->toUriString(),
           'actual' => $tablerow->find('css', 'td:nth-child(5)>a')->getAttribute('href'),
         ],
         [
@@ -295,7 +306,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
         ],
         [
           'message' => 'The sixth column is linked to the client edit page.',
-          'expected' => '/client/' . $client->id() . '/edit',
+          'expected' => '/client/' . $client->id() . '/edit?destination=/clients',
           'actual' => $tablerow->find('css', 'td:nth-child(6)>a')->getAttribute('href'),
         ],
       ];
