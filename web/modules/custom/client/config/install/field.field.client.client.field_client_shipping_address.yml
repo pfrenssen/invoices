@@ -33,29 +33,27 @@ default_value_callback: ''
 settings:
   available_countries: {  }
   fields:
-    administrativeArea: administrativeArea
-    locality: locality
-    dependentLocality: dependentLocality
-    postalCode: postalCode
-    sortingCode: sortingCode
-    addressLine1: addressLine1
-    addressLine2: addressLine2
-    organization: '0'
-    givenName: '0'
-    additionalName: '0'
-    familyName: '0'
+    administrativeArea:
+      behavior: optional
+    locality:
+      behavior: optional
+    dependentLocality:
+      behavior: optional
+    postalCode:
+      behavior: optional
+    sortingCode:
+      behavior: optional
+    addressLine1:
+      behavior: optional
+    addressLine2:
+      behavior: optional
+    organization:
+      behavior: hidden
+    givenName:
+      behavior: hidden
+    additionalName:
+      behavior: hidden
+    familyName:
+      behavior: hidden
   langcode_override: ''
-  allow_optional_fields: true
-  optional_fields:
-    administrativeArea: administrativeArea
-    locality: locality
-    dependentLocality: dependentLocality
-    postalCode: postalCode
-    sortingCode: sortingCode
-    addressLine1: addressLine1
-    addressLine2: addressLine2
-    organization: '0'
-    givenName: '0'
-    additionalName: '0'
-    familyName: '0'
 field_type: address
