@@ -416,25 +416,21 @@ trait BaseTestHelper {
   }
 
   /**
-   * Returns a random Belgian phone number.
+   * Returns an example phone number.
    *
-   * @todo Add support for international numbers.
+   * Note that this always returns the same number for a given country code, so
+   * it is not really random. This is leveraging the example numbers supplied by
+   * libphonenumber.
    *
    * @param string $countrycode
-   *   The country code for which to return a phone number. Currently unused.
+   *   The country code for which to return a phone number.
    *
    * @return string
-   *   A random phone number.
+   *   An example phone number.
    */
   public static function randomPhoneNumber(string $countrycode = 'BE') : string {
-    $matches = NULL;
-    do {
-      $number = (string) rand(10000000, 89000000);
-      // This regex is taken from libphonenumber. See PhoneNumberMetadata_BE.
-      preg_match('/(?:1[0-69]|[49][23]|5\\d|6[013-57-9]|71|8[0-79])[1-9]\\d{5}|[23][2-8]\\d{6}/', $number, $matches);
-    } while (empty($matches[0]));
-
-    return (string) $number;
+    $util = PhoneNumberUtil::getInstance();
+    return $util->format($util->getExampleNumber($countrycode), PhoneNumberFormat::E164);
   }
 
   /**
