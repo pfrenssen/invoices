@@ -14,25 +14,11 @@ label: 'Shipping address'
 description: ''
 required: false
 translatable: false
-default_value:
-  -
-    langcode: null
-    country_code: BE
-    administrative_area: null
-    locality: ''
-    dependent_locality: null
-    postal_code: ''
-    sorting_code: null
-    address_line1: ''
-    address_line2: ''
-    organization: ''
-    given_name: ''
-    additional_name: null
-    family_name: ''
+default_value: {  }
 default_value_callback: ''
 settings:
   available_countries: {  }
-  fields:
+  field_settings:
     administrativeArea:
       behavior: optional
     locality:

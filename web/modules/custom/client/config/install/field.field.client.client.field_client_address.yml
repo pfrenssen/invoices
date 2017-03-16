@@ -14,25 +14,11 @@ label: 'Billing address'
 description: ''
 required: false
 translatable: false
-default_value:
-  -
-    langcode: null
-    country_code: BE
-    administrative_area: ''
-    locality: ''
-    dependent_locality: ''
-    postal_code: ''
-    sorting_code: ''
-    address_line1: ''
-    address_line2: ''
-    organization: ''
-    given_name: ''
-    additional_name: ''
-    family_name: ''
+default_value: {  }
 default_value_callback: ''
 settings:
   available_countries: {  }
-  fields:
+  field_settings:
     administrativeArea:
       behavior: optional
     locality:
