@@ -8,6 +8,7 @@ declare (strict_types = 1);
  */
 
 use Drupal\Core\Render\Element;
+use Drupal\business\Entity\Business;
 use Drupal\business\Entity\BusinessInterface;
 
 /**
@@ -458,12 +459,10 @@ function business_delete_multiple(array $bids) {
  *   The new business entity.
  *
  * @deprecated
+ *   Use Business::create().
  */
 function business_create($values = []) {
-  throw new \Exception('Convert ' . __FUNCTION__ . ' to Drupal 8.');
-  // Default to the 'business' bundle.
-  $values += ['type' => 'business'];
-  return entity_get_controller('business')->create($values);
+  return Business::create($values);
 }
 
 /**
