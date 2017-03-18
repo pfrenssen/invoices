@@ -3,3 +3,10 @@ type: module
 description: Line item related functionality.
 core: 8.x
 package: Invoices
+
+dependencies:
+  - business
+  - inline_entity_form
+  - options
+  - text
+  - views

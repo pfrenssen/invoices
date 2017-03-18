@@ -41,6 +41,7 @@
         "drupal/console": "~1.0",
         "drupal/core": "~8.0",
         "drupal/entity_reference_validators": "dev-1.x",
+        "drupal/inline_entity_form": "dev-1.x#dbfc93fc961b3e6c84497390c62ec36d02c1c4d7",
         "drupal/libphonenumber": "dev-1.x",
         "drush/drush": "~8.0",
         "php": ">=7.0"
@@ -94,7 +95,7 @@
     "extra": {
         "patches": {
             "drupal/address": {
-                "Add an option for allowing incomplete data to be saved. https://www.drupal.org/node/2514126": "https://www.drupal.org/files/issues/2514126-85.field-behavior-settings.patch"
+                "Add an option for allowing incomplete data to be saved. https://www.drupal.org/node/2514126": "https://www.drupal.org/files/issues/2514126-92.field-behavior-settings.patch"
             },
             "drupal/config_devel": {
                 "Create config/install folders in execution time": "https://www.drupal.org/files/issues/2558299-7.patch"
