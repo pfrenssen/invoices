@@ -98,8 +98,13 @@ function drush_business_create($business_name, $user_name) {
     }
 
     $business = Business::create($values);
-    $business->setOwner($user);
     $business->save();
+
+    // Add the business to the user.
+    /** @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $businesses */
+    $businesses = $user->get('field_user_businesses');
+    $businesses->appendItem(['target_id' => $business->id()]);
+    $user->save();
   }
   else {
     drush_set_error('User not found.');

@@ -6,14 +6,13 @@ namespace Drupal\business\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\user\EntityOwnerInterface;
 
 /**
  * Provides an interface for defining Business entities.
  *
  * @ingroup business
  */
-interface BusinessInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
+interface BusinessInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
    * Returns the name of the business.
