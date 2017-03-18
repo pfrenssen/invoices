@@ -92,4 +92,3 @@ content:
 hidden:
   business: true
   revision_log_message: true
-  uid: true

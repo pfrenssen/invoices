@@ -11,10 +11,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionableContentEntityBase;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\libphonenumber\LibPhoneNumberInterface;
-use Drupal\user\UserInterface;
 
 /**
  * Defines the Client entity.
@@ -51,7 +49,6 @@ use Drupal\user\UserInterface;
  *     "revision" = "vid",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "uid" = "uid",
  *     "langcode" = "langcode",
  *   },
  *   links = {
@@ -78,7 +75,6 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
     $business_manager = \Drupal::service('business.manager');
 
     $values += [
-      'uid' => \Drupal::currentUser()->id(),
       'business' => $business_manager->getActiveBusinessId(),
     ];
   }
@@ -90,21 +86,6 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
     parent::preSave($storage);
     if (!$this->getBusinessId()) {
       throw new \Exception('Can not save a client which is not associated with a business.');
-    }
-
-    foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
-      $translation = $this->getTranslation($langcode);
-
-      // If no owner has been set explicitly, make the anonymous user the owner.
-      if (!$translation->getOwner()) {
-        $translation->setOwnerId(0);
-      }
-    }
-
-    // If no revision author has been set explicitly, make the client owner the
-    // revision author.
-    if (!$this->getRevisionUserId()) {
-      $this->setRevisionUserId($this->getOwnerId());
     }
   }
 
@@ -178,36 +159,6 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOwner() : ?AccountInterface {
-    return $this->get('uid')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() : ?int {
-    return (int) $this->get('uid')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) : ClientInterface {
-    $this->set('uid', $uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) : ClientInterface {
-    $this->set('uid', $account->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getEmail(): ?string {
     return $this->get('field_client_email')->value;
   }
@@ -232,31 +183,6 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) : array {
     $fields = parent::baseFieldDefinitions($entity_type);
-
-    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Authored by'))
-      ->setDescription(t('The user ID of author of the Client entity.'))
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'user')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setRequired(TRUE)

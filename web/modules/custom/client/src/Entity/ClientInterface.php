@@ -17,7 +17,7 @@ use Drupal\user\EntityOwnerInterface;
  *
  * @ingroup client
  */
-interface ClientInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, RevisionLogInterface {
+interface ClientInterface extends ContentEntityInterface, EntityChangedInterface, RevisionLogInterface {
 
   /**
    * Returns the client name.
