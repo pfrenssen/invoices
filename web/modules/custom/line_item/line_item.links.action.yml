@@ -1,0 +1,11 @@
+entity.line_item.add_form:
+  route_name: 'entity.line_item.add_page'
+  title: 'Add Line item'
+  appears_on:
+    - entity.line_item.collection
+entity.line_item_type.add_form:
+  route_name: 'entity.line_item_type.add_form'
+  title: 'Add Line item type'
+  appears_on:
+    - entity.line_item_type.collection
+

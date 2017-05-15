@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.line_item.field_line_item_quantity
+    - line_item.line_item_type.service
+id: line_item.service.field_line_item_quantity
+field_name: field_line_item_quantity
+entity_type: line_item
+bundle: service
+label: Quantity
+description: 'The number of units sold.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

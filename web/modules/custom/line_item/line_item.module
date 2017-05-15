@@ -1,0 +1,970 @@
+<?php
+
+/**
+ * @file
+ * Main functions and hook implementations for the Invoicing Line Item module.
+ */
+
+include_once 'line_item.features.inc';
+
+/**
+ * Implements hook_entity_info().
+ */
+function line_item_entity_info() {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $entity_info = array();
+
+  $entity_info['line_item'] = array(
+    'label' => t('Line item'),
+    'plural label' => t('Line items'),
+    'entity class' => 'LineItem',
+    'controller class' => 'LineItemAPIController',
+    'base table' => 'line_item',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'lid',
+      'bundle' => 'type',
+    ),
+    'bundle keys' => array(
+      'bundle' => 'type',
+    ),
+    'bundles' => array(),
+    'label callback' => 'line_item_label',
+    'uri callback' => 'line_item_uri',
+    'access callback' => 'line_item_access',
+    'module' => 'line_item',
+    'inline entity form' => array(
+      'controller' => 'LineItemInlineEntityFormController',
+    ),
+    // Explicitly declare the Views controller, since this is not automatically
+    // set for modules that implement hook_views_data().
+    // @see entity_views_data()
+    'views controller class' => 'EntityDefaultViewsController',
+  );
+
+  // Add bundle info but bypass entity_load() as we cannot use it here.
+  $types = db_select('line_item_type', 'lit')
+    ->fields('lit', array('type', 'name'))
+    ->execute()
+    ->fetchAllKeyed();
+
+  foreach ($types as $type => $name) {
+    $entity_info['line_item']['bundles'][$type] = array(
+      'label' => $name,
+      'admin' => array(
+        'path' => 'admin/structure/line_items/manage/%line_item_type',
+        'real path' => 'admin/structure/line_items/manage/' . $type,
+        'bundle argument' => 4,
+        'access arguments' => array('administer line items'),
+      ),
+    );
+  }
+
+  $entity_info['line_item_type'] = array(
+    'label' => t('Line item type'),
+    'plural label' => t('Line item types'),
+    'entity class' => 'Entity',
+    'controller class' => 'EntityAPIControllerExportable',
+    'base table' => 'line_item_type',
+    'fieldable' => FALSE,
+    'bundle of' => 'line_item',
+    'exportable' => TRUE,
+    'entity keys' => array(
+      'id' => 'type',
+      'name' => 'type',
+      'label' => 'name',
+    ),
+    'access callback' => 'line_item_type_access',
+    'label callback' => 'line_item_type_label',
+    'module' => 'line_item',
+    'admin ui' => array(
+      'path' => 'admin/structure/line_items',
+      'file' => 'line_item.admin.inc',
+      'controller class' => 'EntityDefaultUIController',
+    ),
+    // Explicitly declare the Views controller, since this is not automatically
+    // set for modules that implement hook_views_data().
+    // @see entity_views_data()
+    'views controller class' => 'EntityDefaultViewsController',
+  );
+
+  return $entity_info;
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function line_item_entity_property_info_alter(&$info) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  // Augment the default information that is provided by entityPropertyInfo().
+  // @see EntityDefaultMetadataController::entityPropertyInfo()
+  $properties = &$info['line_item']['properties'];
+
+  $properties['type']['description'] = t('The line item type');
+  $properties['type']['options list'] = 'line_item_type_get_names';
+  $properties['type']['required'] = TRUE;
+  $properties['type']['setter callback'] = 'entity_property_verbatim_set';
+  $properties['type']['setter permission'] = 'administer line items';
+
+  $properties['created']['label'] = t('Date created');
+  $properties['created']['description'] = t('The date the line item was created.');
+  $properties['created']['type'] = 'date';
+  $properties['created']['setter callback'] = 'entity_property_verbatim_set';
+  $properties['created']['setter permission'] = 'administer line items';
+
+  $properties['changed']['label'] = t('Date changed');
+  $properties['changed']['description'] = t('The date the line item was most recently updated.');
+  $properties['changed']['type'] = 'date';
+
+  $properties['is_new']['label'] = t('Is new');
+  $properties['is_new']['description'] = t('Whether the line item is new and not saved to the database yet.');
+  $properties['is_new']['type'] = 'boolean';
+  $properties['is_new']['getter callback'] = 'line_item_entity_metadata_get_properties';
+
+  $properties['bid']['label'] = t('Business');
+  $properties['bid']['description'] = t('The business for which this line item was created.');
+  $properties['bid']['setter callback'] = 'entity_property_verbatim_set';
+  $properties['bid']['setter permission'] = 'administer line items';
+  $properties['bid']['type'] = 'business';
+}
+
+/**
+ * Determines whether the given user has access to a line item.
+ *
+ * @param string $op
+ *   The operation being performed. One of 'view', 'update', 'create', 'delete'
+ *   or just 'edit' (being the same as 'create' or 'update').
+ * @param LineItem $line_item
+ *   Optionally a line item to check access for. If nothing is given, access for
+ *   all line items is determined.
+ * @param \stdClass $account
+ *   Optional, a user object representing the user for whom the operation is to
+ *   be performed. Determines access for a user other than the current user.
+ *
+ * @return bool
+ *   TRUE if the operation may be performed, FALSE otherwise.
+ */
+function line_item_access($op, LineItem $line_item = NULL, \stdClass $account = NULL) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  if (user_access('administer line items', $account)) {
+    return TRUE;
+  }
+
+  if ($op == 'create') {
+    $access = user_access('create new line items', $account);
+    $access |= user_access('administer own line items', $account);
+    return $access;
+  }
+
+  if (!empty($line_item)) {
+    switch ($op) {
+      case 'delete':
+      case 'update':
+        $access = user_access("edit any $line_item->type line item", $account);
+        $access |= user_access('administer own line items', $account) && line_item_is_owned_by_user($line_item, $account);
+        return $access;
+
+      case 'view':
+        $access = user_access("view any $line_item->type line item", $account);
+        $access |= user_access('view own line items', $account) && line_item_is_owned_by_user($line_item, $account);
+        return $access;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function line_item_permission() {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $permissions = array(
+    'administer line items' => array(
+      'title' => t('Administer line items'),
+      'description' => t('Create new line items, and edit and delete all line items.'),
+    ),
+    'administer line item types' => array(
+      'title' => t('Administer line item types'),
+      'description' => t('Create and delete fields for line item types, and set their permissions.'),
+    ),
+    'create new line items' => array(
+      'title' => t('Create new line items'),
+    ),
+    'view own line items' => array(
+      'title' => t('View own line items'),
+    ),
+    'administer own line items' => array(
+      'title' => t('Administer own line items'),
+      'description' => t('Edit and delete your own line items.'),
+    ),
+    'administer tax rates' => array(
+      'title' => t('Administer tax rates'),
+      'description' => t('Create new tax rates, and edit and delete all tax rates.'),
+    ),
+    'create new tax rates' => array(
+      'title' => t('Create new tax rates'),
+    ),
+    'view own tax rates' => array(
+      'title' => t('View own tax rates'),
+    ),
+    'administer own tax rates' => array(
+      'title' => t('Administer own tax rates'),
+      'description' => t('Edit and delete your own tax rates.'),
+    ),
+  );
+
+  // Generate permissions per line item type.
+  foreach (line_item_get_types() as $type) {
+    $permissions += array(
+      "edit any $type->type line item" => array(
+        'title' => t('%type_name: Edit any line item', array('%type_name' => $type->name)),
+      ),
+      "view any $type->type line item" => array(
+        'title' => t('%type_name: View any line item', array('%type_name' => $type->name)),
+      ),
+    );
+  }
+
+  return $permissions;
+}
+
+/**
+ * Access callback for Entity API exportables for line item types.
+ */
+function line_item_type_access($op, $type = NULL, $account = NULL) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  return user_access('administer line item types', $account);
+}
+
+/**
+ * Returns an array of line item types, keyed by the type name.
+ *
+ * @return array
+ *   An associative array of line item types, keyed by line item machine name.
+ */
+function line_item_get_types() {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $types = &drupal_static(__FUNCTION__);
+
+  if (!$types) {
+    $types = db_select('line_item_type', 'lit')
+      ->fields('lit')
+      ->execute()
+      ->fetchAllAssoc('type');
+  }
+
+  return $types;
+}
+
+/**
+ * Returns an line item type by type name.
+ *
+ * @param string $type
+ *   The machine readable name of the line item type.
+ *
+ * @return Entity
+ *   A line item type entity, or FALSE if the line item type does not exist.
+ */
+function line_item_type_load($type) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $types = line_item_get_types();
+
+  return !empty($types[$type]) ? $types[$type] : FALSE;
+}
+
+/**
+ * Returns a list of line item type names.
+ *
+ * @return array
+ *   An associative array of line item type labels, keyed by line item type.
+ */
+function line_item_type_get_names() {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $types = array();
+
+  foreach (line_item_get_types() as $machine_name => $type) {
+    $types[$machine_name] = $type->name;
+  }
+
+  return $types;
+}
+
+/**
+ * Creates a new line item entity.
+ *
+ * @param array $values
+ *   An associative array of values to apply to the entity, keyed by property
+ *   name.
+ *
+ * @return LineItem
+ *   The new line item entity.
+ *
+ * @throws Exception
+ *   Thrown when it is given a missing or invalid item bundle.
+ */
+function line_item_create($values = array()) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  if (empty($values['type'])) {
+    throw new Exception(t('Invalid or missing line item bundle given.'));
+  }
+  return entity_get_controller('line_item')->create($values);
+}
+
+/**
+ * Deletes a line item.
+ *
+ * @param LineItem $line_item
+ *   The line item to delete.
+ */
+function line_item_delete(LineItem $line_item) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $line_item->delete();
+}
+
+/**
+ * Deletes multiple line items.
+ *
+ * @param array $lids
+ *   An array of line item IDs.
+ */
+function line_item_delete_multiple(array $lids) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  entity_get_controller('line_item')->delete($lids);
+}
+
+/**
+ * Composes the label of a line item.
+ *
+ * @param LineItem $entity
+ *   The entity for which to generate the label.
+ * @param string $entity_type
+ *   The entity type; e.g., 'node' or 'user'.
+ *
+ * @return string|bool
+ *   The entity label or FALSE if not found.
+ *
+ * @see entity_label()
+ */
+function line_item_label(LineItem $entity, $entity_type) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  return $entity->id();
+}
+
+/**
+ * Saves a line item to the database.
+ *
+ * @param LineItem $line_item
+ *   The line item entity.
+ *
+ * @return mixed
+ *   Returns FALSE if the transaction failed. If it succeeded, returns SAVED_NEW
+ *   or SAVED_UPDATED, depending on the operation performed.
+ */
+function line_item_save(LineItem $line_item) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  return $line_item->save();
+}
+
+/**
+ * Loads a line item object from the database.
+ *
+ * @param int $lid
+ *   The line item ID.
+ * @param bool $reset
+ *   Whether to reset the cache.
+ *
+ * @return LineItem|FALSE
+ *   A fully-populated line item object, or FALSE if the line item is not found.
+ *
+ * @throws InvalidArgumentException
+ *   Thrown when the passed ID is not valid.
+ */
+function line_item_load($lid, $reset = FALSE) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $lid = (int) $lid;
+  if (empty($lid)) {
+    throw new InvalidArgumentException('Invalid line item ID.');
+  }
+  $line_items = line_item_load_multiple((array) $lid, $reset);
+
+  return $line_items ? reset($line_items) : FALSE;
+}
+
+/**
+ * Loads line items from the database.
+ *
+ * This function should be used whenever you need to load more than one line
+ * item from the database. Line items are loaded into memory and will not
+ * require database access if loaded again during the same page request.
+ *
+ * @param array $lids
+ *   An array of line item IDs.
+ * @param bool $reset
+ *   Whether to reset the internal cache.
+ *
+ * @return array
+ *   An array of line item objects indexed by lid.
+ *
+ * @see entity_load()
+ * @see EntityFieldQuery
+ */
+function line_item_load_multiple($lids = array(), $reset = FALSE) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  return entity_load('line_item', $lids, array(), $reset);
+}
+
+/**
+ * Implements callback_entity_info_uri().
+ */
+function line_item_uri(LineItem $line_item) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  return array(
+    'path' => 'line_item/' . $line_item->lid,
+  );
+}
+
+/**
+ * Creates a line item type.
+ *
+ * @param string $type
+ *   The machine readable name of the line item type.
+ * @param string $name
+ *   The human readable name of the line item type.
+ */
+function line_item_type_create($type, $name) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  db_insert('line_item_type')
+    ->fields(array(
+      'type' => $type,
+      'name' => $name,
+    ))
+    ->execute();
+}
+
+/**
+ * Composes the label of a line item type.
+ *
+ * @param Entity $entity
+ *   The entity for which to generate the label.
+ * @param string $entity_type
+ *   The entity type; e.g., 'node' or 'user'.
+ *
+ * @return string|bool
+ *   The entity label or FALSE if not found.
+ *
+ * @see entity_label()
+ */
+function line_item_type_label(Entity $entity, $entity_type) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  // If the entity type is being created it does not have a name yet.
+  if (empty($entity->is_new)) {
+    return $entity->name;
+  }
+  return FALSE;
+}
+
+/**
+ * Returns whether a given line item is owned by a given user.
+ *
+ * @param LineItem $line_item
+ *   The line item to check.
+ * @param \stdClass $account
+ *   Optional user account to check. Defaults to the currently logged in user.
+ *
+ * @return bool
+ *   TRUE if the line item is owned by the user, FALSE otherwise.
+ */
+function line_item_is_owned_by_user(LineItem $line_item, \stdClass $account = NULL) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  // Default to the logged in user.
+  global $user;
+  $account = $account ?: $user;
+
+  $line_item = entity_metadata_wrapper('line_item', $line_item);
+  return in_array($line_item->bid->value()->bid, array_keys(business_get_businesses_from_user($account)));
+}
+
+/**
+ * Callback for getting line item properties.
+ *
+ * @see line_item_entity_property_info()
+ */
+function line_item_entity_metadata_get_properties(LineItem $line_item, array $options, $name, $entity_type, $info) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  switch ($name) {
+    case 'is_new':
+      return empty($line_item->lid) || !empty($line_item->is_new);
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function line_item_menu() {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $items = array();
+
+  $items['settings/tax-rates/add'] = array(
+    'title' => 'Add tax rate',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('line_item_edit_tax_rate_form'),
+    'access callback' => 'line_item_tax_rate_access',
+    'access arguments' => array('create'),
+    'file' => 'line_item.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['settings/tax-rates/%line_item_tax_rate/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('line_item_delete_tax_rate_confirm_form', 2),
+    'access callback' => 'line_item_tax_rate_access',
+    'access arguments' => array('delete', 2),
+    'file' => 'line_item.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['settings/tax-rates/%line_item_tax_rate/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('line_item_edit_tax_rate_form', 2),
+    'access callback' => 'line_item_tax_rate_access',
+    'access arguments' => array('update', 2),
+    'file' => 'line_item.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['settings/tax-rates/autocomplete/%'] = array(
+    'page callback' => 'line_item_tax_rate_autocomplete',
+    'page arguments' => array(3),
+    'access arguments' => array('view own tax rates'),
+    'type' => MENU_CALLBACK,
+    'file' => 'line_item.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function line_item_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  trigger_error("Convert " . __FUNCTION__ . " to D8.", E_USER_DEPRECATED);
+  return;
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  // Add action link to 'settings/tax-rates/add' on the tax rates overview.
+  if ($root_path == 'settings/tax-rates') {
+    $item = menu_get_item('settings/tax-rates/add');
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function line_item_field_widget_info() {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  return array(
+    'line_item_tax_rate' => array(
+      'label' => t('Tax rate'),
+      'description' => t('Tax rate decimal field type widget'),
+      'field types' => array('number_decimal'),
+      'settings' => array('size' => 7),
+      'behaviors' => array(
+        'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements function hook_field_widget_form().
+ */
+function line_item_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  if ($instance['widget']['type'] == 'line_item_tax_rate') {
+    $element['value'] = array(
+      '#title' => t('Tax rate'),
+      '#type' => 'numberfield',
+      '#min' => 0,
+      '#max' => 100,
+      '#step' => 0.01,
+      '#maxlength' => 7,
+      '#autocomplete_path' => 'settings/tax-rates/autocomplete',
+      '#default_value' => isset($items[$delta]) && is_numeric($items[$delta]['value']) ? $items[$delta]['value'] : '',
+      '#description' => t('Tax rate percentage'),
+      '#required' => FALSE,
+      '#element_validate' => array('line_item_tax_rate_element_validate'),
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * Calculates the price totals of a line item.
+ *
+ * All values are expressed with 2 decimal numbers to represent Euros and cents.
+ * They are returned as strings to avoid rounding errors with floating point
+ * numbers.
+ *
+ * @param \Drupal\line_item\Entity\LineItemInterface $line_item
+ *   The line item for which to calculate the total.
+ *
+ * @return array
+ *   An associative array with the following keys:
+ *   - 'base_price': The base price for the calculation, consisting of the unit
+ *     price multiplied by the number of items.
+ *   - 'discount': The calculated discount.
+ *   - 'subtotal': The total price before tax, with the discount applied.
+ *   - 'tax': The amount of value added tax.
+ *   - 'total': The final total.
+ */
+function line_item_calculate(LineItem $line_item) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $wrapper = $line_item->wrapper();
+  $unit_cost = (string) $wrapper->field_line_item_unit_cost->value();
+  $quantity = (string) $wrapper->field_line_item_quantity->value();
+  $tax_percent = bcdiv($wrapper->field_line_item_tax->value(), 100, 8);
+  $discount_percent = bcdiv($wrapper->field_line_item_discount->value(), 100, 8);
+
+  // Use BCMath for financial calculations. We calculate to a precision of 3
+  // decimal numbers, then round to 2 decimal numbers to get the exact value in
+  // Euros and cents.
+  $base_price = number_format(bcmul($unit_cost, $quantity, 3), 2, '.', '');
+  $discount = number_format(bcmul($base_price, $discount_percent, 3), 2, '.', '');
+  $subtotal = bcsub($base_price, $discount, 2);
+  $tax = number_format(bcmul($subtotal, $tax_percent, 3), 2, '.', '');
+  $total = bcadd($subtotal, $tax, 2);
+
+  return [
+    'base_price' => $base_price,
+    'discount' => $discount,
+    'subtotal' => $subtotal,
+    'tax' => $tax,
+    'total' => $total,
+  ];
+}
+
+/**
+ * Returns the tax rates that belong to the given business.
+ *
+ * @param Business $business
+ *   Optional business for which to return the tax rates. Defaults to the
+ *   active business.
+ *
+ * @return TaxRate[]
+ *   An array of tax rates keyed by 'tid'.
+ *
+ * @throws Exception
+ *   Thrown when there no business was passed and there is no active business.
+ */
+function line_item_get_tax_rates_by_business(Business $business) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $business = $business ?: business_get_active_business();
+
+  if (!$business) {
+    throw new Exception('Cannot retrieve tax rates without a business.');
+  }
+
+  $tax_rates = &drupal_static(__FUNCTION__, array());
+  if (empty($tax_rates[$business->id()])) {
+    $result = db_select('tax_rates', 'tr')
+      ->fields('tr')
+      ->condition('bid', $business->bid, '=')
+      ->execute()
+      ->fetchAllAssoc('tid');
+
+    foreach ($result as $tid => $value) {
+      $tax_rate = line_item_tax_rate_load($tid);
+      $tax_rates[$business->id()][$tid] = $tax_rate->rate;
+    }
+  }
+
+  return $tax_rates[$business->id()];
+}
+
+/**
+ * Loads the tax rate from the {tax_rates} table.
+ *
+ * @param int $tid
+ *   The ID of the tax rate.
+ *
+ * @return TaxRate
+ *   The tax rate object retrieved from the database.
+ *
+ * @throws InvalidArgumentException
+ *   Thrown when the tax rate ID is invalid or empty.
+ */
+function line_item_tax_rate_load($tid) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  if (empty($tid)) {
+    throw new InvalidArgumentException('Missing tax rate ID.');
+  }
+
+  $result = db_select('tax_rates', 'tr')
+    ->fields('tr')
+    ->condition('tid', $tid, '=')
+    ->execute()
+    ->fetchAllAssoc('tid');
+
+  if (!empty($result[$tid])) {
+    $tax_rate = $result[$tid];
+    return new TaxRate($tax_rate->bid, $tax_rate->name, $tax_rate->rate, $tid);
+  }
+  else {
+    throw new InvalidArgumentException('Invalid tax rate ID.');
+  }
+}
+
+/**
+ * Saves the tax rate to the database.
+ *
+ * @param TaxRate $tax_rate
+ *   The tax rate object to save.
+ *
+ * @return int
+ *   The tax rate ID of the saved tax rate.
+ *
+ * @throws Exception
+ *   Thrown when the required business ID property is missing.
+ */
+function line_item_tax_rate_save(TaxRate $tax_rate) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  // Set a default business ID.
+  if (!isset($tax_rate->bid)) {
+    throw new Exception('No business given to link the tax rate to.');
+  }
+
+  // If no TID, create a new tax rate. Otherwise update the tax rate.
+  if (empty($tax_rate->tid)) {
+    $tid = db_insert('tax_rates')
+      ->fields(array(
+        'name' => $tax_rate->name,
+        'rate' => $tax_rate->rate,
+        'bid' => $tax_rate->bid,
+      ))
+      ->execute();
+  }
+  else {
+    db_update('tax_rates')
+      ->fields(array(
+        'name' => $tax_rate->name,
+        'rate' => $tax_rate->rate,
+        'bid' => $tax_rate->bid,
+      ))
+      ->condition('tid', $tax_rate->tid, '=')
+      ->execute();
+
+    $tid = $tax_rate->tid;
+  }
+
+  return $tid;
+}
+
+/**
+ * Returns whether a given tax rate is owned by a given user.
+ *
+ * @param TaxRate $tax_rate
+ *   The tax rate to check.
+ * @param \stdClass $account
+ *   Optional user account to check. Defaults to the currently logged in user.
+ *
+ * @return bool
+ *   TRUE if the tax rate is owned by the user, FALSE otherwise.
+ */
+function line_item_tax_rate_is_owned_by_user(TaxRate $tax_rate, \stdClass $account = NULL) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  // Default to the logged in user.
+  global $user;
+  $account = $account ?: $user;
+
+  return in_array($tax_rate->bid, array_keys(business_get_businesses_from_user($account)));
+}
+
+/**
+ * Determines whether the given user has access to a tax rate.
+ *
+ * @param string $op
+ *   The operation being performed. One of 'view', 'update', 'create', 'delete'.
+ * @param TaxRate $tax_rate
+ *   Optionally a tax rate to check access for. If nothing is given, access for
+ *   all tax rates is determined.
+ * @param \stdClass $account
+ *   Optional, a user object representing the user for whom the operation is to
+ *   be performed. Determines access for a user other than the current user.
+ *
+ * @return bool
+ *   TRUE if the operation may be performed, FALSE otherwise.
+ */
+function line_item_tax_rate_access($op, TaxRate $tax_rate = NULL, \stdClass $account = NULL) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  if (user_access('administer tax rates', $account)) {
+    return TRUE;
+  }
+
+  if ($op == 'create') {
+    $access = user_access('create new tax rates', $account);
+    $access |= user_access('administer own tax rates', $account);
+    return $access;
+  }
+
+  if (!empty($tax_rate) && line_item_tax_rate_is_owned_by_user($tax_rate, $account)) {
+    switch ($op) {
+      case 'delete':
+      case 'update':
+        return user_access('administer own tax rates', $account);
+
+      case 'view':
+        return user_access('view own tax rates', $account);
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Deletes the tax rate.
+ *
+ * @param TaxRate $tax_rate
+ *   The tax rate that needs to be deleted.
+ */
+function line_item_tax_rate_delete(TaxRate $tax_rate) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  db_delete('tax_rates')
+    ->condition('tid', $tax_rate->tid, '=')
+    ->execute();
+}
+
+/**
+ * Validate handler for the tax rate textfield in the line item form.
+ */
+function line_item_tax_rate_element_validate($element, &$form_state, $form) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  if (!empty($element['#value']) && (!is_numeric($element['#value']) || $element['#value'] < 0 || $element['#value'] > 100)) {
+    form_error($element, t('Tax rate should be between 0.00 and 100.00.'));
+  }
+}
+
+/**
+ * A tax rate field on a line item.
+ */
+class TaxRate {
+
+  /**
+   * The tax rate identifier.
+   */
+  protected $tid;
+
+  /**
+   * The business identifier.
+   */
+  protected $bid;
+
+  /**
+   * The human readable name associated with the tax rate.
+   */
+  protected $name;
+
+  /**
+   * The tax rate, which is a decimal number representing a percentage.
+   */
+  protected $rate;
+
+  /**
+   * The TaxRate class constructor.
+   *
+   * @param int $bid
+   *   The business identifier.
+   * @param string $name
+   *   The human readable name associated with the tax rate.
+   * @param float $rate
+   *   The tax rate, which is a decimal number representing a percentage.
+   * @param int $tid
+   *   The tax rate identifier.
+   */
+  public function __construct($bid, $name, $rate, $tid = NULL) {
+    throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+    $this->tid = $tid;
+    $this->bid = $bid;
+    $this->name = $name;
+    $this->rate = $rate;
+  }
+
+  /**
+   * Magic getter. Returns the requested property.
+   *
+   * @param string $property
+   *   The requested property. One of 'tid', 'bid', 'name', 'rate'.
+   *
+   * @throws InvalidArgumentException
+   *   Thrown when a non-existing property is accessed.
+   */
+  public function __get($property) {
+    throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+    if (property_exists($this, $property)) {
+      return $this->$property;
+    }
+    else {
+      throw new InvalidArgumentException('Non-existing property ' . $property . ' is accessed.');
+    }
+  }
+
+  /**
+   * Returns TRUE if the property is set, FALSE otherwise.
+   *
+   * @param string $property
+   *   The property that is checked. One of 'tid', 'bid', 'name', 'rate'.
+   *
+   * @return bool
+   *   TRUE if the property is set, FALSE otherwise.
+   */
+  public function __isset($property) {
+    throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+    return $this->{$property} !== NULL;
+  }
+
+}
+
+/**
+ * Implements hook_theme().
+ */
+function line_item_theme() {
+  trigger_error("Convert " . __FUNCTION__ . " to D8.", E_USER_DEPRECATED);
+  return [];
+  $theme = [];
+  $theme['line_item'] = array(
+    'render element' => 'elements',
+    'file' => 'line_item.page.inc',
+    'template' => 'line_item',
+  );
+  $theme['line_item_content_add_list'] = [
+    'render element' => 'content',
+    'variables' => ['content' => NULL],
+    'file' => 'line_item.page.inc',
+  ];
+  return $theme;
+}
+
+/**
+* Implements hook_theme_suggestions_HOOK().
+*/
+function line_item_theme_suggestions_line_item(array $variables) {
+  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+  $suggestions = array();
+  $entity = $variables['elements']['#line_item'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'line_item__' . $sanitized_view_mode;
+  $suggestions[] = 'line_item__' . $entity->bundle();
+  $suggestions[] = 'line_item__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'line_item__' . $entity->id();
+  $suggestions[] = 'line_item__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}

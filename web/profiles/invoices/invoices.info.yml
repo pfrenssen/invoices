@@ -15,6 +15,7 @@ dependencies:
   - file
   - image
   - invoices_core
+  - line_item
   - options
   - page_cache
   - toolbar

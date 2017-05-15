@@ -1,0 +1,13 @@
+line_item.line_item_type.*:
+  type: config_entity
+  label: 'Line item type'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
+      label: 'UUID'

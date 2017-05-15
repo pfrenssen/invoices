@@ -1,0 +1,19 @@
+add line items:
+  title: 'Create new line items'
+
+administer line items:
+  title: 'Administer line items'
+  description: 'Allow to access the administration form to configure line items.'
+  restrict access: true
+
+delete line items:
+  title: 'Delete line items'
+
+edit line items:
+  title: 'Edit line items'
+
+access line item overview:
+  title: 'Access the line item overview page'
+
+view own line items:
+  title: 'View own line items'

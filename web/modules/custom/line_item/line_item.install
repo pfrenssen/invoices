@@ -1,0 +1,87 @@
+<?php
+
+/**
+ * @file
+ * Install, uninstall, update and schema hooks for Invoicing Line item.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function line_item_schema() {
+  $schema = array();
+
+  $schema['line_item_preset'] = array(
+    'description' => 'The base table for Line item presets.',
+    'fields' => array(
+      'pid' => array(
+        'description' => 'The primary identifier for a line item preset.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'bid' => array(
+        'description' => 'The business that owns the line item preset.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'name' => array(
+        'description' => 'The name of the line item preset.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('pid'),
+    'foreign keys' => array(
+      'bid' => array(
+        'table' => 'business',
+        'columns' => array('bid' => 'bid'),
+      ),
+    ),
+  );
+
+  $schema['tax_rates'] = array(
+    'description' => 'The base table for tax rates.',
+    'fields' => array(
+      'tid' => array(
+        'description' => 'The primary identifier for a tax rate.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'bid' => array(
+        'description' => 'The business that owns the tax rate.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'name' => array(
+        'description' => 'The name of the tax rate.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'rate' => array(
+        'description' => 'The actual tax rate.',
+        'type' => 'numeric',
+        'precision' => 5,
+        'scale' => 2,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('tid'),
+    'foreign keys' => array(
+      'bid' => array(
+        'table' => 'business',
+        'columns' => array('bid' => 'bid'),
+      ),
+    ),
+  );
+
+  return $schema;
+}

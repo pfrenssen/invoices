@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.line_item.field_line_item_time_unit
+    - line_item.line_item_type.service
+  module:
+    - options
+id: line_item.service.field_line_item_time_unit
+field_name: field_line_item_time_unit
+entity_type: line_item
+bundle: service
+label: 'Time unit'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

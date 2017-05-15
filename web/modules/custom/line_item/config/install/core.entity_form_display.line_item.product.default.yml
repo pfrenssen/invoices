@@ -1,0 +1,62 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.line_item.product.field_line_item_description
+    - field.field.line_item.product.field_line_item_discount
+    - field.field.line_item.product.field_line_item_quantity
+    - field.field.line_item.product.field_line_item_tax
+    - field.field.line_item.product.field_line_item_unit_cost
+    - line_item.line_item_type.product
+id: line_item.product.default
+targetEntityType: line_item
+bundle: product
+mode: default
+content:
+  business:
+    type: entity_reference_autocomplete
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  description:
+    type: string_textfield
+    weight: -4
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_line_item_description:
+    weight: 6
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+  field_line_item_discount:
+    weight: 7
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+  field_line_item_quantity:
+    weight: 8
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+  field_line_item_tax:
+    weight: 9
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+  field_line_item_unit_cost:
+    weight: 10
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+hidden: {  }

@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.line_item.field_line_item_unit_cost
+    - line_item.line_item_type.service
+id: line_item.service.field_line_item_unit_cost
+field_name: field_line_item_unit_cost
+entity_type: line_item
+bundle: service
+label: 'Unit cost'
+description: 'The price per unit for the service.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

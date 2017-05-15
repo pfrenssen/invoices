@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Drupal\invoice\Tests;
 
 use Drupal\client\Entity\ClientInterface;
+use Drupal\line_item\Entity\LineItemInterface;
 
 /**
  * Reusable test methods for testing invoices.
@@ -261,9 +262,9 @@ trait InvoiceTestHelper {
     $line_items = [];
     foreach (array_keys($this->getLineItemTypes()) as $type) {
       if (!empty($values["field_invoice_${type}s"])) {
-        /* @var $line_item \LineItem */
+        /* @var $line_item \Drupal\line_item\Entity\LineItemInterface */
         $line_item = reset($values["field_invoice_${type}s"]);
-        if (!$line_item instanceof \LineItem) {
+        if (!$line_item instanceof LineItemInterface) {
           throw new \Exception("The values for field_invoice_${type}s should be instances of LineItem.");
         }
         if ($line_item->bundle() != $type) {

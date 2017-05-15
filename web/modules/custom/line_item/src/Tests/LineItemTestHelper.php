@@ -4,6 +4,9 @@ declare (strict_types = 1);
 
 namespace Drupal\line_item\Tests;
 
+use Drupal\line_item\Entity\LineItem;
+use Drupal\line_item\Entity\LineItemInterface;
+
 /**
  * Reusable test methods for testing line items.
  */
@@ -12,23 +15,19 @@ trait LineItemTestHelper {
   /**
    * Check if the properties of the given line item match the given values.
    *
-   * @param \LineItem $line_item
+   * @param \Drupal\line_item\Entity\LineItemInterface $line_item
    *   The line item entity to check.
    * @param array $values
    *   An associative array of values to check, keyed by property name.
-   * @param string $message
-   *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
    *
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertLineItemProperties(\LineItem $line_item, array $values, $message = '', $group = 'Other') {
+  function assertLineItemProperties(LineItemInterface $line_item, array $values) {
     if (isset($values['type'])) {
       unset($values['type']);
     }
-    return $this->assertEntityProperties('line_item', $line_item, $values, $message, $group);
+    return $this->assertEntityFieldValues($line_item, $values);
   }
 
   /**
@@ -81,14 +80,14 @@ trait LineItemTestHelper {
    *   An optional associative array of values, keyed by property name. Random
    *   values will be applied to all omitted properties.
    *
-   * @return \LineItem
+   * @return \Drupal\line_item\Entity\LineItemInterface
    *   A new line item entity.
    */
   function createLineItem($type = NULL, array $values = []) {
     // Provide some default values.
     $values += $this->randomLineItemValues($type);
-    $line_item = line_item_create(['type' => $values['type']]);
-    $this->updateLineItem($line_item, $values);
+    $line_item = LineItem::create(['type' => $values['type']]);
+    $this->updateEntity($line_item, $values);
 
     return $line_item;
   }
@@ -106,7 +105,7 @@ trait LineItemTestHelper {
     $type = $type ?: $this->randomLineItemType();
 
     $values = [
-      'bid' => $this->randomBusiness(),
+      'business' => $this->randomBusiness()->id(),
       'field_line_item_description' => $this->randomString(),
       'field_line_item_discount' => $this->randomDecimal(),
       'field_line_item_quantity' => $this->randomDecimal(),
@@ -165,13 +164,17 @@ trait LineItemTestHelper {
   /**
    * Updates the given line item with the given properties.
    *
-   * @param \LineItem $line_item
+   * @param \Drupal\line_item\Entity\LineItemInterface $line_item
    *   The line item entity to update.
    * @param array $values
    *   An associative array of values to apply to the entity, keyed by property
    *   name.
+   *
+   * @deprecated
+   *   Use BaseTestHelper::updateEntity() instead.
    */
-  function updateLineItem(\LineItem $line_item, array $values) {
+  function updateLineItem(LineItemInterface $line_item, array $values) {
+    throw new \Exception(__METHOD__ . ' is deprecated.');
     unset($values['type']);
     $wrapper = entity_metadata_wrapper('line_item', $line_item);
     foreach ($values as $property => $value) {
@@ -185,7 +188,7 @@ trait LineItemTestHelper {
    * @param string $type
    *   Optional line item type. Either 'product' or 'service'.
    *
-   * @return \LineItem
+   * @return \Drupal\line_item\Entity\LineItemInterface
    *   A random line item.
    */
   function randomLineItem($type = NULL) {
@@ -201,7 +204,7 @@ trait LineItemTestHelper {
     $lid = $query->execute()
       ->fetchColumn();
 
-    return line_item_load($lid);
+    return LineItem::load($lid);
   }
 
   /**
@@ -250,7 +253,7 @@ trait LineItemTestHelper {
    */
   function randomTaxRateValues() {
     $values = [
-      'bid' => $this->randomBusiness()->identifier(),
+      'business' => $this->randomBusiness()->id(),
       'name' => $this->randomString(),
       'rate' => $this->randomDecimal(),
     ];
@@ -275,7 +278,7 @@ trait LineItemTestHelper {
     // Provide default values.
     $values += $this->randomTaxRateValues();
 
-    return new \TaxRate($values['bid'], $values['name'], $values['rate']);
+    return new \TaxRate($values['business'], $values['name'], $values['rate']);
   }
 
   /**
@@ -295,7 +298,7 @@ trait LineItemTestHelper {
    */
   function assertTaxRateProperties(\TaxRate $tax_rate, array $values, $message = '', $group = 'Other') {
     $result = TRUE;
-    $result &= $this->assertEqual($values['bid'], $tax_rate->bid);
+    $result &= $this->assertEqual($values['business'], $tax_rate->business);
     $result &= $this->assertEqual($values['name'], $tax_rate->name);
     return $result &= $this->assertEqual($values['rate'], $tax_rate->rate);
   }
@@ -316,8 +319,8 @@ trait LineItemTestHelper {
     // Provide some default values.
     $values += $this->randomTaxRateValues();
 
-    if (isset($values['bid'])) {
-      unset($values['bid']);
+    if (isset($values['business'])) {
+      unset($values['business']);
     }
 
     // Convert the property values to form values and submit the form.
@@ -343,7 +346,7 @@ trait LineItemTestHelper {
 
     $result = reset($result);
 
-    return new \TaxRate($result->bid, $result->name, $result->rate, $result->tid);
+    return new \TaxRate($result->business, $result->name, $result->rate, $result->tid);
   }
 
   /**
@@ -361,7 +364,7 @@ trait LineItemTestHelper {
    */
   function updateUiTaxRate(\TaxRate $tax_rate, array $values = []) {
     // Unset the values that cannot be changed through the UI.
-    unset($values['bid']);
+    unset($values['business']);
     unset($values['tid']);
 
     // Convert the new values to form values and submit the form.
@@ -385,7 +388,7 @@ trait LineItemTestHelper {
 
     $result = reset($result);
 
-    return new \TaxRate($result->bid, $result->name, $result->rate, $result->tid);
+    return new \TaxRate($result->business, $result->name, $result->rate, $result->tid);
   }
 
   /**

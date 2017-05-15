@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.line_item.field_line_item_description
+    - line_item.line_item_type.service
+id: line_item.service.field_line_item_description
+field_name: field_line_item_description
+entity_type: line_item
+bundle: service
+label: Description
+description: 'Short description of the service.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

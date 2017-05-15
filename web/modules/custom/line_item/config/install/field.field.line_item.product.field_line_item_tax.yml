@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.line_item.field_line_item_tax
+    - line_item.line_item_type.product
+id: line_item.product.field_line_item_tax
+field_name: field_line_item_tax
+entity_type: line_item
+bundle: product
+label: Tax
+description: 'The tax rate to apply on the product.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: !!float 0
+  max: !!float 100
+  prefix: ''
+  suffix: '%'
+field_type: decimal

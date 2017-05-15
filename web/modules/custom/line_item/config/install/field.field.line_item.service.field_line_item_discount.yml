@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.line_item.field_line_item_discount
+    - line_item.line_item_type.service
+id: line_item.service.field_line_item_discount
+field_name: field_line_item_discount
+entity_type: line_item
+bundle: service
+label: Discount
+description: 'The discount to apply on the service, as a percentage.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: !!float 0
+  max: !!float 100
+  prefix: ''
+  suffix: '%'
+field_type: decimal

@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - line_item
+id: line_item.field_line_item_quantity
+field_name: field_line_item_quantity
+entity_type: line_item
+type: decimal
+settings:
+  precision: 10
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

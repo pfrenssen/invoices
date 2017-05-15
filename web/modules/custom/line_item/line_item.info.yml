@@ -10,3 +10,28 @@ dependencies:
   - options
   - text
   - views
+
+config_devel:
+  - core.entity_form_display.line_item.product.default
+  - core.entity_form_display.line_item.service.default
+  - core.entity_view_display.line_item.product.default
+  - core.entity_view_display.line_item.service.default
+  - field.field.line_item.product.field_line_item_description
+  - field.field.line_item.product.field_line_item_discount
+  - field.field.line_item.product.field_line_item_quantity
+  - field.field.line_item.product.field_line_item_tax
+  - field.field.line_item.product.field_line_item_unit_cost
+  - field.field.line_item.service.field_line_item_description
+  - field.field.line_item.service.field_line_item_discount
+  - field.field.line_item.service.field_line_item_quantity
+  - field.field.line_item.service.field_line_item_tax
+  - field.field.line_item.service.field_line_item_time_unit
+  - field.field.line_item.service.field_line_item_unit_cost
+  - field.storage.line_item.field_line_item_description
+  - field.storage.line_item.field_line_item_discount
+  - field.storage.line_item.field_line_item_quantity
+  - field.storage.line_item.field_line_item_tax
+  - field.storage.line_item.field_line_item_time_unit
+  - field.storage.line_item.field_line_item_unit_cost
+  - line_item.line_item_type.product
+  - line_item.line_item_type.service

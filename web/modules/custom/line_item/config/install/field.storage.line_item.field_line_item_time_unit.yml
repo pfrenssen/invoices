@@ -1,0 +1,38 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - line_item
+    - options
+id: line_item.field_line_item_time_unit
+field_name: field_line_item_time_unit
+entity_type: line_item
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: minutes
+      label: minutes
+    -
+      value: hours
+      label: hours
+    -
+      value: days
+      label: days
+    -
+      value: weeks
+      label: weeks
+    -
+      value: months
+      label: months
+    -
+      value: years
+      label: years
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
