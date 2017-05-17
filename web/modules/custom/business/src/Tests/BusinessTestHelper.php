@@ -252,7 +252,7 @@ trait BusinessTestHelper {
    * @param \Drupal\user\UserInterface $user
    *   The user the business should be added to.
    */
-  public function addBusinessToUser(BusinessInterface $business, UserInterface $user) {
+  public static function addBusinessToUser(BusinessInterface $business, UserInterface $user) {
     /** @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $businesses */
     $businesses = $user->get('field_user_businesses');
     $businesses->appendItem(['target_id' => $business->id()]);
