@@ -38,7 +38,7 @@ trait BaseTestHelper {
    * @throws \Exception
    *   Thrown when user creation fails.
    */
-  protected function drupalCreateUserWithRole(string $role) : User {
+  protected function createUserWithRole(string $role) : User {
     $role = Role::load($role);
 
     // Create a user assigned to that role.

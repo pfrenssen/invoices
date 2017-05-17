@@ -55,7 +55,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
   public function testOverview() {
     // Create a second business owner with a business and client to test
     // negative cases.
-    $this->users['business_owner2'] = $this->drupalCreateUserWithRole('business_owner');
+    $this->users['business_owner2'] = $this->createUserWithRole('business_owner');
 
     $this->business2 = $this->createBusiness();
     $this->business2->save();
@@ -197,7 +197,7 @@ class ClientOverviewTest extends InvoicesFunctionalTestBase {
 
     // Create 2 business owners, each owning a business with 2 clients.
     for ($i = 0; $i < 2; $i++) {
-      $user = $this->drupalCreateUserWithRole('business_owner');
+      $user = $this->createUserWithRole('business_owner');
       $business = $this->createBusiness();
       $business->save();
       $this->addBusinessToUser($business, $user);

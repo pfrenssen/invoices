@@ -68,7 +68,9 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
       $this->businesses[$i]->save();
 
       // Create a user and link the business to it.
-      $this->users[$i] = $this->drupalCreateUser();
+      $user = $this->createUser();
+      $this->addBusinessToUser($this->businesses[$i], $user);
+      $this->users[$i] = $user;
       $user = entity_metadata_wrapper('user', $this->users[$i]);
       $user->field_user_businesses->set(array($this->businesses[$i]->id()));
       $user->save();
@@ -170,7 +172,7 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
     module_load_include('inc', 'line_item', 'line_item.pages');
 
     // Create a new user that does not have a business.
-    $this->users[2] = $this->drupalCreateUser();
+    $this->users[2] = $this->createUser();
 
     // Check that an exception is thrown when the logged in user does not have a
     // business. This can be done by overwriting the global $user.

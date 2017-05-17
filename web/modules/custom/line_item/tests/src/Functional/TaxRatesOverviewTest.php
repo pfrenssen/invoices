@@ -130,7 +130,7 @@ class TaxRatesOverviewTestCase extends InvoicingIntegrationTestCase {
 
     // Create a different user with the role business owner and verify it does
     // not see the tax rates created by another business owner.
-    $business_owner = $this->drupalCreateUserWithRole('business owner');
+    $business_owner = $this->createUserWithRole('business owner');
     $business = $this->createBusiness();
     $business->save();
     $this->addBusinessToUser($business, $business_owner);
