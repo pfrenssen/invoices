@@ -16,42 +16,42 @@ function line_item_type_form($form, &$form_state, $line_item_type, $op = 'edit')
   }
 
   // Human readable name.
-  $form['name'] = array(
+  $form['name'] = [
     '#title' => t('Type name'),
     '#type' => 'textfield',
     '#default_value' => isset($line_item_type->name) ? $line_item_type->name : '',
     '#description' => t('The human-readable name of this line item type.'),
     '#required' => TRUE,
     '#size' => 30,
-  );
+  ];
 
   // Machine readable name.
-  $form['type'] = array(
+  $form['type'] = [
     '#type' => 'machine_name',
     '#default_value' => isset($line_item_type->type) ? $line_item_type->type : '',
     '#maxlength' => 32,
-    '#machine_name' => array(
+    '#machine_name' => [
       'exists' => 'line_item_load',
-      'source' => array('name'),
-    ),
+      'source' => ['name'],
+    ],
     '#description' => t('A unique machine-readable name for this line item type. It must only contain lowercase letters, numbers, and underscores.'),
-  );
+  ];
 
-  $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit'] = array(
+  $form['actions'] = ['#type' => 'actions'];
+  $form['actions']['submit'] = [
     '#type' => 'submit',
     '#value' => t('Save line item type'),
     '#weight' => 40,
-  );
+  ];
 
   if ($op != 'add' && $op != 'clone') {
-    $form['actions']['delete'] = array(
+    $form['actions']['delete'] = [
       '#type' => 'submit',
       '#value' => t('Delete line item type'),
       '#weight' => 45,
-      '#limit_validation_errors' => array(),
-      '#submit' => array('line_item_type_form_submit_delete'),
-    );
+      '#limit_validation_errors' => [],
+      '#submit' => ['line_item_type_form_submit_delete'],
+    ];
   }
 
   return $form;

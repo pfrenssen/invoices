@@ -25,7 +25,7 @@ class LineItemSubContext extends DrupalSubContextBase implements DrupalSubContex
    *
    * @var LineItem[]
    */
-  public $lineItems = array();
+  public $lineItems = [];
 
   /**
    * Creates products with data provided in a table.
@@ -94,7 +94,7 @@ class LineItemSubContext extends DrupalSubContextBase implements DrupalSubContex
     }
 
     foreach ($table->getHash() as $table_hash) {
-      $values = array('bid' => $businesses[0]->id()) + $this->convertTableRowToValues($table_hash);
+      $values = ['bid' => $businesses[0]->id()] + $this->convertTableRowToValues($table_hash);
       $line_item = $this->createLineItem($type, $values);
       line_item_save($line_item);
       $description = $line_item->wrapper()->get('field_line_item_description')->value();
@@ -117,16 +117,16 @@ class LineItemSubContext extends DrupalSubContextBase implements DrupalSubContex
    *   An array of property values.
    */
   protected function convertTableRowToValues(array $row) {
-    $mapping = array(
+    $mapping = [
       'description' => 'field_line_item_description',
       'unit cost' => 'field_line_item_unit_cost',
       'time unit' => 'field_line_item_time_unit',
       'quantity' => 'field_line_item_quantity',
       'tax' => 'field_line_item_tax',
       'discount' => 'field_line_item_discount',
-    );
+    ];
 
-    $values = array();
+    $values = [];
     foreach ($mapping as $column_name => $property) {
       if (isset($row[$column_name])) {
         $values[$property] = $row[$column_name];

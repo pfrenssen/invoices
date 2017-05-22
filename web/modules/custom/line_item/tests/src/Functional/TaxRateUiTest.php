@@ -16,19 +16,19 @@ class TaxRateUITestCase extends InvoicingIntegrationTestCase {
   /**
    * {@inheritdoc}
    */
-  protected $usersToCreate = array(
+  protected $usersToCreate = [
     'business owner',
-  );
+  ];
 
   /**
    * Returns test case metadata.
    */
   public static function getInfo() {
-    return array(
+    return [
       'name' => 'Tax rate UI test',
       'description' => 'Tests the tax rate user interface.',
       'group' => 'Invoicing - Line item',
-    );
+    ];
   }
 
   /**
@@ -60,7 +60,7 @@ class TaxRateUITestCase extends InvoicingIntegrationTestCase {
     // overview is empty.
     $this->drupalGet('settings/tax-rates');
     $xpath = '//div[contains(@class, "view-empty") ]//a[@href="/settings/tax-rates/add"]';
-    $this->assertXPathElements($xpath, 1, array(), 'The no results message is shown.');
+    $this->assertXPathElements($xpath, 1, [], 'The no results message is shown.');
     $this->assertFalse($this->xpath('//div[contains(@class, "view-tax-rate")]//table'), 'The table containing tax rates is not shown.');
   }
 

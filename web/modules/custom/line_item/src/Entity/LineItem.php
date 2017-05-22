@@ -73,9 +73,9 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
     /** @var \Drupal\business\BusinessManagerInterface $business_manager */
     $business_manager = \Drupal::service('business.manager');
 
-    $values += array(
+    $values += [
       'business' => $business_manager->getActiveBusinessId(),
-    );
+    ];
   }
 
   /**
@@ -171,15 +171,15 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
         'text_processing' => 0,
       ))
       ->setDefaultValue('')
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'string',
         'weight' => -4,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -4,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
@@ -235,13 +235,13 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
     //   ->setDisplayConfigurable('view', TRUE);
 
     // @todo Add when the preset IDs are ported.
-    // 'pid' => array(
+    // 'pid' => [
     //   'description' => 'Optional preset ID that was used to construct this line item.',
     //   'type' => 'int',
     //   'unsigned' => TRUE,
     //   'not null' => FALSE,
     //   'default' => 0,
-    // ),
+    // ],
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

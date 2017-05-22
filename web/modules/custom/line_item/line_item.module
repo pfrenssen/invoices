@@ -5,62 +5,62 @@
  * Main functions and hook implementations for the Invoicing Line Item module.
  */
 
-include_once 'line_item.features.inc';
+use Drupal\line_item\Entity\LineItemInterface;
 
 /**
  * Implements hook_entity_info().
  */
 function line_item_entity_info() {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  $entity_info = array();
+  $entity_info = [];
 
-  $entity_info['line_item'] = array(
+  $entity_info['line_item'] = [
     'label' => t('Line item'),
     'plural label' => t('Line items'),
     'entity class' => 'LineItem',
     'controller class' => 'LineItemAPIController',
     'base table' => 'line_item',
     'fieldable' => TRUE,
-    'entity keys' => array(
+    'entity keys' => [
       'id' => 'lid',
       'bundle' => 'type',
-    ),
-    'bundle keys' => array(
+    ],
+    'bundle keys' => [
       'bundle' => 'type',
-    ),
-    'bundles' => array(),
+    ],
+    'bundles' => [],
     'label callback' => 'line_item_label',
     'uri callback' => 'line_item_uri',
     'access callback' => 'line_item_access',
     'module' => 'line_item',
-    'inline entity form' => array(
+    'inline entity form' => [
       'controller' => 'LineItemInlineEntityFormController',
-    ),
+    ],
     // Explicitly declare the Views controller, since this is not automatically
     // set for modules that implement hook_views_data().
     // @see entity_views_data()
     'views controller class' => 'EntityDefaultViewsController',
-  );
+  ];
 
   // Add bundle info but bypass entity_load() as we cannot use it here.
   $types = db_select('line_item_type', 'lit')
-    ->fields('lit', array('type', 'name'))
+    ->fields('lit', ['type', 'name'])
     ->execute()
     ->fetchAllKeyed();
 
   foreach ($types as $type => $name) {
-    $entity_info['line_item']['bundles'][$type] = array(
+    $entity_info['line_item']['bundles'][$type] = [
       'label' => $name,
-      'admin' => array(
+      'admin' => [
         'path' => 'admin/structure/line_items/manage/%line_item_type',
         'real path' => 'admin/structure/line_items/manage/' . $type,
         'bundle argument' => 4,
-        'access arguments' => array('administer line items'),
-      ),
-    );
+        'access arguments' => ['administer line items'],
+      ],
+    ];
   }
 
-  $entity_info['line_item_type'] = array(
+  $entity_info['line_item_type'] = [
     'label' => t('Line item type'),
     'plural label' => t('Line item types'),
     'entity class' => 'Entity',
@@ -69,24 +69,24 @@ function line_item_entity_info() {
     'fieldable' => FALSE,
     'bundle of' => 'line_item',
     'exportable' => TRUE,
-    'entity keys' => array(
+    'entity keys' => [
       'id' => 'type',
       'name' => 'type',
       'label' => 'name',
-    ),
+    ],
     'access callback' => 'line_item_type_access',
     'label callback' => 'line_item_type_label',
     'module' => 'line_item',
-    'admin ui' => array(
+    'admin ui' => [
       'path' => 'admin/structure/line_items',
       'file' => 'line_item.admin.inc',
       'controller class' => 'EntityDefaultUIController',
-    ),
+    ],
     // Explicitly declare the Views controller, since this is not automatically
     // set for modules that implement hook_views_data().
     // @see entity_views_data()
     'views controller class' => 'EntityDefaultViewsController',
-  );
+  ];
 
   return $entity_info;
 }
@@ -179,51 +179,51 @@ function line_item_access($op, LineItem $line_item = NULL, \stdClass $account = 
  */
 function line_item_permission() {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  $permissions = array(
-    'administer line items' => array(
+  $permissions = [
+    'administer line items' => [
       'title' => t('Administer line items'),
       'description' => t('Create new line items, and edit and delete all line items.'),
-    ),
-    'administer line item types' => array(
+    ],
+    'administer line item types' => [
       'title' => t('Administer line item types'),
       'description' => t('Create and delete fields for line item types, and set their permissions.'),
-    ),
-    'create new line items' => array(
+    ],
+    'create new line items' => [
       'title' => t('Create new line items'),
-    ),
-    'view own line items' => array(
+    ],
+    'view own line items' => [
       'title' => t('View own line items'),
-    ),
-    'administer own line items' => array(
+    ],
+    'administer own line items' => [
       'title' => t('Administer own line items'),
       'description' => t('Edit and delete your own line items.'),
-    ),
-    'administer tax rates' => array(
+    ],
+    'administer tax rates' => [
       'title' => t('Administer tax rates'),
       'description' => t('Create new tax rates, and edit and delete all tax rates.'),
-    ),
-    'create new tax rates' => array(
+    ],
+    'create new tax rates' => [
       'title' => t('Create new tax rates'),
-    ),
-    'view own tax rates' => array(
+    ],
+    'view own tax rates' => [
       'title' => t('View own tax rates'),
-    ),
-    'administer own tax rates' => array(
+    ],
+    'administer own tax rates' => [
       'title' => t('Administer own tax rates'),
       'description' => t('Edit and delete your own tax rates.'),
-    ),
-  );
+    ],
+  ];
 
   // Generate permissions per line item type.
   foreach (line_item_get_types() as $type) {
-    $permissions += array(
-      "edit any $type->type line item" => array(
-        'title' => t('%type_name: Edit any line item', array('%type_name' => $type->name)),
-      ),
-      "view any $type->type line item" => array(
-        'title' => t('%type_name: View any line item', array('%type_name' => $type->name)),
-      ),
-    );
+    $permissions += [
+      "edit any $type->type line item" => [
+        'title' => t('%type_name: Edit any line item', ['%type_name' => $type->name]),
+      ],
+      "view any $type->type line item" => [
+        'title' => t('%type_name: View any line item', ['%type_name' => $type->name]),
+      ],
+    ];
   }
 
   return $permissions;
@@ -281,7 +281,7 @@ function line_item_type_load($type) {
  */
 function line_item_type_get_names() {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  $types = array();
+  $types = [];
 
   foreach (line_item_get_types() as $machine_name => $type) {
     $types[$machine_name] = $type->name;
@@ -303,7 +303,7 @@ function line_item_type_get_names() {
  * @throws Exception
  *   Thrown when it is given a missing or invalid item bundle.
  */
-function line_item_create($values = array()) {
+function line_item_create($values = []) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
   if (empty($values['type'])) {
     throw new Exception(t('Invalid or missing line item bundle given.'));
@@ -409,9 +409,9 @@ function line_item_load($lid, $reset = FALSE) {
  * @see entity_load()
  * @see EntityFieldQuery
  */
-function line_item_load_multiple($lids = array(), $reset = FALSE) {
+function line_item_load_multiple($lids = [], $reset = FALSE) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  return entity_load('line_item', $lids, array(), $reset);
+  return entity_load('line_item', $lids, [], $reset);
 }
 
 /**
@@ -419,9 +419,9 @@ function line_item_load_multiple($lids = array(), $reset = FALSE) {
  */
 function line_item_uri(LineItem $line_item) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  return array(
+  return [
     'path' => 'line_item/' . $line_item->lid,
-  );
+  ];
 }
 
 /**
@@ -500,48 +500,50 @@ function line_item_entity_metadata_get_properties(LineItem $line_item, array $op
 
 /**
  * Implements hook_menu().
+ *
+ * @deprecated
  */
 function line_item_menu() {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  $items = array();
+  $items = [];
 
-  $items['settings/tax-rates/add'] = array(
+  $items['settings/tax-rates/add'] = [
     'title' => 'Add tax rate',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('line_item_edit_tax_rate_form'),
+    'page arguments' => ['line_item_edit_tax_rate_form'],
     'access callback' => 'line_item_tax_rate_access',
-    'access arguments' => array('create'),
+    'access arguments' => ['create'],
     'file' => 'line_item.pages.inc',
     'type' => MENU_CALLBACK,
-  );
+  ];
 
-  $items['settings/tax-rates/%line_item_tax_rate/delete'] = array(
+  $items['settings/tax-rates/%line_item_tax_rate/delete'] = [
     'title' => 'Delete',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('line_item_delete_tax_rate_confirm_form', 2),
+    'page arguments' => ['line_item_delete_tax_rate_confirm_form', 2],
     'access callback' => 'line_item_tax_rate_access',
-    'access arguments' => array('delete', 2),
+    'access arguments' => ['delete', 2],
     'file' => 'line_item.pages.inc',
     'type' => MENU_CALLBACK,
-  );
+  ];
 
-  $items['settings/tax-rates/%line_item_tax_rate/edit'] = array(
+  $items['settings/tax-rates/%line_item_tax_rate/edit'] = [
     'title' => 'Edit',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('line_item_edit_tax_rate_form', 2),
+    'page arguments' => ['line_item_edit_tax_rate_form', 2],
     'access callback' => 'line_item_tax_rate_access',
-    'access arguments' => array('update', 2),
+    'access arguments' => ['update', 2],
     'file' => 'line_item.pages.inc',
     'type' => MENU_CALLBACK,
-  );
+  ];
 
-  $items['settings/tax-rates/autocomplete/%'] = array(
+  $items['settings/tax-rates/autocomplete/%'] = [
     'page callback' => 'line_item_tax_rate_autocomplete',
-    'page arguments' => array(3),
-    'access arguments' => array('view own tax rates'),
+    'page arguments' => [3],
+    'access arguments' => ['view own tax rates'],
     'type' => MENU_CALLBACK,
     'file' => 'line_item.pages.inc',
-  );
+  ];
 
   return $items;
 }
@@ -557,10 +559,10 @@ function line_item_menu_local_tasks_alter(&$data, $router_item, $root_path) {
   if ($root_path == 'settings/tax-rates') {
     $item = menu_get_item('settings/tax-rates/add');
     if ($item['access']) {
-      $data['actions']['output'][] = array(
+      $data['actions']['output'][] = [
         '#theme' => 'menu_local_action',
         '#link' => $item,
-      );
+      ];
     }
   }
 }
@@ -570,17 +572,17 @@ function line_item_menu_local_tasks_alter(&$data, $router_item, $root_path) {
  */
 function line_item_field_widget_info() {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  return array(
-    'line_item_tax_rate' => array(
+  return [
+    'line_item_tax_rate' => [
       'label' => t('Tax rate'),
       'description' => t('Tax rate decimal field type widget'),
-      'field types' => array('number_decimal'),
-      'settings' => array('size' => 7),
-      'behaviors' => array(
+      'field types' => ['number_decimal'],
+      'settings' => ['size' => 7],
+      'behaviors' => [
         'multiple values' => FIELD_BEHAVIOR_DEFAULT,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 }
 
 /**
@@ -589,7 +591,7 @@ function line_item_field_widget_info() {
 function line_item_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
   if ($instance['widget']['type'] == 'line_item_tax_rate') {
-    $element['value'] = array(
+    $element['value'] = [
       '#title' => t('Tax rate'),
       '#type' => 'numberfield',
       '#min' => 0,
@@ -600,8 +602,8 @@ function line_item_field_widget_form(&$form, &$form_state, $field, $instance, $l
       '#default_value' => isset($items[$delta]) && is_numeric($items[$delta]['value']) ? $items[$delta]['value'] : '',
       '#description' => t('Tax rate percentage'),
       '#required' => FALSE,
-      '#element_validate' => array('line_item_tax_rate_element_validate'),
-    );
+      '#element_validate' => ['line_item_tax_rate_element_validate'],
+    ];
   }
 
   return $element;
@@ -673,7 +675,7 @@ function line_item_get_tax_rates_by_business(Business $business) {
     throw new Exception('Cannot retrieve tax rates without a business.');
   }
 
-  $tax_rates = &drupal_static(__FUNCTION__, array());
+  $tax_rates = &drupal_static(__FUNCTION__, []);
   if (empty($tax_rates[$business->id()])) {
     $result = db_select('tax_rates', 'tr')
       ->fields('tr')
@@ -939,11 +941,11 @@ function line_item_theme() {
   trigger_error("Convert " . __FUNCTION__ . " to D8.", E_USER_DEPRECATED);
   return [];
   $theme = [];
-  $theme['line_item'] = array(
+  $theme['line_item'] = [
     'render element' => 'elements',
     'file' => 'line_item.page.inc',
     'template' => 'line_item',
-  );
+  ];
   $theme['line_item_content_add_list'] = [
     'render element' => 'content',
     'variables' => ['content' => NULL],
@@ -957,7 +959,7 @@ function line_item_theme() {
 */
 function line_item_theme_suggestions_line_item(array $variables) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  $suggestions = array();
+  $suggestions = [];
   $entity = $variables['elements']['#line_item'];
   $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
 

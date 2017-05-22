@@ -9,79 +9,79 @@
  * Implements hook_schema().
  */
 function line_item_schema() {
-  $schema = array();
+  $schema = [];
 
-  $schema['line_item_preset'] = array(
+  $schema['line_item_preset'] = [
     'description' => 'The base table for Line item presets.',
-    'fields' => array(
-      'pid' => array(
+    'fields' => [
+      'pid' => [
         'description' => 'The primary identifier for a line item preset.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'bid' => array(
+      ],
+      'bid' => [
         'description' => 'The business that owns the line item preset.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
-      ),
-      'name' => array(
+      ],
+      'name' => [
         'description' => 'The name of the line item preset.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-      ),
-    ),
-    'primary key' => array('pid'),
-    'foreign keys' => array(
-      'bid' => array(
+      ],
+    ],
+    'primary key' => ['pid'],
+    'foreign keys' => [
+      'bid' => [
         'table' => 'business',
-        'columns' => array('bid' => 'bid'),
-      ),
-    ),
-  );
+        'columns' => ['bid' => 'bid'],
+      ],
+    ],
+  ];
 
-  $schema['tax_rates'] = array(
+  $schema['tax_rates'] = [
     'description' => 'The base table for tax rates.',
-    'fields' => array(
-      'tid' => array(
+    'fields' => [
+      'tid' => [
         'description' => 'The primary identifier for a tax rate.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'bid' => array(
+      ],
+      'bid' => [
         'description' => 'The business that owns the tax rate.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
-      ),
-      'name' => array(
+      ],
+      'name' => [
         'description' => 'The name of the tax rate.',
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-      ),
-      'rate' => array(
+      ],
+      'rate' => [
         'description' => 'The actual tax rate.',
         'type' => 'numeric',
         'precision' => 5,
         'scale' => 2,
         'not null' => TRUE,
-      ),
-    ),
-    'primary key' => array('tid'),
-    'foreign keys' => array(
-      'bid' => array(
+      ],
+    ],
+    'primary key' => ['tid'],
+    'foreign keys' => [
+      'bid' => [
         'table' => 'business',
-        'columns' => array('bid' => 'bid'),
-      ),
-    ),
-  );
+        'columns' => ['bid' => 'bid'],
+      ],
+    ],
+  ];
 
   return $schema;
 }

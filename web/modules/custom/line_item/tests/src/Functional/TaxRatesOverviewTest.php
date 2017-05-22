@@ -30,19 +30,19 @@ class TaxRatesOverviewTestCase extends InvoicingIntegrationTestCase {
   /**
    * {@inheritdoc}
    */
-  protected $usersToCreate = array(
+  protected $usersToCreate = [
     'business owner',
-  );
+  ];
 
   /**
    * Returns test case metadata.
    */
   public static function getInfo() {
-    return array(
+    return [
       'name' => 'Tax rates overview test',
       'description' => 'Tests the tax rates overview.',
       'group' => 'Invoicing - Line item',
-    );
+    ];
   }
 
   /**
@@ -82,38 +82,38 @@ class TaxRatesOverviewTestCase extends InvoicingIntegrationTestCase {
     foreach ($tablerows as $tablerow) {
       /* @var $tablerow SimpleXMLElement */
       $tax_rate = array_shift($this->taxRates);
-      $testcases = array(
-        array(
+      $testcases = [
+        [
           'message' => 'The first column contains the tax rate name.',
           'expected' => $tax_rate->name,
           'actual' => (string) $tablerow->td[0],
-        ),
-        array(
+        ],
+        [
           'message' => 'The second column contains the rate.',
           'expected' => $tax_rate->rate,
           'actual' => (string) $tablerow->td[1],
-        ),
-        array(
+        ],
+        [
           'message' => 'The third column contains the edit link.',
           'expected' => 'edit',
           'actual' => (string) $tablerow->td[2]->ul->li[0]->a[0],
-        ),
-        array(
+        ],
+        [
           'message' => 'The third column links to the edit link.',
           'expected' => url('settings/tax-rates/' . $tax_rate->tid . '/edit'),
           'actual' => (string) $tablerow->td[2]->ul->li[0]->a[0]['href'],
-        ),
-        array(
+        ],
+        [
           'message' => 'The third column contains the delete link.',
           'expected' => 'delete',
           'actual' => (string) $tablerow->td[2]->ul->li[1]->a[0],
-        ),
-        array(
+        ],
+        [
           'message' => 'The third column links to the delete link.',
           'expected' => url('settings/tax-rates/' . $tax_rate->tid . '/delete'),
           'actual' => (string) $tablerow->td[2]->ul->li[1]->a[0]['href'],
-        ),
-      );
+        ],
+      ];
 
       foreach ($testcases as $testcase) {
         $this->assertEqual(trim($testcase['expected']), trim($testcase['actual']), $testcase['message']);
@@ -139,7 +139,7 @@ class TaxRatesOverviewTestCase extends InvoicingIntegrationTestCase {
     $this->drupalGet('settings/tax-rates');
     // Check that the "Add tax rate" link is present.
     $xpath = '//div[contains(@class, "view-tax-rates")]//div[@class="view-empty"]//a[@href="/settings/tax-rates/add"]';
-    $this->assertXPathElements($xpath, 1, array(), 'The no results message is shown.');
+    $this->assertXPathElements($xpath, 1, [], 'The no results message is shown.');
     $this->assertFalse($this->xpath('//div[contains(@class, "view-tax-rate")]//table'), 'The table containing tax rates is not shown when no tax rate is linked to the user.');
   }
 

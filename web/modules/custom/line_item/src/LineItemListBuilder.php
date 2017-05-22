@@ -33,11 +33,7 @@ class LineItemListBuilder extends EntityListBuilder {
     $row['id'] = $entity->id();
     $row['name'] = $this->l(
       $entity->label(),
-      new Url(
-        'entity.line_item.edit_form', array(
-          'line_item' => $entity->id(),
-        )
-      )
+      new Url('entity.line_item.edit_form', ['line_item' => $entity->id()])
     );
     return $row + parent::buildRow($entity);
   }

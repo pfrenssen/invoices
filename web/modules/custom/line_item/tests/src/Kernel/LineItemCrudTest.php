@@ -100,7 +100,7 @@ class LineItemCRUDTest extends EntityKernelTestBase {
     // Test that an exception is thrown when trying to save a line item without
     // the required properties 'business' and 'type'.
     foreach (array('business', 'type') as $property) {
-      $arguments = array('%property' => $property);
+      $arguments = ['%property' => $property];
       $message = new FormattableMarkup('An exception is thrown when trying to save a line item without the required property %property.', $arguments);
 
       $line_item = $this->createLineItem($values['type'], $values);

@@ -11,12 +11,12 @@
 function line_item_type_add_page() {
   $types = line_item_get_types();
 
-  $items = array();
+  $items = [];
   foreach ($types as $type) {
     $items[] = l($type->name, 'line_item/add/' . $type->type);
   }
 
-  return theme('item_list', array('items' => $items, 'title' => NULL));
+  return theme('item_list', ['items' => $items, 'title' => NULL]);
 }
 
 /**
@@ -31,7 +31,7 @@ function line_item_type_add_page() {
  * @see line_item_edit_form()
  */
 function line_item_add_page($line_item_type) {
-  $line_item = entity_create('line_item', array('type' => $line_item_type->type));
+  $line_item = entity_create('line_item', ['type' => $line_item_type->type]);
 
   return drupal_get_form('line_item_edit_form', $line_item);
 }
@@ -76,22 +76,22 @@ function line_item_edit_form($form, &$form_state, LineItem $line_item) {
   field_attach_form('line_item', $line_item, $form, $form_state, entity_language('line_item', $line_item));
 
   // Add the buttons.
-  $form['actions'] = array('#type' => 'actions');
+  $form['actions'] = ['#type' => 'actions'];
 
-  $form['actions']['submit'] = array(
+  $form['actions']['submit'] = [
     '#type' => 'submit',
     '#value' => t('Save'),
     '#weight' => 5,
-    '#submit' => array('line_item_edit_form_submit'),
-  );
+    '#submit' => ['line_item_edit_form_submit'],
+  ];
 
   if (!empty($line_item->id()) && line_item_access('delete', $line_item)) {
-    $form['actions']['delete'] = array(
+    $form['actions']['delete'] = [
       '#type' => 'submit',
       '#value' => t('Delete'),
       '#weight' => 15,
-      '#submit' => array('line_item_edit_form_delete_submit'),
-    );
+      '#submit' => ['line_item_edit_form_delete_submit'],
+    ];
   }
 
   return $form;
@@ -136,13 +136,13 @@ function line_item_edit_form_submit($form, &$form_state) {
  * @see line_item_delete_confirm_form()
  */
 function line_item_edit_form_delete_submit($form, &$form_state) {
-  $destination = array();
+  $destination = [];
   if (isset($_GET['destination'])) {
     $destination = drupal_get_destination();
     unset($_GET['destination']);
   }
   $line_item = $form_state['line_item'];
-  $form_state['redirect'] = array('line_item/' . $line_item->id() . '/delete', array('query' => $destination));
+  $form_state['redirect'] = ['line_item/' . $line_item->id() . '/delete', ['query' => $destination]];
 }
 
 /**
@@ -179,7 +179,7 @@ function line_item_delete_confirm_form_submit($form, &$form_state) {
  * Page callback for the line item page.
  */
 function line_item_detail_page($line_item) {
-  $output = entity_view('line_item', array($line_item));
+  $output = entity_view('line_item', [$line_item]);
 
   // Prevent the line item title from being rendered twice.
   $output['line_item'][$line_item->id()]['#page'] = TRUE;
@@ -199,48 +199,48 @@ function line_item_edit_tax_rate_form($form, &$form_state, TaxRate $tax_rate = N
   $form_state['tax_rate'] = $tax_rate;
 
   if (!empty($tax_rate)) {
-    drupal_set_title(t('Edit %name', array('%name' => $tax_rate->name)), PASS_THROUGH);
+    drupal_set_title(t('Edit %name', ['%name' => $tax_rate->name]), PASS_THROUGH);
   }
   else {
     drupal_set_title(t('Add new tax rate'));
   }
 
-  $form['name'] = array(
+  $form['name'] = [
     '#type' => 'textfield',
     '#title' => t('Name'),
     '#default_value' => !empty($tax_rate->name) ? $tax_rate->name : '',
     '#size' => 60,
     '#maxlength' => 128,
     '#required' => TRUE,
-  );
+  ];
 
-  $form['rate'] = array(
+  $form['rate'] = [
     '#type' => 'textfield',
     '#title' => t('Rate'),
     '#default_value' => !empty($tax_rate->rate) ? $tax_rate->rate : '0.00',
     '#size' => 60,
     '#maxlength' => 128,
     '#required' => TRUE,
-    '#element_validate' => array('element_validate_number'),
-  );
+    '#element_validate' => ['element_validate_number'],
+  ];
 
   // Add the buttons.
-  $form['actions'] = array('#type' => 'actions');
+  $form['actions'] = ['#type' => 'actions'];
 
-  $form['actions']['submit'] = array(
+  $form['actions']['submit'] = [
     '#type' => 'submit',
     '#value' => t('Save'),
     '#weight' => 5,
-    '#submit' => array('line_item_edit_tax_rate_form_submit'),
-  );
+    '#submit' => ['line_item_edit_tax_rate_form_submit'],
+  ];
 
   if (!empty($tax_rate->tid) && line_item_tax_rate_access('delete', $tax_rate)) {
-    $form['actions']['delete'] = array(
+    $form['actions']['delete'] = [
       '#type' => 'submit',
       '#value' => t('Delete'),
       '#weight' => 15,
-      '#submit' => array('line_item_edit_tax_rate_form_delete_submit'),
-    );
+      '#submit' => ['line_item_edit_tax_rate_form_delete_submit'],
+    ];
   }
 
   return $form;
@@ -275,7 +275,7 @@ function line_item_edit_tax_rate_form_submit($form, &$form_state) {
 
   $business = business_get_active_business();
   if ($business instanceof Business) {
-    $values += array('bid' => $business->bid);
+    $values += ['bid' => $business->bid];
   }
   else {
     throw new Exception('Tax rate cannot be submitted without a business.');
@@ -312,13 +312,13 @@ function line_item_edit_tax_rate_form_submit($form, &$form_state) {
  * @see tax_rate_delete_confirm_form()
  */
 function line_item_edit_tax_rate_form_delete_submit($form, &$form_state) {
-  $destination = array();
+  $destination = [];
   if (isset($_GET['destination'])) {
     $destination = drupal_get_destination();
     unset($_GET['destination']);
   }
   $tax_rate = $form_state['tax_rate'];
-  $form_state['redirect'] = array('settings/tax-rates/' . $tax_rate->tid . '/delete', array('query' => $destination));
+  $form_state['redirect'] = ['settings/tax-rates/' . $tax_rate->tid . '/delete', ['query' => $destination]];
 }
 
 /**
@@ -332,7 +332,7 @@ function line_item_edit_tax_rate_form_delete_submit($form, &$form_state) {
 function line_item_delete_tax_rate_confirm_form($form, &$form_state, TaxRate $tax_rate) {
   $form_state['tax_rate'] = $tax_rate;
   return confirm_form($form,
-    t('Are you sure you want to delete %name?', array('%name' => $tax_rate->name)),
+    t('Are you sure you want to delete %name?', ['%name' => $tax_rate->name]),
     'settings/tax-rates',
     t('This action cannot be undone.'),
     t('Delete'),
@@ -350,7 +350,7 @@ function line_item_delete_tax_rate_confirm_form($form, &$form_state, TaxRate $ta
 function line_item_delete_tax_rate_confirm_form_submit($form, &$form_state) {
   $tax_rate = $form_state['tax_rate'];
   line_item_tax_rate_delete($tax_rate);
-  drupal_set_message(t('The tax rate %name has been deleted.', array('%name' => $tax_rate->name)));
+  drupal_set_message(t('The tax rate %name has been deleted.', ['%name' => $tax_rate->name]));
   $form_state['redirect'] = 'settings/tax-rates';
 }
 
@@ -364,7 +364,7 @@ function line_item_delete_tax_rate_confirm_form_submit($form, &$form_state) {
  *   Thrown when the current user does not own any business.
  */
 function line_item_tax_rate_autocomplete($string = '') {
-  $matches = array();
+  $matches = [];
 
   // Fetch businesses from current user.
   if (!$bids = array_keys(business_get_businesses_from_user())) {
@@ -373,7 +373,7 @@ function line_item_tax_rate_autocomplete($string = '') {
 
   if (!empty($string)) {
     $result = db_select('tax_rates')
-      ->fields('tax_rates', array('tid', 'rate'))
+      ->fields('tax_rates', ['tid', 'rate'])
       ->condition('rate', db_like($string) . '%', 'LIKE')
       ->range(0, 10)
       ->condition('bid', $bids, 'IN')
