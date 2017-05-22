@@ -95,7 +95,7 @@
     "extra": {
         "patches": {
             "drupal/address": {
-                "Add an option for allowing incomplete data to be saved. https://www.drupal.org/node/2514126": "https://www.drupal.org/files/issues/2514126-92.field-behavior-settings.patch"
+                "Add an option for allowing incomplete data to be saved. https://www.drupal.org/node/2514126": "https://www.drupal.org/files/issues/2514126-100.field-behavior-settings.patch"
             },
             "drupal/config_devel": {
                 "Create config/install folders in execution time": "https://www.drupal.org/files/issues/2558299-7.patch"
