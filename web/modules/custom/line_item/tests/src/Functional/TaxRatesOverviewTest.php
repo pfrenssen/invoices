@@ -1,14 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \TaxRatesOverviewTestCase.
- */
+declare (strict_types = 1);
 
 /**
  * Tests the tax rate overview.
  */
-class TaxRatesOverviewTestCase extends InvoicingIntegrationTestCase {
+class TaxRatesOverviewTest extends InvoicingIntegrationTestCase {
 
   use \Drupal\invoicing\Traits\BaseTestHelper;
   use \Drupal\invoicing\Traits\LineItemTestHelper;

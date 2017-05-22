@@ -16,7 +16,7 @@ use Drupal\line_item\Tests\LineItemTestHelper;
  *
  * @coversDefaultClass \Drupal\line_item\LineItemManager
  */
-class LineItemManagerTestEntity extends InvoicesEntityKernelTestBase {
+class LineItemManagerTest extends InvoicesEntityKernelTestBase {
 
   use BaseTestHelper;
   use BusinessTestHelper;
@@ -30,8 +30,8 @@ class LineItemManagerTestEntity extends InvoicesEntityKernelTestBase {
     'business',
     'entity_reference_validators',
     'libphonenumber',
-//    'line_item',
-//    'options',
+    'line_item',
+    'options',
     'views',
   ];
 
@@ -71,8 +71,8 @@ class LineItemManagerTestEntity extends InvoicesEntityKernelTestBase {
     parent::setup();
 
     $this->installEntitySchema('business');
-//    $this->installEntitySchema('line_item');
-    //$this->installConfig(['business', 'line_item']);
+    $this->installEntitySchema('line_item');
+    $this->installConfig(['business', 'line_item']);
     $this->installConfig(['business']);
 
     // Create two test users, each owning one business.
@@ -91,14 +91,12 @@ class LineItemManagerTestEntity extends InvoicesEntityKernelTestBase {
       // Create a user and link the business to it.
       $user = $this->createUser();
       $this->addBusinessToUser($this->businesses[$i], $user);
-      $this->users[$i] = $this->createUser();
-      $user = entity_metadata_wrapper('user', $this->users[$i]);
-      $user->field_user_businesses->set(array($this->businesses[$i]->id()));
       $user->save();
+      $this->users[$i] = $user;
 
       // Create two line items for the business.
       for ($j = 0; $j < 2; $j++) {
-        $values = ['bid' => $this->businesses[$i]];
+        $values = ['business' => $this->businesses[$i]];
         $line_item = $this->createLineItem(NULL, $values);
         $line_item->save();
         $this->lineItems[] = $line_item;
@@ -110,7 +108,7 @@ class LineItemManagerTestEntity extends InvoicesEntityKernelTestBase {
       for ($j = 0; $j < 2; $j++) {
         do {
           $values = [
-            'bid' => $this->businesses[$i]->id(),
+            'business' => $this->businesses[$i]->id(),
             'name' => $this->randomString(),
             'rate' => $this->randomDecimal(),
           ];
