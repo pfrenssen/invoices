@@ -265,6 +265,8 @@ function line_item_get_types() {
  *
  * @return Entity
  *   A line item type entity, or FALSE if the line item type does not exist.
+ *
+ * @deprecated
  */
 function line_item_type_load($type) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
@@ -278,6 +280,8 @@ function line_item_type_load($type) {
  *
  * @return array
  *   An associative array of line item type labels, keyed by line item type.
+ *
+ * @deprecated
  */
 function line_item_type_get_names() {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
@@ -302,6 +306,8 @@ function line_item_type_get_names() {
  *
  * @throws Exception
  *   Thrown when it is given a missing or invalid item bundle.
+ *
+ * @deprecated
  */
 function line_item_create($values = []) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
@@ -316,6 +322,8 @@ function line_item_create($values = []) {
  *
  * @param LineItem $line_item
  *   The line item to delete.
+ *
+ * @deprecated
  */
 function line_item_delete(LineItem $line_item) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
@@ -327,6 +335,8 @@ function line_item_delete(LineItem $line_item) {
  *
  * @param array $lids
  *   An array of line item IDs.
+ *
+ * @deprecated
  */
 function line_item_delete_multiple(array $lids) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
@@ -467,28 +477,30 @@ function line_item_type_label(Entity $entity, $entity_type) {
 /**
  * Returns whether a given line item is owned by a given user.
  *
- * @param LineItem $line_item
+ * @param \Drupal\line_item\Entity\LineItemInterface $line_item
  *   The line item to check.
  * @param \stdClass $account
  *   Optional user account to check. Defaults to the currently logged in user.
  *
  * @return bool
  *   TRUE if the line item is owned by the user, FALSE otherwise.
+ *
+ * @deprecated
+ *   Line items are not linked to users but to businesses. Retrieve the
+ *   businesses from the user manually and call
+ *   LineItemManager::isOwnedByBusiness().
  */
-function line_item_is_owned_by_user(LineItem $line_item, \stdClass $account = NULL) {
-  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  // Default to the logged in user.
-  global $user;
-  $account = $account ?: $user;
-
-  $line_item = entity_metadata_wrapper('line_item', $line_item);
-  return in_array($line_item->bid->value()->bid, array_keys(business_get_businesses_from_user($account)));
+function line_item_is_owned_by_user(LineItemInterface $line_item, \stdClass $account = NULL) {
+  trigger_error(__FUNCTION__ . ' is deprecated', E_USER_DEPRECATED);
+  return \Drupal::service('line_item.manager')->lineItemIsOwnedByUser($line_item, $account);
 }
 
 /**
  * Callback for getting line item properties.
  *
  * @see line_item_entity_property_info()
+ *
+ * @deprecated
  */
 function line_item_entity_metadata_get_properties(LineItem $line_item, array $options, $name, $entity_type, $info) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");

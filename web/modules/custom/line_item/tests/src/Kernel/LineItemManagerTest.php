@@ -4,19 +4,41 @@ declare (strict_types = 1);
 
 namespace Drupal\Tests\line_item\Kernel;
 
-/**
- * Unit tests for the Line item module.
- */
-class LineItemManagerTest extends InvoicingIntegrationTestCase {
+use Drupal\business\Tests\BusinessTestHelper;
+use Drupal\invoices\Tests\BaseTestHelper;
+use Drupal\invoices\Tests\InvoicesEntityKernelTestBase;
+use Drupal\line_item\Tests\LineItemTestHelper;
 
-  use \Drupal\invoicing\Traits\BaseTestHelper;
-  use \Drupal\invoicing\Traits\BusinessTestHelper;
-  use \Drupal\invoicing\Traits\LineItemTestHelper;
+/**
+ * Tests for the LineItemManager service.
+ *
+ * @group line_item
+ *
+ * @coversDefaultClass \Drupal\line_item\LineItemManager
+ */
+class LineItemManagerTestEntity extends InvoicesEntityKernelTestBase {
+
+  use BaseTestHelper;
+  use BusinessTestHelper;
+  use LineItemTestHelper;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'address',
+    'business',
+    'entity_reference_validators',
+    'libphonenumber',
+//    'line_item',
+//    'options',
+    'views',
+  ];
 
   /**
    * Test business entities.
    *
-   * @var Business[]
+   * @var \Drupal\business\Entity\BusinessInterface[]
    *   An array of Business entities.
    */
   protected $businesses;
@@ -24,7 +46,7 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
   /**
    * Test LineItem objects.
    *
-   * @var LineItem[]
+   * @var \Drupal\line_item\Entity\LineItemInterface[]
    *   An array of LineItem objects.
    */
   protected $lineItems;
@@ -32,7 +54,7 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
   /**
    * Test TaxRate objects.
    *
-   * @var TaxRate[]
+   * @var \TaxRate[]
    *   An array of TaxRate objects.
    */
   protected $taxRates;
@@ -40,18 +62,7 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
   /**
    * {@inheritdoc}
    */
-  protected $usersToCreate = array();
-
-  /**
-   * Returns test case metadata.
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Unit test',
-      'description' => 'Unit tests for the line item module.',
-      'group' => 'Invoicing - Line item',
-    );
-  }
+  protected $usersToCreate = [];
 
   /**
    * {@inheritdoc}
@@ -59,8 +70,18 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
   protected function setUp() {
     parent::setup();
 
+    $this->installEntitySchema('business');
+//    $this->installEntitySchema('line_item');
+    //$this->installConfig(['business', 'line_item']);
+    $this->installConfig(['business']);
+
     // Create two test users, each owning one business.
-    $this->businesses = array();
+    $this->businesses = [];
+
+    // Create the requested user accounts.
+    foreach ($this->usersToCreate as $role) {
+      $this->users[$role] = $this->createUserWithRole($role);
+    }
 
     for ($i = 0; $i < 2; $i++) {
       // Create a business.
@@ -70,14 +91,14 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
       // Create a user and link the business to it.
       $user = $this->createUser();
       $this->addBusinessToUser($this->businesses[$i], $user);
-      $this->users[$i] = $user;
+      $this->users[$i] = $this->createUser();
       $user = entity_metadata_wrapper('user', $this->users[$i]);
       $user->field_user_businesses->set(array($this->businesses[$i]->id()));
       $user->save();
 
       // Create two line items for the business.
       for ($j = 0; $j < 2; $j++) {
-        $values = array('bid' => $this->businesses[$i]);
+        $values = ['bid' => $this->businesses[$i]];
         $line_item = $this->createLineItem(NULL, $values);
         $line_item->save();
         $this->lineItems[] = $line_item;
@@ -85,14 +106,14 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
 
       // Create two tax rates for the business, making sure the values are
       // unique.
-      $names = $rates = array();
+      $names = $rates = [];
       for ($j = 0; $j < 2; $j++) {
         do {
-          $values = array(
+          $values = [
             'bid' => $this->businesses[$i]->id(),
             'name' => $this->randomString(),
             'rate' => $this->randomDecimal(),
-          );
+          ];
         } while (in_array($values['name'], $names) || in_array($values['rate'], $rates));
 
         $tax_rate = new TaxRate($values['bid'], $values['name'], $values['rate']);
@@ -119,20 +140,20 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
   public function doTestLineItemIsOwnedByUser() {
     // Define a list of which line items are owned by which users. The first two
     // belong to the first user, the last two to the second.
-    $ownership = array(
-      0 => array(0, 1),
-      1 => array(2, 3),
-    );
+    $ownership = [
+      0 => [0, 1],
+      1 => [2, 3],
+    ];
 
     // Test if line_item_is_owned_by_user() matches the expected ownership.
     foreach ($ownership as $user_key => $line_item_keys) {
       for ($i = 0; $i < 4; $i++) {
         $owned = in_array($i, $line_item_keys);
-        $this->assertEqual($owned, line_item_is_owned_by_user($this->lineItems[$i], $this->users[$user_key]), format_string('Line item :item :owned by user :user.', array(
+        $this->assertEqual($owned, line_item_is_owned_by_user($this->lineItems[$i], $this->users[$user_key]), format_string('Line item :item :owned by user :user.', [
           ':item' => $i,
           ':owned' => $owned ? 'is owned' : 'is not owned',
           ':user' => $user_key,
-        )));
+        ]));
       }
     }
   }
@@ -143,10 +164,10 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
   public function doTestTaxRateIsOwnedByUser() {
     // Define a list of which tax rates are owned by which users. The first two
     // tax rates belong to the first user, the last two to the second user.
-    $ownership = array(
-      0 => array(0, 1),
-      1 => array(2, 3),
-    );
+    $ownership = [
+      0 => [0, 1],
+      1 => [2, 3],
+    ];
 
     // Test if line_item_tax_rate_is_owned_by_user() matches the expected
     // ownership.
@@ -154,11 +175,11 @@ class LineItemManagerTest extends InvoicingIntegrationTestCase {
       for ($i = 0; $i < 4; $i++) {
         $owned = in_array($i, $tax_rate_keys);
         $string = 'Tax rate :tax_rate :owned by user :user.';
-        $args = array(
+        $args = [
           ':tax_rate' => $i,
           ':owned' => $owned ? 'is owned' : 'is not owned',
           ':user' => $user_key,
-        );
+        ];
         $this->assertEqual($owned, line_item_tax_rate_is_owned_by_user($this->taxRates[$i], $this->users[$user_key]), format_string($string, $args));
       }
     }
