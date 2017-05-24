@@ -1,0 +1,4 @@
+services:
+  line_item.manager:
+    class: Drupal\line_item\LineItemManager
+    arguments: ['@current_user', '@entity_type.manager']
