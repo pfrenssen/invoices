@@ -1,7 +1,10 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Drupal\line_item\Entity;
 
+use Drupal\business\BusinessOwnedInterface;
 use Drupal\business\Entity\BusinessInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
@@ -11,7 +14,7 @@ use Drupal\Core\Entity\EntityChangedInterface;
  *
  * @ingroup line_item
  */
-interface LineItemInterface extends EntityChangedInterface, ContentEntityInterface {
+interface LineItemInterface extends BusinessOwnedInterface, EntityChangedInterface, ContentEntityInterface {
 
   /**
    * Gets the line item name.
@@ -31,45 +34,6 @@ interface LineItemInterface extends EntityChangedInterface, ContentEntityInterfa
    *   The called line item entity.
    */
   public function setName($name);
-
-  /**
-   * Returns the ID of the business this client belongs to.
-   *
-   * @return int|null
-   *   The ID of the business this client belongs to, or NULL if no business is
-   *   set yet.
-   */
-  public function getBusinessId() : ?int;
-
-  /**
-   * Returns the business this client belongs to.
-   *
-   * @return \Drupal\business\Entity\BusinessInterface|null
-   *   The business this client belongs to, or NULL if no business is set yet.
-   */
-  public function getBusiness() : ?BusinessInterface;
-
-  /**
-   * Sets the business ID this client belongs to.
-   *
-   * @param int $business_id
-   *   The ID of the business this client belongs to.
-   *
-   * @return self
-   *   The updated client.
-   */
-  public function setBusinessId(int $business_id) : LineItemInterface;
-
-  /**
-   * Sets the business this client belongs to.
-   *
-   * @param \Drupal\business\Entity\BusinessInterface $business
-   *   The business this client belongs to.
-   *
-   * @return self
-   *   The updated client.
-   */
-  public function setBusiness(BusinessInterface $business) : LineItemInterface;
 
   /**
    * Gets the line item creation timestamp.

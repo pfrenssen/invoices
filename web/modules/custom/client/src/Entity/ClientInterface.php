@@ -4,20 +4,19 @@ declare (strict_types = 1);
 
 namespace Drupal\client\Entity;
 
-use Drupal\business\Entity\BusinessInterface;
+use Drupal\business\BusinessOwnedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Url;
 use Drupal\libphonenumber\LibPhoneNumberInterface;
-use Drupal\user\EntityOwnerInterface;
 
 /**
  * Provides an interface for defining Client entities.
  *
  * @ingroup client
  */
-interface ClientInterface extends ContentEntityInterface, EntityChangedInterface, RevisionLogInterface {
+interface ClientInterface extends BusinessOwnedInterface, ContentEntityInterface, EntityChangedInterface, RevisionLogInterface {
 
   /**
    * Returns the client name.
@@ -39,45 +38,6 @@ interface ClientInterface extends ContentEntityInterface, EntityChangedInterface
    * @todo type hint on self.
    */
   public function setName(string $name) : ClientInterface;
-
-  /**
-   * Returns the ID of the business this client belongs to.
-   *
-   * @return int|null
-   *   The ID of the business this client belongs to, or NULL if no business is
-   *   set yet.
-   */
-  public function getBusinessId() : ?int;
-
-  /**
-   * Returns the business this client belongs to.
-   *
-   * @return \Drupal\business\Entity\BusinessInterface|null
-   *   The business this client belongs to, or NULL if no business is set yet.
-   */
-  public function getBusiness() : ?BusinessInterface;
-
-  /**
-   * Sets the business ID this client belongs to.
-   *
-   * @param int $business_id
-   *   The ID of the business this client belongs to.
-   *
-   * @return self
-   *   The updated client.
-   */
-  public function setBusinessId(int $business_id) : ClientInterface;
-
-  /**
-   * Sets the business this client belongs to.
-   *
-   * @param \Drupal\business\Entity\BusinessInterface $business
-   *   The business this client belongs to.
-   *
-   * @return self
-   *   The updated client.
-   */
-  public function setBusiness(BusinessInterface $business) : ClientInterface;
 
   /**
    * Returns the creation timestamp.

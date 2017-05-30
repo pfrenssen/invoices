@@ -4,8 +4,7 @@ declare (strict_types = 1);
 
 namespace Drupal\client\Entity;
 
-use Drupal\business\Entity\Business;
-use Drupal\business\Entity\BusinessInterface;
+use Drupal\business\BusinessOwnedTrait;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -63,6 +62,7 @@ use Drupal\libphonenumber\LibPhoneNumberInterface;
  */
 class Client extends RevisionableContentEntityBase implements ClientInterface {
 
+  use BusinessOwnedTrait;
   use EntityChangedTrait;
 
   /**
@@ -109,36 +109,6 @@ class Client extends RevisionableContentEntityBase implements ClientInterface {
   public function setName(string $name) : ClientInterface {
     $this->set('name', $name);
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBusinessId() : ?int {
-    $business_id = $this->get('business')->target_id;
-    return !empty($business_id) ? (int) $business_id : NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBusiness(): ?BusinessInterface {
-    return Business::load($this->getBusinessId());
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setBusinessId(int $business_id) : ClientInterface {
-    $this->set('business', $business_id);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setBusiness(BusinessInterface $business) : ClientInterface {
-    return $this->setBusinessId($business->id());
   }
 
   /**

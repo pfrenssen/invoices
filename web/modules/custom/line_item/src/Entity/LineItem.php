@@ -4,8 +4,7 @@ declare (strict_types = 1);
 
 namespace Drupal\line_item\Entity;
 
-use Drupal\business\Entity\Business;
-use Drupal\business\Entity\BusinessInterface;
+use Drupal\business\BusinessOwnedTrait;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -61,6 +60,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  */
 class LineItem extends ContentEntityBase implements LineItemInterface {
 
+  use BusinessOwnedTrait;
   use EntityChangedTrait;
 
   /**
@@ -86,36 +86,6 @@ class LineItem extends ContentEntityBase implements LineItemInterface {
     if (!$this->getBusinessId()) {
       throw new \Exception('Can not save a line item which is not associated with a business.');
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBusinessId() : ?int {
-    $business_id = $this->get('business')->target_id;
-    return !empty($business_id) ? (int) $business_id : NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getBusiness(): ?BusinessInterface {
-    return Business::load($this->getBusinessId());
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setBusinessId(int $business_id) : LineItemInterface {
-    $this->set('business', $business_id);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setBusiness(BusinessInterface $business) : LineItemInterface {
-    return $this->setBusinessId($business->id());
   }
 
   /**
