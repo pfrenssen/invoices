@@ -488,11 +488,11 @@ function line_item_type_label(Entity $entity, $entity_type) {
  * @deprecated
  *   Line items are not linked to users but to businesses. Retrieve the
  *   businesses from the user manually and call
- *   LineItemManager::isOwnedByBusiness().
+ *   LineItemHelper::lineItemIsOwnedByBusiness().
  */
 function line_item_is_owned_by_user(LineItemInterface $line_item, \stdClass $account = NULL) {
   trigger_error(__FUNCTION__ . ' is deprecated', E_USER_DEPRECATED);
-  return \Drupal::service('line_item.manager')->lineItemIsOwnedByUser($line_item, $account);
+  return \Drupal::service('line_item.helper')->lineItemIsOwnedByUser($line_item, $account);
 }
 
 /**

@@ -7,16 +7,19 @@ namespace Drupal\Tests\line_item\Kernel;
 use Drupal\business\Tests\BusinessTestHelper;
 use Drupal\invoices\Tests\BaseTestHelper;
 use Drupal\invoices\Tests\InvoicesEntityKernelTestBase;
+use Drupal\line_item\Entity\TaxRate;
+use Drupal\line_item\LineItemHelper;
+use Drupal\line_item\TaxRateHelper;
 use Drupal\line_item\Tests\LineItemTestHelper;
 
 /**
- * Tests for the LineItemManager service.
+ * Tests for the LineItemHelper service.
  *
  * @group line_item
  *
- * @coversDefaultClass \Drupal\line_item\LineItemManager
+ * @coversDefaultClass \Drupal\line_item\LineItemHelper
  */
-class LineItemManagerTest extends InvoicesEntityKernelTestBase {
+class LineItemHelperTest extends InvoicesEntityKernelTestBase {
 
   use BaseTestHelper;
   use BusinessTestHelper;
@@ -44,7 +47,7 @@ class LineItemManagerTest extends InvoicesEntityKernelTestBase {
   protected $businesses;
 
   /**
-   * Test LineItem objects.
+   * Test line items.
    *
    * @var \Drupal\line_item\Entity\LineItemInterface[]
    *   An array of LineItem objects.
@@ -52,9 +55,9 @@ class LineItemManagerTest extends InvoicesEntityKernelTestBase {
   protected $lineItems;
 
   /**
-   * Test TaxRate objects.
+   * Test tax rates.
    *
-   * @var \TaxRate[]
+   * @var \Drupal\line_item\Entity\TaxRateInterface[]
    *   An array of TaxRate objects.
    */
   protected $taxRates;
@@ -72,6 +75,7 @@ class LineItemManagerTest extends InvoicesEntityKernelTestBase {
 
     $this->installEntitySchema('business');
     $this->installEntitySchema('line_item');
+    $this->installEntitySchema('tax_rate');
     $this->installConfig(['business', 'line_item']);
     $this->installConfig(['business']);
 
@@ -114,71 +118,64 @@ class LineItemManagerTest extends InvoicesEntityKernelTestBase {
           ];
         } while (in_array($values['name'], $names) || in_array($values['rate'], $rates));
 
-        $tax_rate = new TaxRate($values['bid'], $values['name'], $values['rate']);
-        line_item_tax_rate_save($tax_rate);
+        $tax_rate = TaxRate::create($values);
+        $tax_rate->save();
         $this->taxRates[] = $tax_rate;
       }
     }
   }
 
   /**
-   * Executes the unit tests.
+   * Executes the tests.
    *
-   * It is faster to run all unit tests in a single test run.
+   * Since the test setUp() is expensive, it is faster to run all tests in a
+   * single test run.
    */
   public function testRunner() {
-    $this->doTestLineItemIsOwnedByUser();
-    $this->doTestTaxRateIsOwnedByUser();
+    $this->doTestLineItemIsOwnedByBusiness();
+    $this->doTestTaxRateIsOwnedByBusiness();
     $this->doTestLineItemTaxRateAutocomplete();
   }
 
   /**
-   * Tests line_item_is_owned_by_user().
+   * @covers ::lineItemIsOwnedByBusiness
    */
-  public function doTestLineItemIsOwnedByUser() {
-    // Define a list of which line items are owned by which users. The first two
-    // belong to the first user, the last two to the second.
+  public function doTestLineItemIsOwnedByBusiness() {
+    // Define a list of which line items are owned by which businesses. The
+    // first two belong to the first business, the last two to the second.
     $ownership = [
       0 => [0, 1],
       1 => [2, 3],
     ];
 
-    // Test if line_item_is_owned_by_user() matches the expected ownership.
-    foreach ($ownership as $user_key => $line_item_keys) {
+    // Test if the result matches the expected ownership.
+    foreach ($ownership as $business_key => $line_item_keys) {
       for ($i = 0; $i < 4; $i++) {
         $owned = in_array($i, $line_item_keys);
-        $this->assertEqual($owned, line_item_is_owned_by_user($this->lineItems[$i], $this->users[$user_key]), format_string('Line item :item :owned by user :user.', [
-          ':item' => $i,
-          ':owned' => $owned ? 'is owned' : 'is not owned',
-          ':user' => $user_key,
-        ]));
+        $this->assertEquals($owned, LineItemHelper::lineItemIsOwnedByBusiness($this->lineItems[$i], $this->businesses[$business_key]));
       }
     }
   }
 
   /**
-   * Tests line_item_tax_rate_is_owned_by_user().
+   * @covers ::taxRateIsOwnedByBusiness
+   *
+   * @todo Move this to a separate TaxRateHelperTest.
    */
-  public function doTestTaxRateIsOwnedByUser() {
-    // Define a list of which tax rates are owned by which users. The first two
-    // tax rates belong to the first user, the last two to the second user.
+  public function doTestTaxRateIsOwnedByBusiness() {
+    // Define a list of which tax rates are owned by which businesses. The first
+    // two tax rates belong to the first business, the last two to the second
+    // business.
     $ownership = [
       0 => [0, 1],
       1 => [2, 3],
     ];
 
-    // Test if line_item_tax_rate_is_owned_by_user() matches the expected
-    // ownership.
-    foreach ($ownership as $user_key => $tax_rate_keys) {
+    // Test if the result matches the expected ownership.
+    foreach ($ownership as $business_key => $tax_rate_keys) {
       for ($i = 0; $i < 4; $i++) {
         $owned = in_array($i, $tax_rate_keys);
-        $string = 'Tax rate :tax_rate :owned by user :user.';
-        $args = [
-          ':tax_rate' => $i,
-          ':owned' => $owned ? 'is owned' : 'is not owned',
-          ':user' => $user_key,
-        ];
-        $this->assertEqual($owned, line_item_tax_rate_is_owned_by_user($this->taxRates[$i], $this->users[$user_key]), format_string($string, $args));
+        $this->assertEquals($owned, TaxRateHelper::taxRateIsOwnedByBusiness($this->taxRates[$i], $this->businesses[$business_key]));
       }
     }
   }
