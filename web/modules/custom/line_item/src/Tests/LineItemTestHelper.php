@@ -13,59 +13,40 @@ use Drupal\line_item\Entity\LineItemInterface;
 trait LineItemTestHelper {
 
   /**
-   * Check if the properties of the given line item match the given values.
+   * Checks if the properties of the given line item match the given values.
    *
    * @param \Drupal\line_item\Entity\LineItemInterface $line_item
    *   The line item entity to check.
    * @param array $values
    *   An associative array of values to check, keyed by property name.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  function assertLineItemProperties(LineItemInterface $line_item, array $values) {
+  function assertLineItemProperties(LineItemInterface $line_item, array $values) : void {
     if (isset($values['type'])) {
       unset($values['type']);
     }
-    return $this->assertEntityFieldValues($line_item, $values);
+    $this->assertEntityFieldValues($line_item, $values);
   }
 
   /**
-   * Check if the line item database table is empty.
-   *
-   * @param string $message
-   *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
+   * Checks if the line item database table is empty.
    */
-  function assertLineItemTableEmpty($message = '', $group = 'Other') {
-    $result = (bool) db_select('line_item', 'li')
+  function assertLineItemTableEmpty() : void {
+    $result = (bool) $this->connection->select('line_item', 'li')
       ->fields('li')
       ->execute()
       ->fetchAll();
-    return $this->assertFalse($result, $message ?: 'The line item database table is empty.', $group);
+    $this->assertFalse($result);
   }
 
   /**
-   * Check if the line item database table is not empty.
-   *
-   * @param string $message
-   *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
+   * Checks if the line item database table is not empty.
    */
-  function assertLineItemTableNotEmpty($message = '', $group = 'Other') {
-    $result = (bool) db_select('line_item', 'li')
+  function assertLineItemTableNotEmpty() : void {
+    $result = (bool) $this->connection->select('line_item', 'li')
       ->fields('li')
       ->execute()
       ->fetchAll();
-    return $this->assertTrue($result, $message ?: 'The line item database table is not empty.', $group);
+    $this->assertTrue($result);
   }
 
   /**
@@ -83,7 +64,7 @@ trait LineItemTestHelper {
    * @return \Drupal\line_item\Entity\LineItemInterface
    *   A new line item entity.
    */
-  function createLineItem($type = NULL, array $values = []) {
+  function createLineItem(string $type = NULL, array $values = []) : LineItemInterface {
     // Provide some default values.
     $values += $this->randomLineItemValues($type);
     $line_item = LineItem::create(['type' => $values['type']]);
@@ -101,7 +82,7 @@ trait LineItemTestHelper {
    * @returns array
    *   An associative array of random values, keyed by property name.
    */
-  function randomLineItemValues($type = NULL) {
+  function randomLineItemValues(string $type = NULL) : array {
     $type = $type ?: $this->randomLineItemType();
 
     $values = [
@@ -129,12 +110,12 @@ trait LineItemTestHelper {
   }
 
   /**
-   * Generate the type for the line item.
+   * Generates the type for the line item.
    *
    * @return string
    *   The line item type.
    */
-  function randomLineItemType() {
+  function randomLineItemType() : string {
     return array_rand($this->getLineItemTypes());
   }
 
@@ -144,7 +125,7 @@ trait LineItemTestHelper {
    * @return array
    *   An associative array of line item names, keyed by bundle name.
    */
-  public function getLineItemTypes() {
+  public function getLineItemTypes() : array {
     return [
       'product' => t('Product'),
       'service' => t('Service'),
@@ -181,8 +162,8 @@ trait LineItemTestHelper {
    * @return \Drupal\line_item\Entity\LineItemInterface
    *   A random line item.
    */
-  function randomLineItem($type = NULL) {
-    $query = db_select('line_item', 'li')
+  function randomLineItem(string $type = NULL) : LineItemInterface {
+    $query = $this->connection->select('line_item', 'li')
       ->fields('li', ['lid'])
       ->orderRandom()
       ->range(0, 1);
