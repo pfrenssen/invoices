@@ -1,3 +1,5 @@
 services:
   line_item.helper:
     class: Drupal\line_item\LineItemHelper
+  tax_rate.helper:
+    class: Drupal\line_item\TaxRateHelper
