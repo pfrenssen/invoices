@@ -6,6 +6,7 @@
  */
 
 use Drupal\line_item\Entity\LineItemInterface;
+use Drupal\line_item\Entity\TaxRateInterface;
 
 /**
  * Implements hook_entity_info().
@@ -715,6 +716,8 @@ function line_item_get_tax_rates_by_business(Business $business) {
  *
  * @throws InvalidArgumentException
  *   Thrown when the tax rate ID is invalid or empty.
+ *
+ * @deprecated Use TaxRate::load() instead.
  */
 function line_item_tax_rate_load($tid) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
@@ -746,15 +749,18 @@ function line_item_tax_rate_load($tid) {
  * @return int
  *   The tax rate ID of the saved tax rate.
  *
- * @throws Exception
- *   Thrown when the required business ID property is missing.
+ * @deprecated
+ *   Use $tax_rate->save() instead.
  */
-function line_item_tax_rate_save(TaxRate $tax_rate) {
-  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
+function line_item_tax_rate_save(TaxRateInterface $tax_rate) {
+
   // Set a default business ID.
   if (!isset($tax_rate->bid)) {
     throw new Exception('No business given to link the tax rate to.');
   }
+
+  trigger_error(__FUNCTION__ . ' is deprecated.', E_USER_DEPRECATED);
+  return $tax_rate->save();
 
   // If no TID, create a new tax rate. Otherwise update the tax rate.
   if (empty($tax_rate->tid)) {
@@ -792,6 +798,11 @@ function line_item_tax_rate_save(TaxRate $tax_rate) {
  *
  * @return bool
  *   TRUE if the tax rate is owned by the user, FALSE otherwise.
+ *
+ * @deprecated
+ *   Tax rates are not linked to users but to businesses. Retrieve the
+ *   businesses from the user manually and call
+ *   TaxRateHelper::taxRateIsOwnedByBusiness().
  */
 function line_item_tax_rate_is_owned_by_user(TaxRate $tax_rate, \stdClass $account = NULL) {
   throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
