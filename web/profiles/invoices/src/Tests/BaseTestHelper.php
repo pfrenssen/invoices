@@ -546,4 +546,14 @@ trait BaseTestHelper {
     return $this->entityTypeManager->getStorage($entity_type_id)->loadUnchanged($id);
   }
 
+  /**
+   * Generates a random decimal number.
+   *
+   * @return string
+   *   A random generated decimal number.
+   */
+  public static function randomDecimal() : string {
+    return rand(0, 99) . '.' . rand(0, 99);
+  }
+
 }
