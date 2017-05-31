@@ -282,10 +282,10 @@ trait BusinessTestHelper {
    * @param int $id
    *   The ID of the business to return.
    *
-   * @return \Drupal\business\Entity\Business
+   * @return \Drupal\business\Entity\BusinessInterface
    *   The business.
    */
-  public function loadUnchangedBusiness(int $id) : Business {
+  public function loadUnchangedBusiness(int $id) : BusinessInterface {
     return $this->loadUnchangedEntity('business', $id);
   }
 
