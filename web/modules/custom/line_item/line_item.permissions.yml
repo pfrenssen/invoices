@@ -1,19 +1,28 @@
-add line items:
+create new line items:
   title: 'Create new line items'
 
 administer line items:
   title: 'Administer line items'
-  description: 'Allow to access the administration form to configure line items.'
+  description: 'Create new line items, and edit and delete all line items.'
   restrict access: true
 
-delete line items:
-  title: 'Delete line items'
-
-edit line items:
-  title: 'Edit line items'
-
-access line item overview:
-  title: 'Access the line item overview page'
+administer own line items:
+  title: 'Administer own line items'
+  description: 'Edit and delete your own line items.'
 
 view own line items:
   title: 'View own line items'
+
+create new tax rates:
+  title: 'Create new tax rates'
+
+administer tax rates:
+  title: 'Administer tax rates'
+  description: 'Create new tax rates, and edit and delete all tax rates.'
+  restrict access: true
+
+view own tax rates:
+  title: 'View own tax rates'
+
+administer own tax rates:
+  title: 'Edit and delete your own tax rates.'

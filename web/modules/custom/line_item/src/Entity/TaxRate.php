@@ -33,7 +33,7 @@ use Drupal\business\BusinessOwnedTrait;
  *     },
  *   },
  *   base_table = "tax_rate",
- *   admin_permission = "administer tax rate entities",
+ *   admin_permission = "administer tax rates",
  *   entity_keys = {
  *     "id" = "tid",
  *     "label" = "name",
