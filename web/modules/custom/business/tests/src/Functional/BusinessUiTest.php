@@ -2,7 +2,7 @@
 
 declare (strict_types = 1);
 
-namespace Drupal\Tests\simpletest\Functional;
+namespace Drupal\Tests\business\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Tags;
