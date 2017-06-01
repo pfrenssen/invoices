@@ -29,8 +29,8 @@ trait BaseTestHelper {
    * - It accepts a user role rather than a set of permissions.
    * - It populates the fields for the first and last name.
    *
-   * @param string $role
-   *   The user role to assign to the user.
+   * @param string $role_id
+   *   The ID of the user role to assign to the user.
    *
    * @return \Drupal\user\Entity\User
    *   A fully loaded user object with pass_raw property.
@@ -38,8 +38,12 @@ trait BaseTestHelper {
    * @throws \Exception
    *   Thrown when user creation fails.
    */
-  protected function createUserWithRole(string $role) : User {
-    $role = Role::load($role);
+  protected function createUserWithRole(string $role_id) : User {
+    $role = Role::load($role_id);
+
+    if (empty($role)) {
+      throw new \Exception("Could not load role with ID '$role_id'.");
+    }
 
     // Create a user assigned to that role.
     $name = $this->randomMachineName();
