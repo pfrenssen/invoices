@@ -44,44 +44,5 @@ function line_item_schema() {
     ],
   ];
 
-  $schema['tax_rates'] = [
-    'description' => 'The base table for tax rates.',
-    'fields' => [
-      'tid' => [
-        'description' => 'The primary identifier for a tax rate.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
-      'bid' => [
-        'description' => 'The business that owns the tax rate.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-      'name' => [
-        'description' => 'The name of the tax rate.',
-        'type' => 'varchar',
-        'length' => 32,
-        'not null' => TRUE,
-      ],
-      'rate' => [
-        'description' => 'The actual tax rate.',
-        'type' => 'numeric',
-        'precision' => 5,
-        'scale' => 2,
-        'not null' => TRUE,
-      ],
-    ],
-    'primary key' => ['tid'],
-    'foreign keys' => [
-      'bid' => [
-        'table' => 'business',
-        'columns' => ['bid' => 'bid'],
-      ],
-    ],
-  ];
-
   return $schema;
 }
