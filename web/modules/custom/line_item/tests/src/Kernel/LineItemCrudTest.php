@@ -123,37 +123,4 @@ class LineItemCRUDTest extends EntityKernelTestBase {
     }
   }
 
-  /**
-   * Tests creating, reading, updating and deleting of tax rates.
-   */
-  public function testTaxRateCrud() {
-    // Check that the database table exists and is empty.
-    $this->assertTrue(db_table_exists('tax_rates'), 'The tax_rates database table exists.');
-    $this->assertTaxRatesTableEmpty('The tax rates database is initially empty.');
-
-    // Check if a new tax rate can be saved to the database.
-    $values = $this->randomTaxRateValues();
-    $tax_rate = new TaxRate($values['bid'], $values['name'], $values['rate']);
-    $tid = line_item_tax_rate_save($tax_rate);
-    $this->assertTaxRatesTableNotEmpty('The tax rate database table is no longer empty after creating a tax rate.');
-
-    // Check that the tax rate data can be read from the database.
-    $retrieved_tax_rate = line_item_tax_rate_load($tid);
-    $this->assertTaxRateProperties($retrieved_tax_rate, $values, 'The tax rate that was saved to the database can be read correctly.');
-
-    // Update the tax rate and check that the new values were written to the
-    // database.
-    $new_values = $this->randomTaxRateValues();
-    $new_values['tid'] = $retrieved_tax_rate->tid;
-    $new_tax_rate = new TaxRate($new_values['bid'], $new_values['name'], $new_values['rate'], $new_values['tid']);
-    $tid = line_item_tax_rate_save($new_tax_rate);
-
-    $retrieved_tax_rate = line_item_tax_rate_load($tid);
-    $this->assertTaxRateProperties($retrieved_tax_rate, $new_values, 'The tax rate has been updated correctly.');
-
-    // Delete the tax rate. The database should be empty again.
-    line_item_tax_rate_delete($retrieved_tax_rate);
-    $this->assertTaxRatesTableEmpty('The tax rate can be deleted from the database.');
-  }
-
 }
