@@ -9,7 +9,6 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\invoices\Tests\BaseTestHelper;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
-use Drupal\line_item\Entity\LineItem;
 use Drupal\line_item\Tests\LineItemTestHelper;
 
 /**
@@ -44,6 +43,13 @@ class LineItemCRUDTest extends EntityKernelTestBase {
   protected $connection;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * A test business.
    *
    * @var \Drupal\business\Entity\BusinessInterface
@@ -57,6 +63,7 @@ class LineItemCRUDTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->connection = $this->container->get('database');
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
 
     $this->installEntitySchema('business');
     $this->installEntitySchema('line_item');
@@ -73,16 +80,16 @@ class LineItemCRUDTest extends EntityKernelTestBase {
   public function testLineItemCrud() {
     // Check that the database table exists and is empty.
     $this->assertTrue($this->connection->schema()->tableExists('line_item'), 'The line_item database table exists.');
-    $this->assertLineItemTableEmpty('The line item database is initially empty.');
+    $this->assertLineItemTableEmpty();
 
     // Check if a new line item can be saved to the database.
     $values = $this->randomLineItemValues();
     $line_item = $this->createLineItem($values['type'], $values);
     $line_item->save();
-    $this->assertLineItemTableNotEmpty('The line item database table is no longer empty after creating a line item.');
+    $this->assertLineItemTableNotEmpty();
 
     // Check that the line item data can be read from the database.
-    $retrieved_line_item = LineItem::load($line_item->id());
+    $retrieved_line_item = $this->loadUnchangedLineItem($line_item->id());
     $this->assertLineItemProperties($retrieved_line_item, $values);
 
     // Update the line item and check that the new values were written to the
@@ -95,7 +102,7 @@ class LineItemCRUDTest extends EntityKernelTestBase {
 
     // Delete the line item. The database should be empty again.
     $line_item->delete();
-    $this->assertLineItemTableEmpty('The line item can be deleted from the database.');
+    $this->assertLineItemTableEmpty();
 
     // Test that an exception is thrown when trying to save a line item without
     // the required properties 'business' and 'type'.
