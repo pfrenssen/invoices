@@ -706,41 +706,6 @@ function line_item_get_tax_rates_by_business(Business $business) {
 }
 
 /**
- * Loads the tax rate from the {tax_rates} table.
- *
- * @param int $tid
- *   The ID of the tax rate.
- *
- * @return TaxRate
- *   The tax rate object retrieved from the database.
- *
- * @throws InvalidArgumentException
- *   Thrown when the tax rate ID is invalid or empty.
- *
- * @deprecated Use TaxRate::load() instead.
- */
-function line_item_tax_rate_load($tid) {
-  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  if (empty($tid)) {
-    throw new InvalidArgumentException('Missing tax rate ID.');
-  }
-
-  $result = db_select('tax_rates', 'tr')
-    ->fields('tr')
-    ->condition('tid', $tid, '=')
-    ->execute()
-    ->fetchAllAssoc('tid');
-
-  if (!empty($result[$tid])) {
-    $tax_rate = $result[$tid];
-    return new TaxRate($tax_rate->bid, $tax_rate->name, $tax_rate->rate, $tid);
-  }
-  else {
-    throw new InvalidArgumentException('Invalid tax rate ID.');
-  }
-}
-
-/**
  * Saves the tax rate to the database.
  *
  * @param TaxRate $tax_rate
@@ -852,19 +817,6 @@ function line_item_tax_rate_access($op, TaxRate $tax_rate = NULL, \stdClass $acc
   }
 
   return FALSE;
-}
-
-/**
- * Deletes the tax rate.
- *
- * @param TaxRate $tax_rate
- *   The tax rate that needs to be deleted.
- */
-function line_item_tax_rate_delete(TaxRate $tax_rate) {
-  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  db_delete('tax_rates')
-    ->condition('tid', $tax_rate->tid, '=')
-    ->execute();
 }
 
 /**
