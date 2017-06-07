@@ -14,11 +14,11 @@ use Drupal\Core\Access\AccessResult;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Access controller for the Line item entity.
+ * Access controller for the Tax rate entity.
  *
- * @see \Drupal\line_item\Entity\LineItem.
+ * @see \Drupal\line_item\Entity\TaxRate.
  */
-class LineItemAccessControlHandler extends EntityAccessControlHandler implements EntityHandlerInterface {
+class TaxRateAccessControlHandler extends EntityAccessControlHandler implements EntityHandlerInterface {
 
   /**
    * The business manager service.
@@ -28,7 +28,7 @@ class LineItemAccessControlHandler extends EntityAccessControlHandler implements
   protected $businessManager;
 
   /**
-   * Constructs a LineItemAccessControlHandler object.
+   * Constructs a TaxRateAccessControlHandler object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
@@ -54,28 +54,23 @@ class LineItemAccessControlHandler extends EntityAccessControlHandler implements
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\line_item\Entity\LineItemInterface $entity */
+    /** @var \Drupal\line_item\Entity\TaxRateInterface $entity */
     switch ($operation) {
       case 'view':
-        // Access is granted if the line item is owned by the user, and the user
-        // has the 'view own line items' permission.
+        // Access is granted if the tax rate is owned by the user, and the user
+        // has the 'view own tax rates' permission.
         if (in_array($entity->getBusiness()->id(), $this->businessManager->getBusinessIdsByUser($account))) {
-          return AccessResult::allowedIfHasPermission($account, 'view own line items')->cachePerUser();
+          return AccessResult::allowedIfHasPermission($account, 'view own tax rates')->cachePerUser();
         }
 
         return AccessResult::forbidden();
 
       case 'update':
       case 'delete':
-        // Administrators have access.
-        if ($account->hasPermission('administer line items')) {
-          return AccessResult::allowed()->cachePerPermissions();
-        }
-
-        // Access is granted if the line item is owned by the user, and the user
-        // has the 'administer own line items' permission.
+        // Access is granted if the tax rate is owned by the user, and the user
+        // has the 'administer own tax rates' permission.
         if (in_array($entity->getBusiness()->id(), $this->businessManager->getBusinessIdsByUser($account))) {
-          return AccessResult::allowedIfHasPermission($account, 'administer own line items')->cachePerUser();
+          return AccessResult::allowedIfHasPermission($account, 'administer own tax rates')->cachePerUser();
         }
 
         return AccessResult::forbidden();
@@ -89,7 +84,7 @@ class LineItemAccessControlHandler extends EntityAccessControlHandler implements
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'create new line items');
+    return AccessResult::allowedIfHasPermission($account, 'create new tax rates');
   }
 
 }
