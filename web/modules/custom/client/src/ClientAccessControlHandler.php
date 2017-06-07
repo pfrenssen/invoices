@@ -68,7 +68,7 @@ class ClientAccessControlHandler extends EntityAccessControlHandler implements E
     /** @var \Drupal\client\Entity\ClientInterface $entity */
     // Administrators have access to all operations.
     if ($account->hasPermission('administer clients')) {
-      return AccessResult::allowed();
+      return AccessResult::allowed()->cachePerPermissions();
     }
 
     switch ($operation) {
@@ -76,7 +76,7 @@ class ClientAccessControlHandler extends EntityAccessControlHandler implements E
         // Access is granted if the client is owned by the user, and the user
         // has the 'view own clients' permission.
         if (in_array($entity->getBusiness()->id(), $this->businessManager->getBusinessIdsByUser($account))) {
-          return AccessResult::allowedIfHasPermission($account, 'view own clients');
+          return AccessResult::allowedIfHasPermission($account, 'view own clients')->cachePerUser();
         }
 
         return AccessResult::forbidden();
@@ -85,7 +85,7 @@ class ClientAccessControlHandler extends EntityAccessControlHandler implements E
         // Access is granted if the client is owned by the user, and the user
         // has the 'administer own clients' permission.
         if (in_array($entity->getBusiness()->id(), $this->businessManager->getBusinessIdsByUser($account))) {
-          return AccessResult::allowedIfHasPermission($account, 'administer own clients');
+          return AccessResult::allowedIfHasPermission($account, 'administer own clients')->cachePerUser();
         }
 
         return AccessResult::forbidden();
@@ -100,7 +100,7 @@ class ClientAccessControlHandler extends EntityAccessControlHandler implements E
         // Access is granted if the client is owned by the user, and the user
         // has the 'administer own clients' permission.
         if (in_array($entity->getBusiness()->id(), $this->businessManager->getBusinessIdsByUser($account))) {
-          return AccessResult::allowedIfHasPermission($account, 'administer own clients');
+          return AccessResult::allowedIfHasPermission($account, 'administer own clients')->cachePerUser();
         }
 
         return AccessResult::forbidden();
