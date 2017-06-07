@@ -42,7 +42,7 @@ use Drupal\business\BusinessOwnedTrait;
  *   },
  *   links = {
  *     "canonical" = "/admin/structure/tax_rate/{tax_rate}",
- *     "add-form" = "/admin/structure/tax_rate/add",
+ *     "add-form" = "/settings/tax-rates/add",
  *     "edit-form" = "/admin/structure/tax_rate/{tax_rate}/edit",
  *     "delete-form" = "/admin/structure/tax_rate/{tax_rate}/delete",
  *     "collection" = "/admin/structure/tax_rate",
