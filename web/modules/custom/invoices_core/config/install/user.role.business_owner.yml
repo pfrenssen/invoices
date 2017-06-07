@@ -12,3 +12,6 @@ permissions:
   - 'administer own clients'
   - 'create new clients'
   - 'view own clients'
+  - 'create new tax rates'
+  - 'view own tax rates'
+  - 'administer own tax rates'
