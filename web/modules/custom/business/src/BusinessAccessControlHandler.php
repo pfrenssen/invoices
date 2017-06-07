@@ -20,6 +20,7 @@ class BusinessAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+    throw new \Exception(__METHOD__ . ' is generated');
     /** @var \Drupal\business\Entity\BusinessInterface $entity */
     // @todo Update with actual permissions from business.permissions.yml.
     switch ($operation) {
@@ -41,6 +42,7 @@ class BusinessAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+    throw new \Exception(__METHOD__ . ' is generated');
     return AccessResult::allowedIfHasPermission($account, 'add business entities');
   }
 

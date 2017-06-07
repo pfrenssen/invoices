@@ -21,6 +21,7 @@ class LineItemSettingsForm extends FormBase {
    *   The unique string identifying the form.
    */
   public function getFormId() {
+    throw new \Exception(__METHOD__ . ' is generated');
     return 'LineItem_settings';
   }
 
@@ -33,6 +34,7 @@ class LineItemSettingsForm extends FormBase {
    *   The current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    throw new \Exception(__METHOD__ . ' is generated');
     // Empty implementation of the abstract submit class.
   }
 
@@ -48,6 +50,7 @@ class LineItemSettingsForm extends FormBase {
    *   Form definition array.
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    throw new \Exception(__METHOD__ . ' is generated');
     $form['LineItem_settings']['#markup'] = 'Settings form for Line item entities. Manage field settings here.';
     return $form;
   }

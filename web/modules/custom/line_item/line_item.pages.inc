@@ -364,6 +364,7 @@ function line_item_delete_tax_rate_confirm_form_submit($form, &$form_state) {
  *   Thrown when the current user does not own any business.
  */
 function line_item_tax_rate_autocomplete($string = '') {
+  throw new \Exception('update ' . __FUNCTION__ . ' to D8.');
   $matches = [];
 
   // Fetch businesses from current user.

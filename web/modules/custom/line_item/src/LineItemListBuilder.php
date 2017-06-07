@@ -20,6 +20,7 @@ class LineItemListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
+    throw new \Exception(__METHOD__ . ' is generated');
     $header['id'] = $this->t('Line item ID');
     $header['name'] = $this->t('Name');
     return $header + parent::buildHeader();
@@ -29,6 +30,7 @@ class LineItemListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    throw new \Exception(__METHOD__ . ' is generated');
     /* @var $entity \Drupal\line_item\Entity\LineItem */
     $row['id'] = $entity->id();
     $row['name'] = $this->l(

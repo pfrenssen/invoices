@@ -16,6 +16,7 @@ class LineItemForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    throw new \Exception(__METHOD__ . ' is generated');
     /* @var $entity \Drupal\line_item\Entity\LineItem */
     $form = parent::buildForm($form, $form_state);
 
@@ -26,6 +27,7 @@ class LineItemForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    throw new \Exception(__METHOD__ . ' is generated');
     $entity = &$this->entity;
 
     $status = parent::save($form, $form_state);

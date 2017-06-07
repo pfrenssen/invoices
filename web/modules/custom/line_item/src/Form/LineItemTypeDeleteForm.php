@@ -15,6 +15,7 @@ class LineItemTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
+    throw new \Exception(__METHOD__ . ' is generated');
     return $this->t('Are you sure you want to delete %name?', ['%name' => $this->entity->label()]);
   }
 
@@ -22,6 +23,7 @@ class LineItemTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
+    throw new \Exception(__METHOD__ . ' is generated');
     return new Url('entity.line_item_type.collection');
   }
 
@@ -29,6 +31,7 @@ class LineItemTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getConfirmText() {
+    throw new \Exception(__METHOD__ . ' is generated');
     return $this->t('Delete');
   }
 
@@ -36,6 +39,7 @@ class LineItemTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    throw new \Exception(__METHOD__ . ' is generated');
     $this->entity->delete();
 
     drupal_set_message(

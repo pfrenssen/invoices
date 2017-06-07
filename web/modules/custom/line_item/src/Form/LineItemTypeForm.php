@@ -16,6 +16,7 @@ class LineItemTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
+    throw new \Exception(__METHOD__ . ' is generated');
     $form = parent::form($form, $form_state);
 
     $line_item_type = $this->entity;
@@ -46,6 +47,7 @@ class LineItemTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    throw new \Exception(__METHOD__ . ' is generated');
     $line_item_type = $this->entity;
     $status = $line_item_type->save();
 

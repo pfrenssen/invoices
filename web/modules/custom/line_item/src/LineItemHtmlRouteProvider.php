@@ -18,6 +18,7 @@ class LineItemHtmlRouteProvider extends AdminHtmlRouteProvider {
    * {@inheritdoc}
    */
   public function getRoutes(EntityTypeInterface $entity_type) {
+    throw new \Exception(__METHOD__ . ' is generated');
     $collection = parent::getRoutes($entity_type);
 
     $entity_type_id = $entity_type->id();
@@ -43,6 +44,7 @@ class LineItemHtmlRouteProvider extends AdminHtmlRouteProvider {
    *   The generated route, if available.
    */
   protected function getCollectionRoute(EntityTypeInterface $entity_type) {
+    throw new \Exception(__METHOD__ . ' is generated');
     if ($entity_type->hasLinkTemplate('collection') && $entity_type->hasListBuilderClass()) {
       $entity_type_id = $entity_type->id();
       $route = new Route($entity_type->getLinkTemplate('collection'));
@@ -68,6 +70,7 @@ class LineItemHtmlRouteProvider extends AdminHtmlRouteProvider {
    *   The generated route, if available.
    */
   protected function getSettingsFormRoute(EntityTypeInterface $entity_type) {
+    throw new \Exception(__METHOD__ . ' is generated');
     if (!$entity_type->getBundleEntityType()) {
       $route = new Route("/admin/structure/{$entity_type->id()}/settings");
       $route

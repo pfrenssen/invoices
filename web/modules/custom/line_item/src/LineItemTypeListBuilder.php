@@ -14,6 +14,7 @@ class LineItemTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
+    throw new \Exception(__CLASS__ . ' is generated');
     $header['label'] = $this->t('Line item type');
     $header['id'] = $this->t('Machine name');
     return $header + parent::buildHeader();
@@ -23,6 +24,7 @@ class LineItemTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    throw new \Exception(__CLASS__ . ' is generated');
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
     // You probably want a few more properties here...
