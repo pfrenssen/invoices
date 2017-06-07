@@ -21,8 +21,7 @@ use Drupal\business\BusinessOwnedTrait;
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\line_item\TaxRateListBuilder",
- *     "views_data" = "Drupal\line_item\Entity\TaxRateViewsData",
- *
+ *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "default" = "Drupal\line_item\Form\TaxRateForm",
  *       "add" = "Drupal\line_item\Form\TaxRateForm",
