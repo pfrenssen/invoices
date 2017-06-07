@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Drupal\business\Plugin\views\argument_default;
 
 use Drupal\business\BusinessManagerInterface;
