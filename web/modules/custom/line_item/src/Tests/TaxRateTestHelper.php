@@ -92,7 +92,7 @@ trait TaxRateTestHelper {
    *   values will be applied to all omitted properties.
    *
    * @return \Drupal\line_item\Entity\TaxRateInterface
-   *   A new TaxRate object.
+   *   A new tax rate object.
    */
   function createUiTaxRate(array $values = []) : TaxRateInterface {
     // Provide some default values.
