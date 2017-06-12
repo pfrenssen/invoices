@@ -3,6 +3,9 @@ administer businesses:
   description: 'Edit and delete all businesses'
   restrict access: true
 
+create new businesses:
+  title: 'Create new businesses'
+
 delete own businesses:
   title: 'Delete own businesses'
 
