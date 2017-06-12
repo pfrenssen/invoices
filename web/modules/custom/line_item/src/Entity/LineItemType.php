@@ -20,7 +20,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *       "delete" = "Drupal\line_item\Form\LineItemTypeDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\line_item\LineItemTypeHtmlRouteProvider",
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
  *   },
  *   config_prefix = "line_item_type",
