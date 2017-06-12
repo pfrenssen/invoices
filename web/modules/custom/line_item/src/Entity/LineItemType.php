@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Drupal\line_item\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
  * Defines the Line item type entity.
@@ -40,7 +41,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class LineItemType extends ConfigEntityBundleBase implements LineItemTypeInterface {
+class LineItemType extends ConfigEntityBundleBase implements ConfigEntityInterface {
 
   /**
    * The Line item type ID.
