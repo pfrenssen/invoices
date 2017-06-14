@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - line_item
+id: tax_rate.tax_rate.default
+targetEntityType: tax_rate
+bundle: tax_rate
+mode: default
+content:
+  name:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  rate:
+    type: number
+    weight: 0
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  business: true

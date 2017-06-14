@@ -16,6 +16,7 @@ config_devel:
   - core.entity_form_display.line_item.service.default
   - core.entity_view_display.line_item.product.default
   - core.entity_view_display.line_item.service.default
+  - core.entity_form_display.tax_rate.tax_rate.default
   - field.field.line_item.product.field_line_item_description
   - field.field.line_item.product.field_line_item_discount
   - field.field.line_item.product.field_line_item_quantity
