@@ -779,47 +779,6 @@ function line_item_tax_rate_is_owned_by_user(TaxRate $tax_rate, \stdClass $accou
 }
 
 /**
- * Determines whether the given user has access to a tax rate.
- *
- * @param string $op
- *   The operation being performed. One of 'view', 'update', 'create', 'delete'.
- * @param TaxRate $tax_rate
- *   Optionally a tax rate to check access for. If nothing is given, access for
- *   all tax rates is determined.
- * @param \stdClass $account
- *   Optional, a user object representing the user for whom the operation is to
- *   be performed. Determines access for a user other than the current user.
- *
- * @return bool
- *   TRUE if the operation may be performed, FALSE otherwise.
- */
-function line_item_tax_rate_access($op, TaxRate $tax_rate = NULL, \stdClass $account = NULL) {
-  throw new \Exception("Convert " . __FUNCTION__ . " to D8.");
-  if (user_access('administer tax rates', $account)) {
-    return TRUE;
-  }
-
-  if ($op == 'create') {
-    $access = user_access('create new tax rates', $account);
-    $access |= user_access('administer own tax rates', $account);
-    return $access;
-  }
-
-  if (!empty($tax_rate) && line_item_tax_rate_is_owned_by_user($tax_rate, $account)) {
-    switch ($op) {
-      case 'delete':
-      case 'update':
-        return user_access('administer own tax rates', $account);
-
-      case 'view':
-        return user_access('view own tax rates', $account);
-    }
-  }
-
-  return FALSE;
-}
-
-/**
  * Validate handler for the tax rate textfield in the line item form.
  */
 function line_item_tax_rate_element_validate($element, &$form_state, $form) {
