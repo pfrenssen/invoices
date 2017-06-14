@@ -2,26 +2,26 @@
 
 declare (strict_types = 1);
 
-namespace Drupal\client\Form;
+namespace Drupal\line_item\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Settings form for client entities.
+ * Settings form for tax rate entities.
  *
  * This form doesn't have any fields. It is mainly used as the main page for
  * field UI, form mode and display mode settings.
  *
- * @ingroup client
+ * @ingroup line_item
  */
-class ClientSettingsForm extends FormBase {
+class TaxRateSettingsForm extends FormBase {
 
   /**
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'client_settings';
+    return 'tax_rate_settings';
   }
 
   /**
@@ -34,7 +34,7 @@ class ClientSettingsForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['description']['#markup'] = 'Settings form for Client entities. Manage field settings here.';
+    $form['description']['#markup'] = 'Settings form for Tax rate entities. Manage field settings here.';
     return $form;
   }
 

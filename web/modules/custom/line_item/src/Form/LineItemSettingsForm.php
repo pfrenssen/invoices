@@ -8,52 +8,33 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class LineItemSettingsForm.
+ * Settings form for line item entities.
  *
- * @package Drupal\line_item\Form
+ * This form doesn't have any fields. It is mainly used as the main page for
+ * field UI, form mode and display mode settings.
  *
  * @ingroup line_item
  */
 class LineItemSettingsForm extends FormBase {
 
   /**
-   * Returns a unique string identifying the form.
-   *
-   * @return string
-   *   The unique string identifying the form.
+   * {@inheritdoc}
    */
   public function getFormId() {
-    throw new \Exception(__METHOD__ . ' is generated');
-    return 'LineItem_settings';
+    return 'line_item_settings';
   }
 
   /**
-   * Form submission handler.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
+   * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    throw new \Exception(__METHOD__ . ' is generated');
-    // Empty implementation of the abstract submit class.
   }
 
   /**
-   * Defines the settings form for Line item entities.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @return array
-   *   Form definition array.
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    throw new \Exception(__METHOD__ . ' is generated');
-    $form['LineItem_settings']['#markup'] = 'Settings form for Line item entities. Manage field settings here.';
+    $form['description']['#markup'] = 'Settings form for Line item entities. Manage field settings here.';
     return $form;
   }
 
