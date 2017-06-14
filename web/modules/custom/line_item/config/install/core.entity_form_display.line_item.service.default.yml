@@ -22,6 +22,7 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+    region: content
   description:
     type: string_textfield
     weight: -4
@@ -29,6 +30,7 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+    region: content
   field_line_item_description:
     weight: 6
     settings:
@@ -36,33 +38,39 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: string_textfield
+    region: content
   field_line_item_discount:
     weight: 7
     settings:
       placeholder: ''
     third_party_settings: {  }
     type: number
+    region: content
   field_line_item_quantity:
     weight: 8
     settings:
       placeholder: ''
     third_party_settings: {  }
     type: number
+    region: content
   field_line_item_tax:
     weight: 9
     settings:
       placeholder: ''
     third_party_settings: {  }
     type: number
+    region: content
   field_line_item_time_unit:
     weight: 10
     settings: {  }
     third_party_settings: {  }
     type: options_select
+    region: content
   field_line_item_unit_cost:
     weight: 11
     settings:
       placeholder: ''
     third_party_settings: {  }
     type: number
+    region: content
 hidden: {  }
