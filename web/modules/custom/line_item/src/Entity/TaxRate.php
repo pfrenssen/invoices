@@ -41,11 +41,11 @@ use Drupal\business\BusinessOwnedTrait;
  *     "uuid" = "uuid",
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/tax_rate/{tax_rate}",
+ *     "canonical" = "/settings/tax-rates/{tax_rate}",
  *     "add-form" = "/settings/tax-rates/add",
- *     "edit-form" = "/admin/structure/tax_rate/{tax_rate}/edit",
- *     "delete-form" = "/admin/structure/tax_rate/{tax_rate}/delete",
- *     "collection" = "/admin/structure/tax_rate",
+ *     "edit-form" = "/settings/tax-rates/{tax_rate}/edit",
+ *     "delete-form" = "/settings/tax-rates/{tax_rate}/delete",
+ *     "collection" = "/settings/tax-rates",
  *   },
  *   field_ui_base_route = "tax_rate.settings"
  * )
