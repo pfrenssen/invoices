@@ -20,6 +20,13 @@ class InvoicesFunctionalTestBase extends BrowserTestBase {
   protected $profile = 'invoices';
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -32,6 +39,7 @@ class InvoicesFunctionalTestBase extends BrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
+    $this->connection = $this->container->get('database');
     $this->entityTypeManager = $this->container->get('entity_type.manager');
 
     // Create the requested user accounts.
