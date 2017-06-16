@@ -1,11 +1,17 @@
 entity.line_item.add_form:
-  route_name: 'entity.line_item.add_page'
-  title: 'Add Line item'
+  route_name: entity.line_item.add_page
+  title: 'Add line item'
   appears_on:
     - entity.line_item.collection
+
 entity.line_item_type.add_form:
-  route_name: 'entity.line_item_type.add_form'
-  title: 'Add Line item type'
+  route_name: entity.line_item_type.add_form
+  title: 'Add line item type'
   appears_on:
     - entity.line_item_type.collection
 
+entity.tax_rate.add_form:
+  route_name: entity.tax_rate.add_form
+  title: 'Add tax rate'
+  appears_on:
+    - entity.tax_rate.collection
