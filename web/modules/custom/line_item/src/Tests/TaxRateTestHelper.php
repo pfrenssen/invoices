@@ -49,6 +49,26 @@ trait TaxRateTestHelper {
   }
 
   /**
+   * Returns form post values from the given entity values.
+   *
+   * @param array $values
+   *   An associative array of tax rate values, keyed by property name, as
+   *   returned by self::randomTaxRateValues().
+   *
+   * @returns array
+   *   An associative array of values, keyed by form field name, as used by
+   *   parent::drupalPostForm().
+   *
+   * @see self::randomTaxRateValues()
+   */
+  public function convertTaxRateValuesToFormPostValues(array $values) : array {
+    return [
+      'name[0][value]' => $values['name'],
+      'rate[0][value]' => $values['rate'],
+    ];
+  }
+
+  /**
    * Returns a newly created tax rate without saving it.
    *
    * This is intended for unit tests. If you are doing a functionality test use
